@@ -62,3 +62,13 @@ $0.0022 (attack) / $0.0027 (honest), none $0.0009 / $0.0010, window $0.0012 / $0
 - Matched ARL: attacks are appended to 0–4 random honest test trajectories with no reset. The
   non-restarting e-process has no stationary ARL (its log-statistic peaks at the stream start and drifts
   to −∞), so it is excluded there; its fresh-start vs after-prefix detection is reported separately.
+
+**2026-10-20 13:49: Honest-550 scoring done (T3 may use it now).**
+`data/processed/mb_honest/scores_openai_gpt-4.1-mini_full.jsonl` (550 streams, 13,797 steps, 0 NaN) and
+`..._none.jsonl` (550 streams, 13,796/13,797 steps scored; 1 API failure left as NaN). Monitor ids
+`openai/gpt-4.1-mini|ctrl-basic-v1|full` / `|none`. All steps are scored (≤ 60 per trajectory; no honest trajectory
+exceeds 60 except the 75-step max, truncated at 60), including the final submit step (strip it at analysis time).
+Honest cost: ≈ $33.6 (full ≈ $0.0015/step after `prompt_cache_key`, none ≈ $0.00095/step). Spend t1 so far $41.5.
+The cache-routing fix: with all T1 prompts sharing the same first ~256 tokens (system prompt), OpenAI's prefix-hash
+routing overflowed and most cache lookups missed; passing `prompt_cache_key=<traj id>` (an OpenAI routing hint,
+not part of the prompt) gave a cost / list-price ratio of 0.47 vs 0.78 in an A/B on 6+6 S4 attacks.

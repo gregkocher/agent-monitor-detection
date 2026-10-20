@@ -324,8 +324,20 @@ def honest_autocorr(honest, max_lag=3):
     within = np.mean([np.nanvar(z) for z in Z if np.isfinite(z).sum() >= 3])
     out["icc"] = float(np.var(means) - within / np.mean(lens)) / var if var > 0 else np.nan
     out["n_units"] = len(allz)
-    # tie structure: share of honest units at the modal value
+    # tail clustering: lift of P(next unit above the honest q-quantile | this unit above it), q = 0.9, 0.95
     raw = np.concatenate([s[np.isfinite(s)] for s in honest])
+    for q in (0.9, 0.95):
+        thr = np.quantile(raw, q)
+        both, first, tot_hi, tot = 0, 0, 0, 0
+        for s in honest:
+            v = s[np.isfinite(s)]
+            hi = v > thr
+            tot_hi += hi.sum(); tot += len(v)
+            if len(v) > 1:
+                first += hi[:-1].sum(); both += (hi[:-1] & hi[1:]).sum()
+        base = tot_hi / tot if tot else np.nan
+        out[f"tail_lift{int(q * 100)}"] = (both / first) / base if first and base > 0 else np.nan
+    # tie structure: share of honest units at the modal value
     vals, cnts = np.unique(raw, return_counts=True)
     out["frac_mode"] = cnts.max() / cnts.sum()
     out["n_distinct"] = len(vals)

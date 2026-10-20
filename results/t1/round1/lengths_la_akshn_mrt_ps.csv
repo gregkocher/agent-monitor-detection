@@ -1,0 +1,41 @@
+set,n_honest,n_attack,len_h_med,len_a_med,len_h_q90,len_a_q90,length_auroc,note
+la:claude-haiku-4-5,200,101,53.0,49.0,135.1,91.0,0.46212871287128715,grouped by main_task
+la:claude-opus-4-6,200,142,53.0,43.0,135.1,83.70000000000002,0.40857394366197186,grouped by main_task
+la:claude-sonnet-4-6,200,137,53.0,41.0,135.1,78.60000000000002,0.3908394160583941,grouped by main_task
+la:gemini-3-flash,200,137,53.0,41.0,135.1,78.60000000000002,0.3905839416058394,grouped by main_task
+la:gemini-3.1-pro,200,132,53.0,42.0,135.1,80.60000000000002,0.39717803030303034,grouped by main_task
+la:glm-5,200,137,53.0,41.0,135.1,78.60000000000002,0.3908394160583941,grouped by main_task
+la:gpt-4.1-nano,200,137,53.0,41.0,135.1,78.60000000000002,0.3906751824817518,grouped by main_task
+la:gpt-5-mini,200,137,53.0,41.0,135.1,78.60000000000002,0.3906751824817518,grouped by main_task
+la:gpt-5-nano,200,142,53.0,43.0,135.1,83.70000000000002,0.40857394366197186,grouped by main_task
+la:gpt-5.4,200,142,53.0,43.0,135.1,83.70000000000002,0.40848591549295776,grouped by main_task
+la:gpt-oss-120b,199,137,53.0,41.0,131.00000000000009,78.60000000000002,0.3930235117191798,grouped by main_task
+la:kimi-k2.5,200,137,53.0,41.0,135.1,78.60000000000002,0.3908394160583941,grouped by main_task
+akshn_bash:cumulative,750,750,17.0,16.0,42.10000000000002,35.0,0.4815973333333333,grouped by main_task
+akshn_bash:local,750,750,17.0,16.0,42.10000000000002,35.0,0.4815973333333333,grouped by main_task
+akshn_agentdojo:cumulative,750,750,3.0,5.0,5.0,8.0,0.8248204444444444,iid split
+akshn_agentdojo:local,750,750,3.0,5.0,5.0,8.0,0.8248204444444444,iid split
+akshn_iac:cumulative,750,750,17.0,20.0,31.0,35.0,0.6116755555555555,iid split
+akshn_iac:local,750,750,17.0,20.0,31.0,35.0,0.6116586666666667,iid split
+akshn_shade:cumulative,747,750,61.0,66.0,92.39999999999998,94.0,0.5329317269076306,iid split
+akshn_shade:local,747,750,61.0,66.0,92.39999999999998,94.0,0.5329317269076306,iid split
+akshn_basharena_opus46:cumulative,468,564,23.0,14.0,41.30000000000001,21.0,0.18673470934109232,grouped by main_task
+akshn_basharena_opus46:local,468,564,23.0,14.0,41.30000000000001,21.0,0.18673470934109232,grouped by main_task
+akshn_basharena_sonnet45:cumulative,335,925,50.0,19.0,100.0,38.0,0.054957644211375556,grouped by main_task
+akshn_basharena_sonnet45:local,335,925,50.0,19.0,100.0,38.0,0.054957644211375556,grouped by main_task
+akshn_linuxarena:cumulative,1396,1305,62.0,44.0,113.0,76.0,0.32945169010528164,grouped by main_task
+akshn_linuxarena:local,1396,1305,62.0,44.0,113.0,76.0,0.32945169010528164,grouped by main_task
+mrt:claude-3-5-sonnet-20241022|mrt_sequential_5+likert_reminder_v2_superaware,321,680,11.0,11.0,61.0,18.100000000000023,0.4871449514385193,iid split
+mrt:claude-3-5-sonnet-20241022|mrt_sequential_5+likert_reminder_v2_unaware,269,680,11.0,12.0,29.0,18.0,0.5721025584955172,iid split
+mrt:claude-3-5-sonnet-20241022|mrt_sequential_5,320,680,11.0,12.0,61.0,18.0,0.4915487132352941,iid split
+mrt:claude-3-5-sonnet-20241022|mrt_sequential_7+likert_reminder_v2_superaware,75,75,7.0,9.0,9.600000000000009,13.600000000000009,0.768,iid split
+mrt:claude-3-5-sonnet-20241022|mrt_sequential_7+likert_reminder_v2_unaware,75,75,7.0,9.0,9.600000000000009,13.600000000000009,0.768,iid split
+mrt:claude-3-5-sonnet-20241022|mrt_sequential_7,125,109,8.0,9.0,12.0,15.0,0.6227889908256881,iid split
+ps:diff_current_only:gradual,167,120,5.0,5.0,5.0,5.0,0.5419161676646707,iid split
+ps:diff_current_only:positional,167,398,5.0,5.0,5.0,5.0,0.5359732795715103,iid split
+ps:diff_full_diffs:gradual,167,120,5.0,5.0,5.0,5.0,0.5419161676646707,iid split
+ps:diff_full_diffs:positional,167,398,5.0,5.0,5.0,5.0,0.5336186922637137,iid split
+ps:diff_task_sequence:gradual,167,120,5.0,5.0,5.0,5.0,0.5419161676646707,iid split
+ps:diff_task_sequence:positional,167,397,5.0,5.0,5.0,5.0,0.5336279581894146,iid split
+ps:traj:gradual,167,120,5.0,5.0,5.0,5.0,0.5440119760479042,iid split
+ps:traj:positional,167,397,5.0,5.0,5.0,5.0,0.5349175704007602,iid split

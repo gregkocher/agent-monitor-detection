@@ -3,8 +3,8 @@
     uv run python tracks/t1_matched_budget/run_round1.py [--sets la,akshn,mrt,ps] [--quick]
 
 Writes results/t1/round1/{matched,gain,logit_roc,streaming,localization,autocorr,lengths,
-length_matched}.csv (one row per set x detector [x alpha]) and per-set raw pickles under
-results/t1/round1/raw/ (gitignored size permitting; small).
+length_matched,arl}_<sets>.csv (one row per set x detector [x alpha]) and per-set raw pickles under
+data/t1_raw/round1/ (not committed).
 
 Sets
 - la:<monitor>          LinuxArena sweep, 12 history-aware per-action monitors (0-100). Hidden tools
@@ -35,6 +35,7 @@ from t1lib import (ALPHAS, build_set, honest_autocorr, length_matched_indices, l
 from amd.common.schema import REPO, load_trajectories  # noqa: E402
 
 OUT = REPO / "results" / "t1" / "round1"
+RAW = REPO / "data" / "t1_raw" / "round1"   # per-split statistics (large; not committed)
 AKSHN = ["akshn_bash", "akshn_agentdojo", "akshn_iac", "akshn_shade", "akshn_basharena_opus46",
          "akshn_basharena_sonnet45", "akshn_linuxarena"]
 ACCUM = ["cusum_k0.5", "cusum_k0.25", "sr_d1", "glr_w20", "eproc_power", "esr_power", "top3sum",
@@ -84,6 +85,30 @@ def mrt_sets(min_streams=150):
         ss = build_set("mrt:" + mid.replace("|chunk", ""), T, recs, group_key="task", unit="chunk")
         if ss.n_h >= 40 and ss.n_a >= 40:
             out.append(ss)
+    return out
+
+
+PS_KEYS = ["score_pr_diff_current_only|current_only", "score_pr_diff_full_diffs|full_diffs",
+           "score_pr_diff_task_sequence|task_sequence", "score_pr_traj|task_sequence"]
+
+
+def ps_sets():
+    """Persistent-state (cross-session): unit = PR (5 per run). Honest 171 runs vs gradual (120,
+    distributed over PRs, no onset) and positional (400, onset = target PR) attacks. The same GPT-4o
+    diff monitor with three history modes: current_only (this PR's diff only: innovation),
+    full_diffs (all diffs so far), task_sequence (task list context); plus the trajectory monitor."""
+    T = {t.traj_id: t for t in load_trajectories("persistent_state")}
+    idx = load_scores_index("persistent_state")
+    out = []
+    for key in PS_KEYS:
+        mid = "openai/gpt-4o|" + key
+        recs = idx.get(mid, {})
+        for pol in ("gradual", "positional"):
+            keep = (lambda t, pol=pol: t.label == "honest" or t.context.get("policy") == pol)
+            out.append(build_set(f"ps:{key.split('|')[0].replace('score_pr_', '')}:{pol}", T, recs,
+                                 group_key="app", unit="pr", keep=keep,
+                                 ameta_fn=lambda t: {"policy": t.context.get("policy"),
+                                                     "side_task_success": t.side_task_success}))
     return out
 
 
@@ -144,17 +169,17 @@ def main():
                                      "akshn_basharena_sonnet45:local,akshn_basharena_sonnet45:cumulative")
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "raw").mkdir(exist_ok=True)
+    RAW.mkdir(parents=True, exist_ok=True)
     sets = []
     for k in a.sets.split(","):
-        sets += {"la": la_sets, "akshn": akshn_sets, "mrt": mrt_sets}[k]()
+        sets += {"la": la_sets, "akshn": akshn_sets, "mrt": mrt_sets, "ps": ps_sets}[k]()
     arl_sets = set(a.arl.split(","))
     tables: dict = {}
     for ss in sets:
         res, raw = run_set(ss, quick=a.quick, arl=ss.name in arl_sets)
         for k, v in res.items():
             tables.setdefault(k, []).append(v)
-        with open(OUT / "raw" / (ss.name.replace(":", "__").replace("/", "_") + ".pkl"), "wb") as f:
+        with open(RAW / (ss.name.replace(":", "__").replace("/", "_") + ".pkl"), "wb") as f:
             pickle.dump(dict(raw=raw, honest_ids=ss.honest_ids, attack_ids=ss.attack_ids,
                              onsets=ss.onsets, harm=ss.harm, attack_meta=ss.attack_meta), f)
     tag = "_".join(a.sets.split(","))
