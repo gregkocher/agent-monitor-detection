@@ -11,6 +11,13 @@ to the target while splitting the budget across components in proportion to w, a
 for the dependence between components (unlike a Bonferroni split alpha*w_i per component,
 which is conservative). The running path uses each component's running path, so the streaming
 alarm time is the first time any component crosses its share.
+
+tail="exp" (opt-in) extends T_i beyond the largest honest fit statistic with an exponential tail,
+log T_i(s) = log(1/(n+1)) - (s - max_ref) / scale_i (scale_i = mean excess over the 90% quantile),
+so statistics beyond the calibration range keep their order instead of all tying at 1/(n+1).
+This matters when alpha is close to 1/n_cal: with the empirical tail, every attack beyond the
+honest range ties with the most extreme calibration statistics and is alarmed only with the
+randomization probability.
 """
 from __future__ import annotations
 
@@ -20,8 +27,11 @@ from .base import Detector, Packed
 
 
 class MultiChart(Detector):
-    def __init__(self, components: list[Detector], weights=None, name: str | None = None):
+    def __init__(self, components: list[Detector], weights=None, name: str | None = None,
+                 tail: str = "empirical"):
         super().__init__(None)
+        assert tail in ("empirical", "exp"), tail
+        self.tail = tail
         self.components = components
         w = np.ones(len(components)) if weights is None else np.asarray(weights, float)
         self.weights = w / w.sum()
@@ -36,6 +46,17 @@ class MultiChart(Detector):
         for c in self.components:
             c._fit_packed(Ph, Pa if c.supervised else None, attack_onsets if c.supervised else None)
             self.ref_.append(np.sort(c.stats_packed(Ph)))
+        self.scale_ = []
+        for ref in self.ref_:
+            fin = ref[np.isfinite(ref)]
+            sc = np.nan
+            if len(fin) >= 5:
+                q = np.quantile(fin, 0.9)
+                ex = fin[fin > q] - q
+                sc = ex.mean() if len(ex) else np.nan
+                if not np.isfinite(sc) or sc <= 0:
+                    sc = fin.std()
+            self.scale_.append(sc if np.isfinite(sc) and sc > 0 else 1.0)
         self.fitted_ = True
         return self
 
@@ -43,7 +64,12 @@ class MultiChart(Detector):
         ref = self.ref_[i]
         n = len(ref)
         ge = n - np.searchsorted(ref, s, side="left")
-        return np.log((1.0 + ge) / (n + 1.0))
+        out = np.log((1.0 + ge) / (n + 1.0))
+        if self.tail == "exp" and n:
+            beyond = s > ref[-1]
+            if np.any(beyond):
+                out = np.where(beyond, -np.log(n + 1.0) - (s - ref[-1]) / self.scale_[i], out)
+        return out
 
     def component_paths(self, P: Packed) -> list[np.ndarray]:
         out = []

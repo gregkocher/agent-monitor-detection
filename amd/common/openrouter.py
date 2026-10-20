@@ -41,20 +41,32 @@ def _key() -> str:
     return KEY_PATH.read_text().strip()
 
 
+_LEDGER_STATE: dict = {"path": None, "ino": None, "offset": 0, "tot": 0.0, "per": {}}
+
+
 def ledger_totals() -> tuple[float, dict]:
-    tot, per = 0.0, {}
+    """(total, per-track) spend. Reads only lines appended since the previous call (the ledger is
+    append-only), so per-call budget checks stay O(new lines) over long jobs."""
+    st = _LEDGER_STATE
     if not LEDGER.exists():
-        return tot, per
-    with open(LEDGER) as f:
-        for line in f:
-            try:
-                r = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            c = float(r.get("cost") or 0.0)
-            tot += c
-            per[r["track"]] = per.get(r["track"], 0.0) + c
-    return tot, per
+        return 0.0, {}
+    fs = LEDGER.stat()
+    if st["path"] != str(LEDGER) or st["ino"] != fs.st_ino or fs.st_size < st["offset"]:
+        st.update(path=str(LEDGER), ino=fs.st_ino, offset=0, tot=0.0, per={})
+    with open(LEDGER, "rb") as f:
+        f.seek(st["offset"])
+        data = f.read()
+    end = data.rfind(b"\n") + 1  # only complete lines
+    for line in data[:end].splitlines():
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        c = float(r.get("cost") or 0.0)
+        st["tot"] += c
+        st["per"][r["track"]] = st["per"].get(r["track"], 0.0) + c
+    st["offset"] += end
+    return st["tot"], dict(st["per"])
 
 
 def _check_budget(track: str, reserve_usd: float) -> None:

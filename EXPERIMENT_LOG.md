@@ -15,3 +15,50 @@
   - MRT sequential.
   - Persistent-state per-PR.
   - MonitoringBench attacks + Honest-550.
+
+## 2026-10-20: T1 (matched-budget decision rules): setup, pilot, Round 2 scoring launched
+
+**Scoring outputs (T1 owns these; T3 may reuse them).** Monitor `openai/gpt-4.1-mini`, prompt
+`ctrl-basic-v1` (action-only: agent reasoning hidden; current action's output shown), `--max-steps 60`:
+- Honest-550 (all 550): `data/processed/mb_honest/scores_openai_gpt-4.1-mini_{full,none}.jsonl`
+- MonitoringBench attack sample (775 = all 475 S4 + 100 each of S1/S2/S3, stratified by side task, seed
+  20261020; ids in `tracks/t1_matched_budget/sample.json`):
+  `data/processed/monitoringbench/scores_openai_gpt-4.1-mini_{full,none}.jsonl`
+- Per-step cache: `data/processed/{monitoringbench,mb_honest}/score_cache.sqlite`, monitor ids
+  `openai/gpt-4.1-mini|ctrl-basic-v1|{full,none,window}`. Pilot files are `pilot_scores_*` (do not use).
+- Each file is (re)written at the end of its job; a job still running means the default-named file may be
+  missing or hold an older selection. Status lines are appended below when each finishes.
+
+**Pilot (40 trajectories, 1,166 steps per mode; $4.97).** No API errors, 100% logprob coverage.
+Mean per-step score at the attack (execution) step / heuristic first attack step / pre-onset attack steps /
+honest steps: full 4.2 / 3.2 / 0.31 / 0.23; none 3.9 / 3.5 / 0.13 / 0.13; window 4.5 / 3.5 / 0.41 / 0.22.
+AUROC of the per-trajectory max (20 vs 20): full 0.76, none 0.83, window 0.79. Cost per step: full
+$0.0022 (attack) / $0.0027 (honest), none $0.0009 / $0.0010, window $0.0012 / $0.0014.
+
+**Cost decisions.**
+- The full run at harness scheduling projected to ~$134 (> the $125 T1 limit). Full mode benefits from
+  OpenAI's automatic prompt caching, but the harness dispatches all steps of a trajectory at once, so
+  only ~25% of the cache discount was realized. `tracks/t1_matched_budget/score.py` now sends each
+  trajectory's steps strictly in order (many trajectories in parallel), with identical prompts, cache keys
+  and records; then `amd.scoring.run` assembles the file from the cache (0 calls). Measured on 8 S4
+  attacks (300 steps): cost / list price 0.55 vs 0.74. Projected Round 2 (full + none, all 775 + 550):
+  ≈ $101, leaving ≈ $15 for window mode / nano on subsets.
+- `amd/common/openrouter.py`: `ledger_totals()` now reads the ledger incrementally (it re-read the
+  whole file before every call, quadratic over a ~40k-call job). Same results; tests pass.
+
+**Analysis decisions.**
+- Calibration: honest-only, 10 repeated 50/50 splits, grouped by main task when ≥ 30 tasks (else iid),
+  5-fold cross-fitting, randomized plug-in thresholds as primary (removes integer-score discreteness so
+  all detectors realize ≈ α), α ∈ {0.05, 0.01, 0.003}, cluster bootstrap by task (300 replicates).
+- T1 suite = `default_suite()` with three changes (`tracks/t1_matched_budget/t1lib.py:t1_suite`):
+  (1) `eproc_jumper` uses randomized p-values: with conservative p, the jumper's ε=+1 bet *grows* on
+  tie-heavy honest data (p = 1 for the modal score), giving TPR 0 on LinuxArena; (2) the OR charts'
+  max component uses raw scores (whitened z saturates above the honest range, so attacks tie);
+  (3) the OR charts use a new opt-in exponential tail beyond the calibration range
+  (`MultiChart(tail="exp")`, default unchanged). Added `or(max+cusum)`.
+- LinuxArena hidden tools (auto-scored 0, never shown to the monitor) are set to NaN.
+- MonitoringBench / Honest-550: the final submit step is stripped from both before analysis (78% of
+  attacks vs 99% of honest end with submit); with/without check reported.
+- Matched ARL: attacks are appended to 0–4 random honest test trajectories with no reset. The
+  non-restarting e-process has no stationary ARL (its log-statistic peaks at the stream start and drifts
+  to −∞), so it is excluded there; its fresh-start vs after-prefix detection is reported separately.
