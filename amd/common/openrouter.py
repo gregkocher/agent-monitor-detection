@@ -137,7 +137,8 @@ class OpenRouter:
                     return {"text": (ch.get("message") or {}).get("content") or "",
                             "logprobs": (ch.get("logprobs") or {}).get("content"),
                             "cost": cost, "provider": d.get("provider"), "usage": usage,
-                            "finish_reason": ch.get("finish_reason")}
+                            "finish_reason": ch.get("finish_reason"),
+                            "latency": round(time.time() - t0, 2)}
                 except (httpx.HTTPError, RuntimeError, KeyError, json.JSONDecodeError) as e:
                     last = e
                     await asyncio.sleep(min(60, 2 ** attempt + random.random()))
