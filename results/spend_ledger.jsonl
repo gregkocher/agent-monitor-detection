@@ -1,0 +1,2 @@
+{"t": 1792511348.608726, "track": "dev", "tag": "smoke", "model": "openai/gpt-4.1-mini", "provider": "OpenAI", "in": 28, "out": 2, "cost": 1.44e-05, "latency": 1.12}
+{"t": 1792511349.2476149, "track": "dev", "tag": "smoke", "model": "openai/gpt-4.1-nano", "provider": "OpenAI", "in": 28, "out": 2, "cost": 3.6e-06, "latency": 0.64}

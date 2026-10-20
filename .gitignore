@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+!data/README.md
+results/**/raw/
+*.eval
+.env
+*.key
+openrouter_api_key*.txt
+spend_ledger*.jsonl.lock
