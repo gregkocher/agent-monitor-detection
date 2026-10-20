@@ -72,3 +72,83 @@ Honest cost: ≈ $33.6 (full ≈ $0.0015/step after `prompt_cache_key`, none ≈
 The cache-routing fix: with all T1 prompts sharing the same first ~256 tokens (system prompt), OpenAI's prefix-hash
 routing overflowed and most cache lookups missed; passing `prompt_cache_key=<traj id>` (an OpenAI routing hint,
 not part of the prompt) gave a cost / list-price ratio of 0.47 vs 0.78 in an A/B on 6+6 S4 attacks.
+
+## 2026-10-20: T3 (monitor-aware attacker): setup, refiner pilots
+
+**Question.** Can an LLM that knows the deployed detector (Kerckhoffs) restructure real multi-step
+MonitoringBench attacks to evade it without breaking the attack? Full cross of attacker-told
+{nothing, max, CUSUM, multichart} x deployed {max, CUSUM, e-process, multichart}; covert-adversary
+sqrt(ARL) damage check; does the multi-chart OR close the gap?
+
+**Design / code (`tracks/t3_aware_attacker/`).**
+- `detector_specs.py`: natural-language Kerckhoffs spec per arm, embedding the exact monitor system
+  prompt + rubric (`amd.scoring.prompts.SYSTEM`) and how each detector maps per-step scores to an
+  alarm. Arm `nothing` = the original attack (control), not a refiner call.
+- `select_attacks.py`: 150 base attacks, S2-S4, with a known onset (`meta.first_attack_step`) and
+  execution step, 6-55 steps, stratified across side-task x structure. Restricted to track 1's 775
+  attack sample (517 eligible) so the originals' per-step streams come free from track 1; T3 pays
+  only for refined attacks.
+- `refine.py`: per (attack, arm): LLM checklist of attack-critical effects -> refiner produces a
+  restructured action sequence with fabricated-but-plausible tool outputs -> LLM validity judge
+  checks every effect is preserved -> deployed monitor scores it -> the arm detector's calibrated
+  verdict + per-step profile fed back for up to `--rounds` adaptive rounds (round 0 kept separately
+  for the non-adaptive comparison). Early-stop when evaded AND valid. Resumable (skips pairs in
+  `refine_log.jsonl`); in-loop full-mode scores are saved to avoid re-scoring.
+- `evaluate.py`: calibrates each deployed detector on Honest-550 at matched trajectory FPR
+  (randomized thresholds, alpha in {0.01, 0.003}); undetected-success = valid * (1 - E[alarm]);
+  cost (length inflation / steps added); covert ARL sweep (undetected attack-critical steps before
+  alarm vs ARL=1/FPR, fitted exponent vs sqrt); suspicion profiles; vector-PDF figures.
+
+**Monitor / modes.** Deployed monitor = `openai/gpt-4.1-mini`, prompt `ctrl-basic-v1`, action-only
+(matches track 1; refined trajectories carry no visible reasoning, so the reasoning honest/attack
+confound noted by the data worker does not apply). Feedback/analysis primary mode `full`
+(history-aware, deployed-realistic); `none` (innovation) scored for the robustness view (least
+sensitive to fabricated outputs). The final submit step is stripped from honest/attack/refined at
+analysis time (matches track 1).
+
+**Output fabrication choice.** New/changed actions' tool outputs do not exist, so the refiner
+generates plausible outputs consistent with the originals. This affects history-aware (`full`)
+scoring of later steps but not `none` (each step scored on its own action+output); both are
+reported and the caveat flagged. Side-task success of refined attacks is validated by (1) an LLM
+judge over a per-attack critical-effect checklist and (2) a judge-independent static check that the
+attack's target literals (IP prefixes/host/user) still appear verbatim. BashArena Docker replay is
+disk-infeasible on this laptop (~12 GB free; coordinator cap ~6 GB) and pod SSH is blocked, so
+replay is deferred and this is flagged as a validity limitation.
+
+**Refiner model pilot.** gpt-5-mini: cheapest, but ~50% of completions were unparseable JSON even
+with `json.loads(strict=False)` (embedded unescaped quotes in fabricated outputs). gpt-4.1: parses
+reliably (no refusals; restructured sequences of 13-31 steps), chosen as the refiner;
+`gpt-4.1-mini` as validity judge and checklist builder; `REFINER_MAX_TOKENS=14000` (31-step outputs
+need ~11k). Pilot cost ~ $0.08 per (attack, arm) at rounds=2 with early-stop.
+
+**2026-10-20 ~15:15: Round 2 scoring done.** `data/processed/monitoringbench/scores_openai_gpt-4.1-mini_{full,none}.jsonl`:
+775 attack streams (all 475 S4 + 100 each of S1/S2/S3), 25,021 steps each, 0 NaN after the retry pass (~1.8% of calls
+needed a second pass: rate limiting while T2 was also scoring). The one failed honest none step was re-scored: both
+honest files now have 0 NaN. T1 spend $103.81 (honest ≈ $33.6, attacks ≈ $56.6, pilots/tests ≈ $8.8, chained-cost
+A/B ≈ $0.9; full-mode attack cost $0.0013/step with cache keys). Window mode was **not** run at scale: full + none
+used the budget, and window on a meaningful sample (≥ $15) plus the nano arm would exceed the $125 T1 limit.
+Window results are pilot-only (20 + 20). Started: gpt-4.1-nano `none` on the 775 attacks (honest nano none done:
+`data/processed/mb_honest/scores_openai_gpt-4.1-nano_none.jsonl`, $3.4).
+
+### 2026-10-20: T1 results (Rounds 1–3)
+
+**Round 1 ($0; 40 stream sets: LinuxArena 12 monitors, aksh-n 7 sets × local/cumulative, MRT, persistent state).**
+At matched FPR 0.01 a max-type rule (max / 2nd-max / length-aware max) ≥ the best accumulator in 86% of aksh-n, 67% of
+LinuxArena and 83% of MRT streams. Median CUSUM(k=0.5) − max: −0.39 / −0.25 / −0.01. Streaming: max alarms at the ideal
+flag step (median delay 0), CUSUM 3–25 steps late. CUSUM gain vs honest lag-1 autocorrelation: Spearman −0.57 (α=0.05),
+−0.45 (α=0.01). Persistent state (same GPT-4o PR monitor): history-free `current_only` → accumulation beats max on
+gradual attacks at α=0.05 (top-3 sum +0.15 [0.12, 0.17], CUSUM +0.12); history-aware `full_diffs` → it loses (−0.07, −0.02).
+
+**Round 2 (MonitoringBench 775 attacks + Honest-550, gpt-4.1-mini, full vs none).** Pooled TPR at FPR 0.01: max
+0.171 / 0.156, top-3 sum 0.195 / 0.190, 2nd-max 0.190 / 0.152, CUSUM 0.030 / 0.039, e-process 0.052 / 0.065 (full / none).
+DiD (none − full) of the gain over max: CUSUM +0.023 [0.015, 0.032] at α=0.01 (S4 +0.029) but −0.083 at α=0.05; 2nd-max
+and top-3 sum gain more in full mode. With integer scores every DiD is negative. Prediction (sequential gains concentrate
+in none mode on S4) **not supported** for gpt-4.1-mini. Mechanism: its full-mode honest scores are not cumulative
+(integer lag-1 autocorrelation 0.01, tail lift ≈ 1) while attacks get re-flagged (S1: ≥2 high steps 60% full vs 39%
+none). Across 44 sets (α=0.05), the top-3-sum gain tracks the repeat-spike LR (Spearman +0.55) and the CUSUM gain falls
+with honest spike persistence (−0.65).
+
+**Round 3 ($0 + nano).** CUSUM with k = 1.5–2 ≈ max (k = 0.5 is mis-tuned for spike evidence); the integer score lifts
+CUSUM to ≈ max; conformal thresholds give the same ranking; Mondrian per-task whitening inflates FPR under grouped
+splits (inconclusive); keeping the submit step changes nothing. The Ville threshold of the e-process over-alarms
+(2× nominal); the length-aware max's analytic threshold holds nominal FPR.

@@ -57,7 +57,7 @@ def pretty_set(s: str) -> str:
     return s
 
 
-def dotplot(ax, df, value="tpr", lo=None, hi=None, order=None, dets=None):
+def dotplot(ax, df, value="tpr", lo=None, hi=None, order=None, dets=None, invert=True):
     dets = dets or list(DET_STYLE)
     order = order or list(df["set"].unique())
     y = np.arange(len(order))
@@ -71,7 +71,8 @@ def dotplot(ax, df, value="tpr", lo=None, hi=None, order=None, dets=None):
             ax.hlines(y + off[j], sub[lo], sub[hi], color=c, lw=1.0, alpha=0.7, zorder=2)
     ax.set_yticks(y)
     ax.set_yticklabels([pretty_set(s) for s in order])
-    ax.invert_yaxis()
+    if invert:
+        ax.invert_yaxis()
     ax.grid(axis="y", visible=False)
 
 
@@ -151,9 +152,9 @@ def round2(tag="main"):
         groups = ["S1", "S2", "S3", "S4", "all"]
         fig, axes = plt.subplots(1, len(modes), figsize=(3.4 * len(modes) + 0.6, 3.2), sharey=True, sharex=True)
         axes = np.atleast_1d(axes)
-        for ax, mode in zip(axes, modes):
+        for i, (ax, mode) in enumerate(zip(axes, modes)):
             s = x[x["mode"] == mode].rename(columns={"group": "set"})
-            dotplot(ax, s, lo="lo", hi="hi", order=[g for g in groups if g in set(s.set)])
+            dotplot(ax, s, lo="lo", hi="hi", order=[g for g in groups if g in set(s.set)], invert=(i == 0))
             ax.set_title({"full": "history-aware (full history)", "none": "history-free (current action only)",
                           "window": "window (last 3 actions)"}[mode], loc="left", color=INK)
             ax.set_xlabel(f"TPR at trajectory FPR = {alpha:g}")
@@ -207,6 +208,49 @@ def round2(tag="main"):
         plt.close(fig)
 
 
+def round2_tables(tag="main"):
+    d = R / "round2" / tag
+    if not (d / "matched.csv").exists():
+        return
+    keep = ["max", "kth2", "top3sum", "mean", "cusum_k0.5", "sr_d1", "glr_w20", "eproc_power", "esr_power",
+            "max_lenaware", "or(max+cusum)", "or(max+cusum+eproc)"]
+    m = pd.read_csv(d / "matched.csv")
+    m = m[(m.threshold_kind == "calibrated") & m.detector.isin(keep)]
+    m["cell"] = m.apply(lambda r: f"{r.tpr:.3f} [{r.tpr_lo:.2f}, {r.tpr_hi:.2f}]", axis=1)
+    lines = [f"## Round 2 ({tag}): pooled TPR at matched FPR (95% CI incl. calibration; cluster bootstrap by task)\n"]
+    for a in (0.05, 0.01, 0.003):
+        x = m[m.alpha == a].pivot(index="detector", columns="mode", values="cell").reindex(keep)
+        f = m[m.alpha == a].pivot(index="detector", columns="mode", values="fpr").reindex(keep)
+        x = x.join(f.add_prefix("realized FPR ").round(3))
+        lines.append(f"\n### α = {a:g}\n")
+        lines.append(md(x, floatfmt="{:.3f}"))
+    t = pd.read_csv(d / "tpr_by_structure.csv")
+    t = t[t.detector.isin(keep)]
+    for a in (0.05, 0.01):
+        x = t[t.alpha == a].pivot_table(index="detector", columns=["mode", "group"], values="tpr").reindex(keep)
+        x.columns = [f"{m_}:{g}" for m_, g in x.columns]
+        lines.append(f"\n### TPR by attack structure, α = {a:g} (point estimates)\n")
+        lines.append(md(x))
+    if (d / "did.csv").exists():
+        did = pd.read_csv(d / "did.csv")
+        did = did[did.detector.isin(keep)]
+        did["cell"] = did.apply(lambda r: f"{r.did:+.3f} [{r.lo:+.3f}, {r.hi:+.3f}]", axis=1)
+        for a in (0.05, 0.01):
+            x = did[did.alpha == a].pivot(index="detector", columns="group", values="cell")
+            lines.append(f"\n### DiD: (gain over max, none) − (gain over max, full), α = {a:g} (paired attack bootstrap)\n")
+            lines.append(md(x))
+    g = pd.read_csv(d / "gains_by_structure.csv")
+    g = g[g.detector.isin(keep) & g.group.isin(["S4", "all"])]
+    g["cell"] = g.apply(lambda r: f"{r.gain_vs_max:+.3f} [{r.lo:+.3f}, {r.hi:+.3f}]", axis=1)
+    for a in (0.05, 0.01):
+        x = g[g.alpha == a].pivot_table(index="detector", columns=["mode", "group"], values="cell", aggfunc="first")
+        x.columns = [f"{m_}:{gg}" for m_, gg in x.columns]
+        lines.append(f"\n### Gain over max (paired attack bootstrap; threshold fixed per split), α = {a:g}\n")
+        lines.append(md(x))
+    (R / "tables").mkdir(exist_ok=True)
+    (R / "tables" / f"r2_{tag}.md").write_text("\n".join(lines) + "\n")
+
+
 def _prefix(d):
     import json
     return json.load(open(d / "config.json")).get("prefix", "")
@@ -229,3 +273,4 @@ if __name__ == "__main__":
         round1()
     if a.round in ("2", "all"):
         round2(a.r2tag)
+        round2_tables(a.r2tag)

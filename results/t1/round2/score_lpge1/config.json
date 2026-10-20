@@ -1,0 +1,12 @@
+{
+ "prefix": "",
+ "modes": [
+  "full",
+  "none"
+ ],
+ "score": "lpge1",
+ "keep_submit": false,
+ "model": "openai_gpt-4.1-mini",
+ "n_honest": 550,
+ "n_attack": 775
+}
