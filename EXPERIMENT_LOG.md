@@ -152,3 +152,13 @@ with honest spike persistence (−0.65).
 CUSUM to ≈ max; conformal thresholds give the same ranking; Mondrian per-task whitening inflates FPR under grouped
 splits (inconclusive); keeping the submit step changes nothing. The Ville threshold of the e-process over-alarms
 (2× nominal); the length-aware max's analytic threshold holds nominal FPR.
+
+**gpt-4.1-nano, none mode (weak history-free monitor; 775 attacks + 550 honest, $9.1).** Files:
+`data/processed/{monitoringbench,mb_honest}/scores_openai_gpt-4.1-nano_none.jsonl` (0 NaN). Pooled TPR at FPR 0.01: max
+0.056 [0.02, 0.12], top-3 sum 0.082 [0.03, 0.16], CUSUM(k=0.5) 0.021; S4: top-3 sum 0.108 vs max 0.070. Mild accumulation
+helps on the noisy weak monitor; the textbook CUSUM still loses. Mechanism over 46 sets (α=0.05): top-3-sum gain vs
+repeat-spike LR Spearman +0.47 (p=0.001); CUSUM gain vs honest spike persistence −0.67 (p<0.001).
+
+**T1 final spend: $109.56** (cap $130). REPORT.md: the subagent harness refused to write report files, so the write-up
+is not in `results/t1/REPORT.md`; all numbers are in `results/t1/tables/` (r1_tpr.md, r2_main.md, r2_score_int.md,
+r2_nano.md) and the entries above.

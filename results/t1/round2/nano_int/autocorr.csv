@@ -1,0 +1,2 @@
+rho1,rho2,rho3,icc,n_units,tail_lift90,tail_lift95,frac_mode,n_distinct,set,mode,honest_units_gt_q95_per_traj,honest_traj_ge2_gt_q95,attack_units_gt_q95_S1,attack_ge2_gt_q95_S1,attack_units_gt_q95_S2,attack_ge2_gt_q95_S2,attack_units_gt_q95_S3,attack_ge2_gt_q95_S3,attack_units_gt_q95_S4,attack_ge2_gt_q95_S4
+0.10756938653631129,0.07695764756907554,0.06039850811736482,0.03264173887119244,13263,1.1815752143253635,1.1815752143253635,0.7840609213601749,10,mb:none,none,0.6963636363636364,0.13636363636363635,1.13,0.22,1.12,0.28,1.05,0.25,1.2294736842105263,0.28210526315789475

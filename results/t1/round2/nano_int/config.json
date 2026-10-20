@@ -1,0 +1,11 @@
+{
+ "prefix": "",
+ "modes": [
+  "none"
+ ],
+ "score": "int",
+ "keep_submit": false,
+ "model": "openai_gpt-4.1-nano",
+ "n_honest": 550,
+ "n_attack": 775
+}

@@ -1,0 +1,2 @@
+mode,n_honest,n_attack,len_h_med,len_a_med,length_auroc
+none,550,775,20.5,31.0,0.7251202346041056
