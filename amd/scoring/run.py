@@ -210,7 +210,7 @@ def main(argv: list[str] | None = None, client_factory=None, data_root: Path = P
     ap.add_argument("--history", required=True, choices=HISTORY_MODES)
     ap.add_argument("--track", required=True,
                     choices=["t1", "t2", "t3", "dev", "reserve",
-                             "wb", "r2t1", "r2t2", "r2t3", "dev2", "reserve2"])
+                             "wb", "r2t1", "r2t2", "r2t3", "r3t3", "dev2", "reserve2"])
     ap.add_argument("--limit", type=int)
     ap.add_argument("--labels", type=lambda s: s.split(","))
     ap.add_argument("--traj-ids", type=lambda s: s.split(","))
