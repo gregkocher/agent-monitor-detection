@@ -7,7 +7,9 @@ taxonomy, `SCORE: 0-10`, logprob-expected) on a COMPACT audit-event rendering: t
 account-day, each rendered line cut to L=250 chars (MOLE's default is 400 events with args <= 600 chars; the
 compact form keeps ~0.5-0.6 of the tokens so all 8 corpora fit the budget). Providers are restricted to those
 supporting logprobs (`require_parameters`; order GMICloud, Parasail -- both serve logprobs; Google Vertex 404s; the
-provider of every call is recorded in the cache).
+provider of every call is recorded in the cache). --any-provider (used after the logprob providers throttled to
+~0.4 calls/s): any provider, no logprobs; the common monitor output across all corpora is the generated integer
+score `int_score` (present for every call), the logprob-expected score is kept where available.
 
 Per corpus (cheapest first): fetch the needed columns (tracks/r2_t1/mole_fetch.py) if not built, build account-days
 + renders (tracks/r2_t1/mole_build.py), score, write data/processed/r2_mole/<corpus>/llm_<slug>_compact.parquet,
@@ -64,7 +66,7 @@ def ensure_built(corpus: str) -> bool:
     return True
 
 
-def score_corpus(corpus, model, concurrency, pilot=0):
+def score_corpus(corpus, model, concurrency, pilot=0, any_provider=False):
     d = PROCESSED / "r2_mole" / corpus
     D = pd.read_parquet(d / "accountdays.parquet")
     R = {(r["account"], r["day"]): r["text"] for r in map(json.loads, open(d / "renders.jsonl"))}
@@ -79,12 +81,15 @@ def score_corpus(corpus, model, concurrency, pilot=0):
     chars = sum(len(m[1]["content"]) for _, c in items for _, m in c)
     print(f"{corpus}: {len(items)} account-days, ~{chars / 4 / 1e6:.1f}M input tokens", flush=True)
     cache = PromptCache(CACHE)
-    extra = (lambda cid: {"provider": {"require_parameters": True, "allow_fallbacks": True,
-                                       "order": ["gmicloud", "parasail"]}}) \
-        if not model.startswith("openai/") else None
+    if any_provider:   # throughput mode: any provider, no logprobs (integer score); same cache keys
+        extra = lambda cid: {"provider": {"order": ["deepinfra", "nebius", "venice", "parasail", "gmicloud"], "allow_fallbacks": True}}  # noqa: E731
+    else:
+        extra = (lambda cid: {"provider": {"require_parameters": True, "allow_fallbacks": True,
+                                           "order": ["gmicloud", "parasail"]}}) \
+            if not model.startswith("openai/") else None
     for attempt in range(3):  # resumable passes (network errors / parse failures)
         asyncio.run(score_chains(items, model, cache, track="r3t1", concurrency=concurrency, max_tokens=MAX_TOKENS,
-                                 logprobs=True, extra_fn=extra, tag=f"r3t1:mole:{corpus}"))
+                                 logprobs=not any_provider, extra_fn=extra, tag=f"r3t1:mole:{corpus}"))
         if all(cache.get(k) for k in keymap.values()):
             break
     rows = []
@@ -108,10 +113,12 @@ def main():
     ap.add_argument("--concurrency", type=int, default=96)
     ap.add_argument("--pilot", type=int, default=0)
     ap.add_argument("--keep-renders", action="store_true")
+    ap.add_argument("--any-provider", action="store_true",
+                    help="route to any provider without logprobs (integer scores; the analysis uses int_score)")
     a = ap.parse_args()
     for c in a.corpora.split(","):
         built_here = ensure_built(c)
-        score_corpus(c, a.model, a.concurrency, a.pilot)
+        score_corpus(c, a.model, a.concurrency, a.pilot, a.any_provider)
         if not a.pilot and not a.keep_renders and (built_here or c not in PRE_EXISTING):
             (PROCESSED / "r2_mole" / c / "renders.jsonl").unlink(missing_ok=True)
 

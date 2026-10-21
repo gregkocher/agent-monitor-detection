@@ -60,9 +60,17 @@ def load(corpus):
         return None
     D = pd.read_parquet(d / "accountdays.parquet")
     for m, f in MON_FILES.items():
-        if (d / f).exists():
-            D = D.merge(pd.read_parquet(d / f)[["account", "day", "score"]].rename(columns={"score": m}),
-                        on=["account", "day"], how="left")
+        if not (d / f).exists():
+            continue
+        X = pd.read_parquet(d / f)
+        if m == "qwen_compact":
+            # common monitor on every corpus: the generated integer score (some corpora were scored by providers
+            # without logprobs); the logprob-expected score only where every call has logprobs
+            X["qwen_int"] = X.int_score.astype(float)
+            cols = ["qwen_int"] + (["score"] if X.get("lp_ok") is not None and X.lp_ok.fillna(False).mean() > 0.99 else [])
+            D = D.merge(X[["account", "day"] + cols].rename(columns={"score": "qwen_lp"}), on=["account", "day"], how="left")
+        else:
+            D = D.merge(X[["account", "day", "score"]].rename(columns={"score": m}), on=["account", "day"], how="left")
     return D.sort_values(["account", "day"]).reset_index(drop=True)
 
 
@@ -103,8 +111,14 @@ def main():
         if D is None:
             print(f"skip {corpus}"); continue
         D["activity_only"] = np.log1p(D.n_events.astype(float))  # length/activity-only baseline monitor
-        mons = [m for m in list(MON_FILES) + ["z_score", "peer_fit", "activity_only"]
+        base = [m for m in ["qwen_int", "qwen_lp", "mini_full", "z_score", "peer_fit", "activity_only"]
                 if m in D and D[m].notna().mean() > 0.98]
+        # account-centered variants: day score minus the account's own median over its 30 days (removes stable
+        # account-level offsets, e.g. insiders' roles being more active / more suspicious-looking on routine days)
+        for m in base:
+            if m in ("qwen_int", "mini_full", "peer_fit", "activity_only"):
+                D[m + "_c"] = D[m] - D.groupby("account")[m].transform("median")
+        mons = base + [m + "_c" for m in base if m + "_c" in D]
         CF.append(confounds(D, corpus))
         for mon in mons:
             D[mon] = D[mon].fillna(D[mon].median())
@@ -146,7 +160,7 @@ def main():
                 g3["n_a"] = hs.n_a
                 g3["tpr_max"] = d3[(d3.detector == "max") & (d3.threshold_kind == "calibrated")].tpr.iloc[0]
                 HZ.append(g3)
-            if mon in ("qwen_compact", "mini_full"):
+            if mon in ("qwen_int", "mini_full"):
                 rk = daily_ranking(D, mon, corpus, {k: dets[k] for k in ["max", "kth3", "top3sum", "cusum_k1.5", "mean"]})
                 from amd.detectors import Max
                 rk = pd.concat([rk, daily_ranking(D, mon, corpus, {"today": Max()})])
@@ -158,7 +172,8 @@ def main():
     R = pd.concat(R) if R else pd.DataFrame()
     HZ = pd.concat(HZ) if HZ else pd.DataFrame()
     CHS = pd.concat(C)
-    emp = chooser_summary(CHS).set_index(["set", "alpha"])
+    emp = chooser_summary(CHS, "nested").set_index(["set", "alpha"])
+    chooser_summary(CHS, "fpr_matched").to_csv(OUT / "mole_chooser_fpr_matched.csv", index=False)
     for name, df in (("matched", M), ("gains", G), ("streaming", S), ("features", F), ("daily_rank", R),
                      ("horizon", HZ), ("chooser", emp.reset_index()), ("chooser_splits", CHS)):
         df.to_csv(OUT / f"mole_{name}.csv", index=False)
@@ -180,7 +195,7 @@ def confounds(D, corpus):
                ev_attack_day=att.n_events.median(),
                auroc_activity_attackday=roc_auc_score(y, np.r_[rout.n_events, att.n_events]),
                days_routine=rout.groupby("account").size().mean(), days_insider=X[X.is_insider].groupby("account").size().mean())
-    for m in MON_FILES:
+    for m in ("qwen_int", "mini_full"):
         if m in X and X[m].notna().all():
             out[f"rho_{m}_vs_events_routine"] = spearmanr(rout[m], rout.n_events).statistic
     return out
@@ -203,8 +218,9 @@ def pooled(g):
 def report(M, G, S, F, R, HZ, emp, CF):
     from scipy.stats import spearmanr
     lines = ["# MOLE: per-account accumulation across 8 corpora (round 3)", "",
-             "Gains: paired gain over max with a FULL bootstrap (honest calibration accounts and insider accounts "
-             "resampled, thresholds recomputed per replicate; r3lib.paired_gain_full); p = share of replicates <= 0. "
+             "Gains: paired gain over max, amd.evaluation.paired bootstrap (one joint resample of routine and insider "
+             "accounts per replicate across splits, thresholds recomputed); p = share of replicates <= 0. Chooser: "
+             "nested calibration (r3lib.chooser_matched). "
              "Discovery corpora (detector choices made in round 2): GPT-5.3 single-day and multiday, DeepSeek-V4 "
              "single-day; the other five are confirmation corpora. Pre-specified comparisons: 3rd-max, top-3 sum, "
              "CUSUM k=1.5 and the empirical chooser vs max; all other detectors are exploratory.", ""]
@@ -227,7 +243,7 @@ def report(M, G, S, F, R, HZ, emp, CF):
                     v = f"{g.loc[c].tpr:.2f} [{g.loc[c].tpr_lo:.2f}, {g.loc[c].tpr_hi:.2f}]"
                 cells.append(f"**{v}**" if c == best else v)
             ch = emp.loc[(s, al)] if (s, al) in emp.index else None
-            chs = (f"{ch['tpr_choice']:.2f} (FPR {ch['fpr_choice']:.3f}; vs max at same FPR {ch['gain_matched']:+.3f})"
+            chs = (f"{ch['tpr_choice']:.2f} (FPR {ch['fpr_choice']:.3f}; {ch['gain']:+.3f} vs max, nested)"
                    if ch is not None else "")
             c0, m0 = g.corpus.iloc[0], g.monitor.iloc[0]
             lines.append(f"| {cname(c0)} | {m0} | {int(g.n_honest_total.iloc[0])}/{int(g.n_attack_total.iloc[0])} | "
@@ -286,7 +302,7 @@ def report(M, G, S, F, R, HZ, emp, CF):
     for _, c in CF.iterrows():
         lines.append(f"| {cname(c.corpus)} | {c.ev_routine:.0f} | {c.ev_insider_other:.0f} | {c.ev_attack_day:.0f} | "
                      f"{c.auroc_activity_attackday:.2f} | {c.days_routine:.1f} vs {c.days_insider:.1f} | "
-                     f"{c.get('rho_qwen_compact_vs_events_routine', np.nan):+.2f} | {c.get('rho_mini_full_vs_events_routine', np.nan):+.2f} |")
+                     f"{c.get('rho_qwen_int_vs_events_routine', np.nan):+.2f} | {c.get('rho_mini_full_vs_events_routine', np.nan):+.2f} |")
     lines.append("The `activity_only` monitor rows in the main table run the same per-account statistics on log(1 + events "
                  "per day): what activity volume alone achieves.")
     if len(HZ):
@@ -306,7 +322,8 @@ def figures(G, F):
     gm = G[(G.alpha == 0.10) & ~G.set.str.contains("noattackdays")]
     j = gm[gm.detector.isin(["kth3", "top3sum", "cusum_k1.5"])].merge(F, on=["corpus", "monitor"])
     fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.7), sharey=True)
-    mk = {"qwen_compact": "o", "mini_full": "s", "z_score": "^", "peer_fit": "D", "activity_only": "x"}
+    mk = {"qwen_int": "o", "qwen_lp": "P", "mini_full": "s", "z_score": "^", "peer_fit": "D", "activity_only": "x",
+          "qwen_int_c": "o", "mini_full_c": "s", "peer_fit_c": "D", "activity_only_c": "x"}
     for ax, det in zip(axes, ["kth3", "top3sum", "cusum_k1.5"]):
         x = j[j.detector == det]
         for mon, g in x.groupby("monitor"):
@@ -325,7 +342,7 @@ def figures(G, F):
     fig.tight_layout(rect=(0, 0.08, 1, 1))
     fig.savefig(OUT / "fig_mole_gain_vs_repeat_lr.pdf")
 
-    q = gm[(gm.monitor == "qwen_compact")]
+    q = gm[(gm.monitor == "qwen_int")]
     if len(q):
         corp = list(dict.fromkeys(q.corpus))
         fig, ax = plt.subplots(figsize=(7.2, 3.0))
@@ -340,7 +357,7 @@ def figures(G, F):
         ax.set_xticks(range(len(corp)), [cname(c).replace(" ", "\n", 1) for c in corp], fontsize=7)
         ax.set_ylabel("TPR gain over max\n(account FPR 0.10)")
         ax.legend(frameon=False, ncol=4, fontsize=6.5)
-        ax.set_title("History-free qwen3-235b account-day monitor, per-account accumulation over 30 workdays", loc="left")
+        ax.set_title("History-free qwen3-235b account-day monitor (integer score), per-account accumulation", loc="left")
         fig.tight_layout()
         fig.savefig(OUT / "fig_mole_gain_by_corpus.pdf")
 

@@ -185,7 +185,9 @@ def main():
         Ls.append(chooser_matched(ss, n_lab=20, n_splits=40, alphas=ALPHAS))
         print(f"  {ss.name}: n_h={ss.n_h} n_a={ss.n_a} rep_lr={f['rep_lr']:.2f} h2c={f['h2c']:.2f}", flush=True)
     M, G, F = pd.concat(M), pd.concat(G), pd.DataFrame(rows)
-    CH = chooser_summary(pd.concat(Ls))
+    CHS = pd.concat(Ls)
+    CH = chooser_summary(CHS, "nested")
+    chooser_summary(CHS, "fpr_matched").to_csv(OUT / "reflag_chooser_fpr_matched.csv", index=False)
     for n, df in (("matched", M), ("gains", G), ("features", F), ("chooser", CH)):
         df.to_csv(OUT / f"reflag_{n}.csv", index=False)
     report(M, G, F, CH)
@@ -213,7 +215,7 @@ def report(M, G, F, CH):
                     v = (f"{m.loc[det].tpr:.2f} [{m.loc[det].tpr_lo:.2f}, {m.loc[det].tpr_hi:.2f}]" if det == "max" else
                          f"{m.loc[det].tpr:.2f} ({g.loc[det].gain_vs_max:+.2f} [{g.loc[det].lo:+.2f}, {g.loc[det].hi:+.2f}])")
                     cells.append(f"**{v}**" if det == best else v)
-                cells.append(f"{ch.tpr_choice.iloc[0]:.2f} (FPR {ch.fpr_choice.iloc[0]:.3f}; {ch.gain_matched.iloc[0]:+.2f} vs max at same FPR)"
+                cells.append(f"{ch.tpr_choice.iloc[0]:.2f} (FPR {ch.fpr_choice.iloc[0]:.3f}; {ch.gain.iloc[0]:+.2f} vs max, nested)"
                              if len(ch) else "")
             m05 = M[(M.data == data) & (M.design == design) & (M.alpha == 0.05) & (M.threshold_kind == "calibrated")]
             fpr = m05[m05.detector == "max"].fpr.iloc[0]
@@ -222,10 +224,11 @@ def report(M, G, F, CH):
         la = F[F.data == data].length_auc.iloc[0]
         lines += ["", f"Stream-length AUROC (attack longer than honest): {la:.2f}.", ""]
         lines.append("")
-    lines.append("TPR at matched run-level FPR (randomized thresholds, 20 splits); parentheses: paired gain over max with a "
-                 "FULL bootstrap (honest calibration + attacks resampled jointly, clustered by task for MonitoringBench; "
-                 "thresholds recomputed per replicate). Chooser column: empirical chooser on held-out attacks, its "
-                 "realized FPR, and its gain over always-max evaluated at the chooser's own realized FPR. Bold: best fixed rule.")
+    lines.append("TPR at matched run-level FPR (randomized thresholds, 20 splits); parentheses: paired gain over max, "
+                 "amd.evaluation.paired bootstrap (one joint honest + attack resample per replicate across splits, "
+                 "clustered by task for MonitoringBench, thresholds recomputed). Chooser column: empirical chooser with nested calibration "
+                 "(selected on one calibration half, thresholded on the other), its realized FPR and its gain over "
+                 "always-max under the same nested thresholds; task-grouped labeled-attack draw for MonitoringBench. Bold: best fixed rule.")
     (OUT / "reflag_tables.md").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
     plt = mpl_style()
