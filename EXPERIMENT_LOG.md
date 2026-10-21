@@ -423,3 +423,36 @@ loses 0.11–0.15 TPR at FPR 0.01 (tail resolution). The analytic length-aware m
 that helps.
 
 **Library change.** None; all code is new under `tracks/r2_t1/`.
+
+## 2026-10-21: T3 ROUND 2 results (strong monitor gpt-4.1, pacing + rewrite-control arms; r2t3 $304.77)
+
+150 base attacks; analysis paired on 126. Monitor gpt-4.1 none mode (Honest-550 0 NaN, all logprob-expected).
+Tables/figures: `results/r2_t3/` (`tables.md`, `paired_diffs.md`, `mechanism.md`, `cross_table.csv`, `summary.json`,
+`cross_*.pdf`, `covert_*.pdf`, `mechanism_none.pdf`). The harness blocked writing `results/r2_t3/FINDINGS.md`, so the
+full write-up is in the T3-r2 hand-back message.
+
+- **Monitor:** the pilot (40+40) favoured gpt-4.1 (AUROC 0.871 vs gpt-4o 0.709, haiku-4.5 0.836), but on the full
+  150 vs 550 its AUROC equals gpt-4.1-mini's (0.784 [0.748,0.823] vs 0.784): a winner's curse. It is better only at low
+  FPR: max TPR 0.24 vs 0.14 @1% (paired +0.10 [−0.01,+0.22]), 0.15 vs 0.07 @0.3%. The ≥0.9 target was not met.
+- **Pacing arms** (no shortening, keep/add filler, spread attack steps, honest z-table): length ratio 1.17 (+4.4
+  steps) vs round-1 0.55–0.83. Fixes needed: JSON mode (the round-1 parser failed on ~50% of long outputs) and a
+  90% length floor with resampling.
+- **New control arm `rewrite_control`** (same pipeline and length floor, no monitor/detector info): undetected vs
+  max −0.36 [−0.45,−0.26] relative to the originals; peak step score +2.29 [+1.82,+2.79]; 92% vs 44% have an attack
+  step above the honest q99. The round-1 "aware attacks backfire" effect is mostly an LLM-rewrite artifact (the
+  critical operation becomes an explicit standalone action).
+- **Pacing vs control:** +0.21 [+0.12,+0.29] against max and +0.18 [+0.10,+0.26] against multichart, a real
+  strategy effect; but +0.03 (n.s.) against **top-3 sum**, which neutralizes it. Pacing vs round-1 condensation:
+  +0.07–0.10 (significant at α=0.003). Net, pacing vs originals is −0.15 (still worse than doing nothing).
+- **Detectors (α=0.01, adaptive):** max ≈ CUSUM k=1.5 ≈ multichart are strongest. CUSUM k=0.5, SR, windowed GLR
+  and the e-process are nearly powerless (originals ≥0.95 undetected): 90% of honest steps score exactly 0, so
+  whitening makes every non-zero benign step z≳1.3. Adaptive feedback adds +0.11–0.13 for pacing (oracle-feedback
+  caveat).
+- **Covert √ARL:** slopes 0.01–0.07 (CIs ≤0.10) vs 0.5 over the calibratable ARL 10^1.5–551 (550 honest ⇒ no
+  alarms above ≈551). Detection is spike-driven and damage saturates; √ARL is rejected for both naive and pacing
+  attackers.
+- **Goal 5 (non-resetting / windowed accumulators, eval-only):** the SR e-detector and windowed GLR catch somewhat
+  more of pace_cusum (0.71/0.78 undetected) than CUSUM 0.5 (0.91), but all are far weaker than max/top-3. This is
+  inconclusive on burst-and-pause because these charts are uninformative on this monitor.
+- Limitations: no Docker replay (fabricated outputs; judge + literal checks, 0.88–1.00); none mode only;
+  refiner = monitor model; attack-relevant labels self-reported by the refiner.
