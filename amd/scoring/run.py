@@ -120,8 +120,12 @@ async def run_jobs(jobs: list[Job], client, model: str, monitor_id: str, cache: 
     async def one(job: Job):
         t0 = time.time()
         try:
+            # prompt_cache_key routes all of a trajectory's steps to one OpenAI cache shard
+            # (same ~0.5x list-price discount measured in track 1); it is a routing hint, not
+            # part of the prompt, so cached scores are identical.
             res = await client.chat(model, job.messages, max_tokens=MAX_TOKENS, temperature=0.0,
-                                    logprobs=True, top_logprobs=20)
+                                    logprobs=True, top_logprobs=20,
+                                    extra={"prompt_cache_key": f"amd:{job.traj.traj_id}"})
         except Exception as e:  # noqa: BLE001 - every API failure becomes a NaN step
             return job, None, f"{type(e).__name__}: {str(e)[:300]}", time.time() - t0
         return job, res, None, time.time() - t0
@@ -204,7 +208,9 @@ def main(argv: list[str] | None = None, client_factory=None, data_root: Path = P
     ap.add_argument("--source", required=True)
     ap.add_argument("--model", required=True)
     ap.add_argument("--history", required=True, choices=HISTORY_MODES)
-    ap.add_argument("--track", required=True, choices=["t1", "t2", "t3", "dev", "reserve"])
+    ap.add_argument("--track", required=True,
+                    choices=["t1", "t2", "t3", "dev", "reserve",
+                             "wb", "r2t1", "r2t2", "r2t3", "dev2", "reserve2"])
     ap.add_argument("--limit", type=int)
     ap.add_argument("--labels", type=lambda s: s.split(","))
     ap.add_argument("--traj-ids", type=lambda s: s.split(","))
