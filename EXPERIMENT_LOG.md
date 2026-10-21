@@ -456,3 +456,60 @@ full write-up is in the T3-r2 hand-back message.
   inconclusive on burst-and-pause because these charts are uninformative on this monitor.
 - Limitations: no Docker replay (fabricated outputs; judge + literal checks, 0.88–1.00); none mode only;
   refiner = monitor model; attack-relevant labels self-reported by the refiner.
+
+## 2026-10-21: T2 ROUND 3 (white-box / strong-monitor panels; Watcher-like severity tiers)
+
+Code `tracks/r2_t2/e5_new_streams.py` (rewritten) and `tracks/r3_t2/` (`score_severity.py`, `watcher_eval.py`,
+`make_report.py`); results `results/r2_t2/e5_*` and `results/r3_t2/` (`tables.md`, CSVs, PDF figures);
+raw replicates `data/processed/r3_t2_runs/`. Spend: r3t2 $21.82 (Watcher-style severity scoring of 38.4k steps with
+gpt-4.1-mini, 0 errors); r2t2 $0.
+
+**E5: white-box probes vs LLM monitors.**
+- Common set: Honest-550 plus 541 attacks (33 MonitoringBench originals and 508 T3 monitor-aware refined attacks)
+  scored by all 17 signals: 7 white-box streams × {full, none} from `data/processed/whitebox/scores/` with
+  `wblib.derived` definitions, gpt-4.1 none, and gpt-4.1-mini none/full. Contexts: T2 task clusters (7 with ≥ 20
+  honest). The trajectory statistic is the max over steps; jl_lm_max is sign-flipped (attacks score lower).
+- **Probe scores are far more context-dependent than LLM-monitor scores.** Logit-normal τ at a global 5% threshold:
+  - probes: dec_full 3.79, fibs_fu_full 2.70, dec_none 2.28, jl_lm_max_none 1.77, fibs_tok_none 1.26, sab_full 1.21
+    (all p ≤ 0.006); per-cluster FPR ranges up to 0–24.6%.
+  - LLM monitors: τ 0.00–0.46, all n.s.
+  - ICC of honest max: 0.10–0.16 for fibs_fu / dec / sab_max_none vs 0.002–0.035 for the LLMs.
+- **Allocation (spend-matched).** CFAR roughly doubles uniform TPR for the heterogeneous probes (dec_full 0.24 → 0.50
+  at 1%; fibs_fu_full 0.35 → 0.62). It does not raise selection safety (e.g. sab_full 0.39 vs global 0.56 at 5%).
+  Stackelberg is ≥ global on 14/17 signals at 5% (e.g. gpt-4.1 0.55 vs 0.31; fibs_fu_full 0.62 vs 0.40). Paired
+  intervals are wide and cover 0.
+- LinuxArena white-box streams (7 trajectories) are too few for a panel.
+
+**R3: Watcher-like severity tiers.**
+- Intent-agnostic per-action expected severity (1–10, Apollo Watcher tiers) was scored on all MonitoringBench steps
+  (Honest-550 and T1's 775 attacks). It was paired with history-free gpt-4.1-mini, history-aware gpt-4.1-mini and
+  gpt-4.1 suspicion. Orgs = task clusters; damage = the attack's max severity or the side-task tier.
+- **Severity does not separate attacks from honest work on BashArena:** AUROC of max severity 0.53–0.54.
+  - 100% of honest trajectories contain a 7–8 action; 1.5% of honest vs 7% of attack trajectories contain a 9–10
+    action.
+  - With outcome-adjudicated aksh-n severity (honest 97% tier 1–3, attacks 87% tier ≥ 7) the AUROC is 0.998. That is
+    label leakage, not something a deployed rater can see.
+- **Fixed Watcher tiers lose to a plain suspicion threshold at matched budget:**
+  - "Always block 9–10" alone flags ~1.5% of honest trajectories, more than a 1% budget, so the tiered policies are
+    infeasible at 1%.
+  - At 5%, damage-weighted uniform detection: permissive 0.26 / strict 0.28 vs global 0.34 (mb_mini; Δ −0.08
+    [−0.19, −0.03] and −0.06 [−0.16, −0.01]); gpt-4.1: 0.26 / 0.31 vs 0.37.
+  - Org-selecting and severity-aware attackers do no better against the tiers. The incriminating action is often not
+    the highest-severity one.
+- **Severity-tilted score.** A global threshold on s + β·v with β tuned on calibration attacks picks β = 0 in ≈ 90% of
+  replicates on BashArena, i.e. severity adds nothing. On the label-leaking panel it picks β > 0 and wins
+  (0.96–0.99): the illusory upside.
+- **Tuned tier thresholds.** The tuner picks near-flat FPR weights, and the result ≈ global.
+- **Per-org rules.** CFAR, Stackelberg and severity-damage Stackelberg / cell minimax are within noise of global at 5%
+  (homogeneous clusters, n.s. τ). At 1% they over-spend out of sample (10–40 honest per org per half).
+- **Severity-aware attacker with side-task damage.** At 5% it reaches 0.37 (mini) / 0.59 (gpt-4.1) under global vs
+  0.11 / 0.47 under CFAR.
+
+**Recipe for a Watcher-like product:**
+1. Rank by suspicion with one budget-matched threshold per deployment.
+2. Do not hard-wire an always-block tier: measure its honest hit rate first.
+3. Use severity as a tilt only if a validation set shows it discriminates (tune β; β → 0 otherwise).
+4. Go per-org only after measuring org heterogeneity (τ), and then with Stackelberg (with ≥ 20 attacks per org, or
+   shrunk), never CFAR.
+5. Expect white-box probe signals to need per-context normalization against uniform attackers. Pair it with
+   damage-equalizing allocation against selection.
