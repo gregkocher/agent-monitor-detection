@@ -39,7 +39,9 @@ URL = "https://openrouter.ai/api/v1/chat/completions"
 GLOBAL_CAP_USD = 1100.0  # raised 2026-10-21 (user OK with going over the $700 round-2 plan)
 TRACK_CAPS_USD = {"t1": 130.0, "t2": 70.0, "t3": 200.0, "dev": 15.0, "reserve": 100.0,
                   # round 2
-                  "wb": 120.0, "r2t1": 200.0, "r2t2": 60.0, "r2t3": 350.0, "dev2": 20.0, "reserve2": 50.0}
+                  "wb": 120.0, "r2t1": 200.0, "r2t2": 60.0, "r2t3": 350.0, "dev2": 20.0, "reserve2": 50.0,
+                  # round 3 (2026-10-21)
+                  "r3t1": 150.0, "r3t2": 70.0, "r3t3": 60.0, "dev3": 10.0}
 
 
 class BudgetExceeded(RuntimeError):
