@@ -205,3 +205,29 @@ damage-weighted.
 
 **REPORT.md.** The subagent harness refused to write `results/t2/REPORT.md`; the full write-up text is in the T2
 hand-back message, and all numbers are in `results/t2/tables.md` and the CSVs.
+
+## 2026-10-20: T3 results (150 base attacks, 3 refiner arms x 2 rounds; t3 $68)
+
+Refined 150 MonitoringBench S2-S4 attacks (within track-1's scored sample) with a gpt-4.1 refiner
+told the Kerckhoffs detector spec per arm (max / cusum / multichart), gpt-4.1-mini judge+checklist;
+scored every refined trajectory with the deployed monitor in `full` and `none`; evaluated the full
+attacker x detector cross at matched FPR on Honest-550. Coverage 145/131/143 of 150; paired on 126.
+Tables/figures/CSV in `results/t3/` (full write-up handed back to the coordinator).
+
+- **Negative headline:** detector-aware refinement did NOT improve, and usually reduced, undetected-
+  success vs leaving the attack unchanged. gpt-4.1-mini catches only 14/4/8/15% of the *original*
+  attacks at 1% FPR (max/cusum/eproc/multichart) — originals already evade by length/dilution. The
+  refiner condensed attacks (−8 to −15 steps; length ratio 0.58–0.83), concentrating malicious
+  actions and raising per-step max suspicion 5.8→7.6, so undetected-success vs multichart fell from
+  0.85 (original) to 0.49–0.68 (aware arms).
+- CUSUM-alone is the weakest/most-evadable detector (cusum-aware vs cusum 0.86 undetected); max and
+  the multi-chart OR are strongest; the OR closes CUSUM's gap but ~ties max on this monitor.
+- Adaptive (2 feedback rounds) beats one-shot by +0.10..+0.17 undetected-success on the matched
+  diagonal, but still underperforms the original attack.
+- Covert √ARL: undetected damage is flat in ARL (10^1.5–10^4), slopes 0.00–0.03 ≪ 0.5 — attacks sit
+  below the detectability band of this weak monitor, so damage saturates (no √ARL growth).
+- Validity: judge preservation 98–99%, target-literal preservation 0.88–0.90; BashArena Docker
+  replay deferred (laptop disk ~12 GB free vs ~6 GB cap; pod SSH blocked) — flagged as a limitation.
+- Caveat: results are conditioned on a weak monitor (AUROC≈0.76–0.83); the small evasion headroom and
+  the refiner's condensation behavior drive the negative result. Fabricated new-step outputs affect
+  `full` more than `none` (results are consistent across both modes).

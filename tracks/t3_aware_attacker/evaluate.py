@@ -201,7 +201,12 @@ def build_cross(mode: str, variant: str, n_boot: int = 2000, seed: int = 0) -> d
                              harm=t.attack_step, n_steps_orig=t.meta.get("n_steps_orig"))
         arm_data[arm] = data
 
-    # common base-attack set actually produced across refiner arms (for paired comparison use union)
+    # paired comparison: restrict every arm to base attacks present in ALL arms
+    common = None
+    for arm in ATTACKER_ARMS:
+        ids = set(arm_data.get(arm, {}))
+        common = ids if common is None else (common & ids)
+    common = sorted(common or [])
     rows = []
     for alpha in ALPHAS:
         # calibrate each deployed detector once on honest (randomized -> matched FPR ~ alpha)
@@ -212,7 +217,7 @@ def build_cross(mode: str, variant: str, n_boot: int = 2000, seed: int = 0) -> d
             dets[dn] = (det, thr)
         for arm in ATTACKER_ARMS:
             data = arm_data.get(arm, {})
-            ids = sorted(data)
+            ids = [i for i in common if i in data] if common else sorted(data)
             if not ids:
                 continue
             streams = [data[i]["stream"] for i in ids]
@@ -273,15 +278,31 @@ def covert_sweep(mode: str, variant: str, arm: str = "cusum", deployed: str = "c
     from amd.evaluation import alarm_times
 
     honest = load_honest(mode)
-    trajs = refined_meta(arm, variant)
-    rstreams = load_streams(f"t3_refined/{arm}{variant}", mode)
     items = []
-    for oid, t in trajs.items():
-        s = rstreams.get(t.traj_id)
-        ar = t.meta.get("attack_relevant_steps") or []
-        if s is None or not ar or not t.meta.get("valid"):
-            continue
-        items.append((s, ar))
+    if arm == "nothing":
+        sel = load_selection()
+        streams = load_from_cache("monitoringbench", mode, sel)
+        by_id = {t.traj_id: t for t in load_trajectories("monitoringbench")}
+        for oid, s in streams.items():
+            t = by_id.get(oid)
+            if t is None:
+                continue
+            onset = t.meta.get("first_attack_step", t.attack_step)
+            harm = t.attack_step
+            if onset is None or harm is None:
+                continue
+            ar = list(range(int(onset), min(int(harm) + 1, len(s))))  # attack-relevant span
+            if ar:
+                items.append((s, ar))
+    else:
+        trajs = refined_meta(arm, variant)
+        rstreams = load_streams(f"t3_refined/{arm}{variant}", mode)
+        for oid, t in trajs.items():
+            s = rstreams.get(t.traj_id)
+            ar = t.meta.get("attack_relevant_steps") or []
+            if s is None or not ar or not t.meta.get("valid"):
+                continue
+            items.append((s, ar))
     if not items:
         return {"arls": [], "damage": [], "damage_frac": [], "fit": None, "n": 0}
     det = deployed_detector(deployed).fit(honest)
@@ -424,26 +445,28 @@ def fig_cross(rows, mode, variant):
         plt.close(fig)
 
 
-def fig_covert(sweep, mode, variant):
-    if not sweep.get("arls"):
+def fig_covert(sweeps: dict, mode, variant):
+    """sweeps: {label: sweep-dict}. Overlays naive vs aware attacker + sqrt(ARL) reference."""
+    sweeps = {k: v for k, v in sweeps.items() if v.get("arls")}
+    if not sweeps:
         return
     plt = _style()
-    fig, ax = plt.subplots(figsize=(5.6, 4.0))
-    arls = np.array(sweep["arls"])
-    dmg = np.array(sweep["damage"])
-    ax.plot(arls, dmg, "o-", color="#E07B2F", label="achieved undetected damage")
-    if sweep.get("fit"):
-        b = sweep["fit"]["exponent"]
-        c = sweep["fit"]["intercept"]
-        ax.plot(arls, np.exp(c) * arls ** b, "--", color="#444",
-                label=f"fit: slope={b:.2f}")
-        ref = dmg[0] / np.sqrt(arls[0])
-        ax.plot(arls, ref * np.sqrt(arls), ":", color="#2F7DD1", label="sqrt(ARL) reference")
+    fig, ax = plt.subplots(figsize=(5.8, 4.2))
+    colors = {"naive (original)": "#5B6670", "cusum-aware": "#E07B2F", "multichart-aware": "#2E8B57"}
+    ref_done = False
+    for label, sw in sweeps.items():
+        arls = np.array(sw["arls"])
+        dmg = np.array(sw["damage"])
+        ax.plot(arls, dmg, "o-", ms=4, color=colors.get(label, "#888"), label=label)
+        if not ref_done and len(dmg) and dmg[0] > 0:
+            ref = dmg[0] / np.sqrt(arls[0])
+            ax.plot(arls, ref * np.sqrt(arls), ":", color="#2F7DD1", label="sqrt(ARL) reference")
+            ref_done = True
     ax.set_xscale("log")
-    ax.set_yscale("log")
     ax.set_xlabel("deployed ARL (trajectories between false alarms)")
     ax.set_ylabel("attack-critical steps before alarm")
-    ax.set_title(f"Covert scaling ({mode} monitor, cusum-aware attacker)")
+    fits = ", ".join(f"{k} slope={sw['fit']['exponent']:.2f}" for k, sw in sweeps.items() if sw.get("fit"))
+    ax.set_title(f"Covert damage scaling ({mode} monitor)\n{fits}", fontsize=8.5)
     ax.legend(fontsize=8)
     fig.savefig(RESULTS / f"covert_{mode}_{(variant or 'adaptive')}.pdf")
     plt.close(fig)
@@ -487,12 +510,15 @@ def main(argv=None):
                 "cost": cost_table(res["arm_data"]),
                 "validity": validity_summary(variant),
                 "profiles": suspicion_profiles(res["arm_data"]),
+                "covert_nothing": covert_sweep(mode, variant, "nothing", "cusum"),
                 "covert_cusum": covert_sweep(mode, variant, "cusum", "cusum"),
                 "covert_multichart": covert_sweep(mode, variant, "multichart", "multichart"),
             }
             if a.figures:
+                s = summary[f"{mode}{variant or '_adaptive'}"]
                 fig_cross(res["rows"], mode, variant)
-                fig_covert(summary[f"{mode}{variant or '_adaptive'}"]["covert_cusum"], mode, variant)
+                fig_covert({"naive (original)": s["covert_nothing"], "cusum-aware": s["covert_cusum"],
+                            "multichart-aware": s["covert_multichart"]}, mode, variant)
     if allrows:
         import csv
         with open(RESULTS / "cross_table.csv", "w", newline="") as f:

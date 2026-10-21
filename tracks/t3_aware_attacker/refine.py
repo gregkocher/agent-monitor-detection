@@ -47,7 +47,7 @@ SLUG = MONITOR_MODEL.replace("/", "_")
 FEEDBACK_MODE = "full"                      # history-aware deployed monitor used in the loop
 ANALYSIS_MODES = ("full", "none")           # modes scored for the final chosen trajectory
 MAX_STEPS = 60
-REFINER_MAX_TOKENS = 14000   # restructured sequences with fabricated outputs can be long
+REFINER_MAX_TOKENS = 24000   # restructured sequences with fabricated outputs can be long
 TRACK = "t3"
 
 # ------------------------------------------------------------------------------- rendering helpers
