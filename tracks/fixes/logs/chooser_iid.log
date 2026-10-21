@@ -1,0 +1,46 @@
+67 sets
+computed in 37s
+         design  alpha         chooser  mean_gain_vs_max  set_boot_lo  set_boot_hi  family_boot_lo  family_boot_hi  win  loss  mean_fpr  mean_fpr_max
+4      same_cal   0.01  always_top3sum           -0.0380      -0.0660      -0.0108         -0.0575         -0.0092   24    39    0.0122        0.0136
+6      same_cal   0.01             emp            0.0232       0.0108       0.0389          0.0115          0.0348   29     5    0.0157        0.0136
+7      same_cal   0.01            mech           -0.0221      -0.0451       0.0005         -0.0472          0.0055   25    35    0.0133        0.0136
+8      same_cal   0.01            meta            0.0184       0.0056       0.0345          0.0064          0.0310   28    25    0.0155        0.0136
+9      same_cal   0.01          oracle            0.0447       0.0306       0.0615          0.0327          0.0581   48     0    0.0177        0.0136
+14     same_cal   0.05  always_top3sum           -0.0143      -0.0307       0.0051         -0.0326          0.0046   20    43    0.0510        0.0530
+16     same_cal   0.05             emp            0.0140       0.0048       0.0268          0.0010          0.0231   20    10    0.0557        0.0530
+17     same_cal   0.05            mech           -0.0116      -0.0284       0.0065         -0.0348          0.0083   24    40    0.0527        0.0530
+18     same_cal   0.05            meta            0.0144       0.0037       0.0279          0.0001          0.0244   26    26    0.0560        0.0530
+19     same_cal   0.05          oracle            0.0407       0.0293       0.0549          0.0229          0.0525   54     0    0.0607        0.0530
+4        nested   0.01  always_top3sum           -0.0310      -0.0579      -0.0042         -0.0586         -0.0069   27    35    0.0186        0.0201
+6        nested   0.01             emp            0.0023      -0.0078       0.0152         -0.0136          0.0137   14    31    0.0199        0.0201
+7        nested   0.01            mech           -0.0172      -0.0404       0.0059         -0.0437          0.0048   27    33    0.0199        0.0201
+8        nested   0.01            meta           -0.0081      -0.0228       0.0086         -0.0212          0.0028   16    40    0.0195        0.0201
+9        nested   0.01          oracle            0.0603       0.0453       0.0776          0.0453          0.0711   61     0    0.0292        0.0201
+14       nested   0.05  always_top3sum           -0.0170      -0.0360       0.0040         -0.0386          0.0044   19    41    0.0543        0.0560
+16       nested   0.05             emp            0.0041      -0.0058       0.0175         -0.0098          0.0143   13    28    0.0562        0.0560
+17       nested   0.05            mech           -0.0129      -0.0306       0.0064         -0.0370          0.0078   22    40    0.0559        0.0560
+18       nested   0.05            meta           -0.0015      -0.0152       0.0145         -0.0164          0.0102   17    37    0.0552        0.0560
+19       nested   0.05          oracle            0.0493       0.0369       0.0644          0.0281          0.0635   55     0    0.0702        0.0560
+4   fpr_matched   0.01  always_top3sum           -0.0215      -0.0471       0.0042         -0.0390          0.0073   29    34    0.0100        0.0100
+6   fpr_matched   0.01             emp            0.0083      -0.0020       0.0219         -0.0048          0.0220   11    23    0.0100        0.0100
+7   fpr_matched   0.01            mech           -0.0183      -0.0403       0.0035         -0.0447          0.0100   25    35    0.0100        0.0100
+8   fpr_matched   0.01            meta            0.0068      -0.0057       0.0225         -0.0071          0.0241   21    34    0.0100        0.0100
+9   fpr_matched   0.01          oracle            0.0582       0.0421       0.0766          0.0423          0.0769   61     0    0.0100        0.0100
+14  fpr_matched   0.05  always_top3sum           -0.0053      -0.0218       0.0132         -0.0255          0.0152   24    38    0.0500        0.0500
+16  fpr_matched   0.05             emp            0.0083      -0.0006       0.0204         -0.0045          0.0177   13    20    0.0500        0.0500
+17  fpr_matched   0.05            mech           -0.0107      -0.0276       0.0072         -0.0362          0.0105   22    38    0.0500        0.0500
+18  fpr_matched   0.05            meta            0.0059      -0.0054       0.0199         -0.0097          0.0173   21    31    0.0500        0.0500
+19  fpr_matched   0.05          oracle            0.0470       0.0351       0.0615          0.0257          0.0611   54     0    0.0500        0.0500
+   alpha     gain_of predictor            predictor_source  n_sets  spearman_sets  p_sets_naive  family_boot_lo  family_boot_hi  n_families  spearman_family_means  p_family_means       design
+0   0.05     top3sum    rep_lr  labeled attacks (disjoint)      67          0.299         0.014          -0.004           0.448          14                  0.314           0.274     same_cal
+1   0.05        kth2    rep_lr  labeled attacks (disjoint)      67          0.100         0.423          -0.274           0.309          14                 -0.020           0.946     same_cal
+2   0.05  cusum_k0.5       h2c  labeled attacks (disjoint)      67         -0.558         0.000          -0.690          -0.045          14                 -0.341           0.233     same_cal
+3   0.01     top3sum    rep_lr  labeled attacks (disjoint)      67          0.231         0.060          -0.193           0.455          14                 -0.156           0.594     same_cal
+4   0.01        kth2    rep_lr  labeled attacks (disjoint)      67          0.109         0.381          -0.218           0.335          14                 -0.187           0.523     same_cal
+5   0.01  cusum_k0.5       h2c  labeled attacks (disjoint)      67         -0.257         0.036          -0.570           0.325          14                  0.037           0.899     same_cal
+0   0.05     top3sum    rep_lr  labeled attacks (disjoint)      67          0.167         0.178          -0.165           0.336          14                  0.231           0.427  fpr_matched
+1   0.05        kth2    rep_lr  labeled attacks (disjoint)      67          0.092         0.460          -0.294           0.298          14                 -0.002           0.994  fpr_matched
+2   0.05  cusum_k0.5       h2c  labeled attacks (disjoint)      67         -0.583         0.000          -0.725          -0.015          14                 -0.332           0.246  fpr_matched
+3   0.01     top3sum    rep_lr  labeled attacks (disjoint)      67          0.157         0.206          -0.287           0.422          14                 -0.152           0.605  fpr_matched
+4   0.01        kth2    rep_lr  labeled attacks (disjoint)      67          0.082         0.508          -0.232           0.300          14                 -0.174           0.553  fpr_matched
+5   0.01  cusum_k0.5       h2c  labeled attacks (disjoint)      67         -0.268         0.029          -0.589           0.331          14                  0.152           0.605  fpr_matched

@@ -1,0 +1,13 @@
+mode,arm,variant,n,n_streams_changed,n_missing_meta_literals
+full,max,adaptive,145,2,4
+full,cusum,adaptive,131,1,4
+full,multichart,adaptive,143,4,4
+full,max,_r0,145,2,4
+full,cusum,_r0,131,0,4
+full,multichart,_r0,143,2,4
+none,max,adaptive,145,2,4
+none,cusum,adaptive,131,1,4
+none,multichart,adaptive,143,4,4
+none,max,_r0,145,2,4
+none,cusum,_r0,131,0,4
+none,multichart,_r0,143,2,4

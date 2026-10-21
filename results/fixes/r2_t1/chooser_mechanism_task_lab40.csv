@@ -1,0 +1,13 @@
+alpha,gain_of,predictor,predictor_source,n_sets,spearman_sets,p_sets_naive,family_boot_lo,family_boot_hi,n_families,spearman_family_means,p_family_means,design
+0.0500,top3sum,rep_lr,labeled attacks (disjoint),67,0.1832,0.1378,-0.0338,0.3771,14,0.2747,0.3418,same_cal
+0.0500,kth2,rep_lr,labeled attacks (disjoint),67,0.0834,0.5024,-0.2917,0.2325,14,0.0286,0.9228,same_cal
+0.0500,cusum_k0.5,h2c,labeled attacks (disjoint),67,-0.5621,0.0000,-0.6834,-0.0461,14,-0.4066,0.1491,same_cal
+0.0100,top3sum,rep_lr,labeled attacks (disjoint),67,0.1844,0.1353,-0.2093,0.3704,14,-0.1297,0.6586,same_cal
+0.0100,kth2,rep_lr,labeled attacks (disjoint),67,0.1222,0.3247,-0.2472,0.2836,14,-0.1165,0.6917,same_cal
+0.0100,cusum_k0.5,h2c,labeled attacks (disjoint),67,-0.2531,0.0388,-0.5436,0.3404,14,0.0242,0.9346,same_cal
+0.0500,top3sum,rep_lr,labeled attacks (disjoint),67,0.0485,0.6966,-0.2213,0.2564,14,0.1516,0.6048,fpr_matched
+0.0500,kth2,rep_lr,labeled attacks (disjoint),67,0.0597,0.6315,-0.3048,0.2217,14,0.0418,0.8873,fpr_matched
+0.0500,cusum_k0.5,h2c,labeled attacks (disjoint),67,-0.5452,0.0000,-0.6794,0.0067,14,-0.2835,0.3260,fpr_matched
+0.0100,top3sum,rep_lr,labeled attacks (disjoint),67,0.1540,0.2133,-0.3050,0.3797,14,-0.1341,0.6477,fpr_matched
+0.0100,kth2,rep_lr,labeled attacks (disjoint),67,0.1294,0.2967,-0.2419,0.3027,14,-0.1121,0.7028,fpr_matched
+0.0100,cusum_k0.5,h2c,labeled attacks (disjoint),67,-0.2583,0.0348,-0.5603,0.3301,14,0.1516,0.6048,fpr_matched

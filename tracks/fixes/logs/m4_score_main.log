@@ -1,0 +1,43 @@
+calls=21786 to_score=20810 chains=718; list-price estimate $42.34 (caching typically bills full-mode at ~0.5x)
+  [567/20810] err=0 job_cost=$0.539 audit_spent=$1.70 30s
+  [1147/20810] err=0 job_cost=$1.205 audit_spent=$2.37 60s
+  [1720/20810] err=0 job_cost=$1.950 audit_spent=$3.11 90s
+  [2281/20810] err=0 job_cost=$2.717 audit_spent=$3.88 120s
+  [2860/20810] err=0 job_cost=$3.383 audit_spent=$4.54 150s
+  [3435/20810] err=0 job_cost=$4.108 audit_spent=$5.27 181s
+  [4010/20810] err=0 job_cost=$4.934 audit_spent=$6.10 211s
+  [4570/20810] err=0 job_cost=$5.568 audit_spent=$6.73 241s
+  [5155/20810] err=0 job_cost=$6.328 audit_spent=$7.49 271s
+  [5725/20810] err=0 job_cost=$7.123 audit_spent=$8.28 301s
+  [6299/20810] err=0 job_cost=$7.711 audit_spent=$8.87 331s
+  [6868/20810] err=0 job_cost=$8.374 audit_spent=$9.54 361s
+  [7429/20810] err=0 job_cost=$9.070 audit_spent=$10.23 391s
+  [7984/20810] err=0 job_cost=$9.706 audit_spent=$10.87 421s
+  [8532/20810] err=0 job_cost=$10.456 audit_spent=$11.62 451s
+  [9092/20810] err=0 job_cost=$11.119 audit_spent=$12.28 481s
+  [9667/20810] err=0 job_cost=$11.785 audit_spent=$12.95 511s
+  [10238/20810] err=0 job_cost=$12.472 audit_spent=$13.63 541s
+  [10804/20810] err=0 job_cost=$13.108 audit_spent=$14.27 571s
+  [11360/20810] err=0 job_cost=$13.828 audit_spent=$14.99 601s
+  [11930/20810] err=0 job_cost=$14.462 audit_spent=$15.62 631s
+  [12495/20810] err=0 job_cost=$15.133 audit_spent=$16.29 661s
+  [13088/20810] err=0 job_cost=$15.778 audit_spent=$16.94 691s
+  [13669/20810] err=0 job_cost=$16.431 audit_spent=$17.59 721s
+  [14250/20810] err=0 job_cost=$17.055 audit_spent=$18.22 752s
+  [14851/20810] err=0 job_cost=$17.701 audit_spent=$18.86 782s
+  [15436/20810] err=0 job_cost=$18.334 audit_spent=$19.50 812s
+  [16023/20810] err=0 job_cost=$18.986 audit_spent=$20.15 842s
+  [16610/20810] err=0 job_cost=$19.621 audit_spent=$20.78 872s
+  [17212/20810] err=0 job_cost=$20.263 audit_spent=$21.42 902s
+  [17806/20810] err=0 job_cost=$20.932 audit_spent=$22.09 932s
+  [18392/20810] err=0 job_cost=$21.574 audit_spent=$22.74 962s
+  [18970/20810] err=0 job_cost=$22.209 audit_spent=$23.37 992s
+  [19548/20810] err=0 job_cost=$22.835 audit_spent=$24.00 1022s
+  [20100/20810] err=0 job_cost=$23.429 audit_spent=$24.59 1052s
+  [20669/20810] err=0 job_cost=$24.019 audit_spent=$25.18 1082s
+  [20810/20810] err=0 job_cost=$24.150 audit_spent=$25.31 1109s
+job cost 24.15 errors 0
+wrote fixm4_scores_openai_gpt-4.1-mini_full.jsonl [mb_honest] streams=200 units=5089 NaN=0 cost=$7.253 ($0.00143/step)
+wrote fixm4_scores_openai_gpt-4.1-mini_none.jsonl [mb_honest] streams=200 units=5089 NaN=0 cost=$4.603 ($0.00090/step)
+wrote fixm4_scores_openai_gpt-4.1-mini_full.jsonl [monitoringbench] streams=175 units=5804 NaN=0 cost=$8.146 ($0.00140/step)
+wrote fixm4_scores_openai_gpt-4.1-mini_none.jsonl [monitoringbench] streams=175 units=5804 NaN=0 cost=$5.310 ($0.00091/step)

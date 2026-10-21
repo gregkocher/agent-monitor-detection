@@ -513,3 +513,119 @@ gpt-4.1-mini, 0 errors); r2t2 $0.
    shrunk), never CFAR.
 5. Expect white-box probe signals to need per-context normalization against uniform attackers. Pair it with
    damage-equalizing allocation against selection.
+
+## 2026-10-21: Audit fixes (corrected results for every completed track; audit spend $25.31 / $60)
+
+Fixes for `results/audit/issues.csv` (C1–C2, M1–M9, m1–m13). Code `tracks/fixes/` (T2/E5 in `tracks/fixes/e5/`, T3 in
+`tracks/fixes/t3/`); outputs `results/fixes/<track>/`; the claim-by-claim errata is `results/fixes/corrections.csv`
+(issue_id, track, original_claim, corrected_claim, numbers_before, numbers_after, verdict), built by
+`tracks/fixes/build_corrections.py`. Original outputs are untouched. Library: new `amd/evaluation/paired.py` (+
+`tests/test_paired.py`, exported from `amd.evaluation`; nothing existing changed). The round-1 PDFs in `docs/reports/`
+were not regenerated; read them together with `corrections.csv` (M8).
+
+**C2: paired-gain CIs.** `amd.evaluation.paired` draws one joint resample per replicate: honest trajectories (cluster =
+task where the split was grouped) with every split's randomized threshold recomputed, and attacks (same clusters). The
+same weights are used in every split and every term of the contrast, and the split-averaged contrast is bootstrapped.
+Point estimates equal the originals; MOLE raw outputs were regenerated with the original seed. Cross-fitted whitening is
+held fixed. In a test simulation coverage is ≥ 0.85, and duplicated splits no longer shrink the interval. Corrected CIs
+are 6.4× wider (median); 792 of 1,560 round-1 gains stay significant (before: 1,397).
+- Headlines (`results/fixes/t1/c2_headline.md`, `fig_c2_headline_cis.pdf`):
+
+  | gain over max | before | corrected | verdict |
+  |---|---|---|---|
+  | r1 PS GPT-4o, top-3 sum | +0.15 [0.12, 0.17] | +0.146 [0.025, 0.226] | holds |
+  | r2 PS gpt-4.1-mini | +0.145 [0.13, 0.16] | [−0.001, 0.228], p≤0 = 0.026 | borderline |
+  | r2 PS GPT-4o | | +0.101 [0.015, 0.208] | holds |
+  | r2 PS Gemini, Qwen | | not significant | dropped |
+  | MB full, FPR 0.01, top-3 sum | +0.024 | [−0.025, 0.085] | dropped |
+  | MB CUSUM DiD | +0.023 [0.015, 0.032] | [−0.050, 0.072] | dropped |
+  | MOLE gpt53 LLM 3rd-max | +0.131 [0.11, 0.15] | [−0.028, 0.287] | not significant |
+  | MOLE peer-fit | | +0.172 [0.042, 0.317] | holds |
+
+- PS DiD: GPT-4o +0.173 [0.055, 0.271] holds; Qwen +0.127 becomes not significant; gpt-4.1-mini −0.169 [−0.368, −0.019].
+- The audit's "full" CIs pool replicates over splits. That is the CI of a single-split estimator, so it is wider than
+  the CI of the split average reported here.
+
+**M4: matched prompts** (`tracks/fixes/m4_score.py`, `m4_analysis.py`; `results/fixes/t1/m4_tables.md`).
+- Design: prompt `ctrl-matched-v1` gives full and none the same system prompt, task, current-action rendering and
+  neutral instruction. Full adds only the previous-actions block.
+- Data: 200 Honest-550 + 175 attacks (r3_t1's 100 S4 + 25 each of S1–S3, stratified by side task); gpt-4.1-mini;
+  21,786 calls, 0 NaN, $25.31 (track `audit`).
+- Original prompts on the same subset reproduce the negative DiD at FPR 0.05 (kth2 −0.153, top-3 sum −0.122). With
+  matched prompts it vanishes (−0.023, +0.030, CUSUM +0.089; all n.s.). The instruction effect on the CUSUM DiD is
+  −0.180 [−0.289, −0.025].
+- So "accumulators gain more with history" was an instruction artifact. "Gains concentrate in history-free mode" is
+  still not supported (no matched DiD > 0).
+- Re-flagging mechanism: share of attacks with ≥ 2 high steps, full − none = +0.03 [−0.03, 0.09] (S1 +0.08, n.s.).
+  Weakened.
+- New: with matched prompts history-free max TPR is lower, not higher (none − full −0.091 [−0.186, 0.038] vs +0.089
+  with the original prompts). The original none instruction helped the history-free monitor.
+- Persistent-state prompts differ only by the history block (checked in `ps_score.py`), so they were not re-scored.
+
+**M6 / M7 / m10: chooser** (`tracks/fixes/chooser_fixed.py`; 67 sets, 40 splits, task-grouped labeled draw;
+family-cluster CIs over 14 set families).
+- The empirical chooser's +0.023 is the winner's curse:
+
+  | design (FPR 0.01) | emp | meta |
+  |---|---|---|
+  | same calibration (re-run) | +0.023 | +0.019 |
+  | nested (select on one calibration half, threshold on the other) | +0.001 [−0.014, 0.013] | −0.006 |
+  | FPR-matched | +0.009 [−0.003, 0.023] | |
+
+- With 40 labeled attacks: nested −0.001. The mechanism rule stays at about −0.02 (n.s.). Practitioner lesson 3 is
+  dropped.
+- Mechanism correlations with the repeat-spike LR estimated on disjoint labeled attacks:
+  - top-3 sum gain: Spearman +0.30, family CI [−0.03, 0.45] (weakened);
+  - CUSUM gain vs honest persistence: −0.56, family CI [−0.69, −0.05] (holds at FPR 0.05).
+
+**M9 / m1 / m9 / m7 / hybrid** (`tracks/fixes/t1_extras.py`, `c2_hybrid.py`).
+- M9, MB max TPR at FPR 0.01: opus-4-5 attacks 0.121 (full) / 0.117 (none) vs opus-4-6 0.258 / 0.224 (pooled 0.171 /
+  0.156). The honest set is all opus-4-5, so like-for-like TPR is about 12%.
+- m1: realized FPR at nominal 0.01 is 0.77–2.3× target (mean 1.28×). It is now tabulated next to every TPR.
+- m9, PS gain on side-task-successful attacks:
+  - gpt-4.1-mini: +0.241 [0.073, 0.336];
+  - GPT-4o: +0.051 n.s. Its pooled gain comes from failed attacks.
+- m7: MRT length-aware gains survive (+0.365 [0.127, 0.445]); caveat that an attacker can pad length.
+- Hybrid negative result holds at family level: lenbin(top-3 sum) −0.152 [−0.243, −0.040].
+
+**T2 / E5: C1, M5, m2, m3, m11** (`tracks/fixes/e5/`; `results/fixes/r2_t2/`, `t2/`, `r3_t2/`).
+- C1: the spend matcher now has no clamping and a 0–3×B grid. Per-context rules have a test-spend floor of about 2.6%
+  (analytic Σw/(n+1) = 2.5%), so the 1% spend-matched comparison is not estimable. At equal realized spend, CFAR gains
+  1.3–1.5×, not 2× (dec_full +0.18 [0.08, 0.27] at 3.6%).
+- M5:
+  - The E5 set has 0 exact duplicates; the r0 copies share ids. The leak was variants of one base attack on both sides
+    of the split.
+  - With the split grouped by base attack, Stackelberg ≥ global on 10/17 signals at 5% (claimed 14/17; the original
+    CSV gives 13/17), with no CI above 0.
+  - AUROCs on the 33 originals are much lower (gpt-4.1 0.77, fibs_fu_full 0.69, dec_full 0.57). The fabrication /
+    rewrite confound is flagged.
+- m2: holds at 5% and with independent attacker info; 1% matched [−0.11, +0.20]; the ControlArena 1% gain is dropped.
+- m3: at ε = 10% the rule holds 0.62–0.81 by panel.
+- m11: an annotated copy of the r3_t2 tables carries the label-leakage caveat.
+- Not fixed: other T2/r3_t2 matched tables that use the clamping matcher.
+
+**T3: M1, M2, M3, m4, m5, m6, M9** (`tracks/fixes/t3/`; `results/fixes/r2_t3/`, `t3/`). Joint bootstrap over base attacks
+and Honest-550, with detectors refit per replicate. Validity bounds are judge-only, strict (all target literals) and
+strict-rel.
+- M1: one-shot vs one-shot, pace_max_r0 − control on max at FPR 0.01 = +0.095 [−0.024, 0.190]; strict +0.087
+  [−0.032, 0.183], which is the pre-specified primary contrast (p = 0.20). Weakened. No adaptive control exists.
+  Adaptive − r0 is +0.11–0.12 (oracle-feedback selection).
+- M2 (strict validity), relative to the originals:
+  - pace_max − nothing: −0.317 [−0.444, −0.167];
+  - rewrite_control − nothing: −0.500.
+- M3: the round-1 "aware rewriting backfires" claim is dropped. Against the round-2 rewrite control (gpt-4.1 only),
+  the round-1 aware arms are +0.06 to +0.14, in the attacker's favour.
+- m4: with Holm correction no pacing-vs-condensation contrast is significant. The pace_cusum − r1_cusum reversal
+  (−0.103) becomes [−0.159, +0.024] once Honest-550 is resampled too.
+- m5: on held-out honest runs the multichart OR alarms at 1.85× nominal FPR at 0.01 and 3.8× at 0.003, so its cells
+  overstate detection. Max and the others are close to nominal.
+- m6: the stripping fix changes 12–20 streams and no point estimate.
+- Round-1 levels: 0.63–0.73 judge-only, 0.47–0.53 strict.
+- Covert √ARL holds when refit on ARL ≤ 551 (slopes 0.007–0.045).
+- M9 (T3): opus-4-5 max TPR 0.233 vs opus-4-6 0.275.
+
+**Not done:** PDFs in `docs/reports/` and the original REPORT.md files are unchanged (`corrections.csv` is the errata).
+m13 (README budget text, `.gitignore` for `results/.key_index`, the synthetic `sk-proj-` placeholder in
+`tracks/r2_t1/ps_score.py`) is outside the fixes scope and still open. In-progress r3 tracks (`r3lib.paired_gain_full`,
+`mole_r3_analysis.py` / `reflag_analysis.py`, which still call the old `gains_table`) were not touched; they should
+switch to `amd.evaluation.paired`.

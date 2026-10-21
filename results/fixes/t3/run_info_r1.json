@@ -1,0 +1,16 @@
+{
+ "paired_n": {
+  "full": {
+   "adaptive": 126,
+   "_r0": 126
+  },
+  "none": {
+   "adaptive": 126,
+   "_r0": 126
+  }
+ },
+ "boot": 2000,
+ "validation_max_abs_diff": 1.1102230246251565e-16,
+ "max_abs_m6_effect": 0.0,
+ "runtime_s": 416.30194091796875
+}

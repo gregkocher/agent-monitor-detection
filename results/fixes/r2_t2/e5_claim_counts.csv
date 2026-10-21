@@ -1,0 +1,49 @@
+source,B,mode,rule,metric,n_estimable,n_ge_global,n_ci_above_0,n_ci_below_0,mean_spend
+"E5 original (clamped matching, iid split)",0.01,matched,stack,sel_informed,17,14,0,0,0.02821
+"E5 original (clamped matching, iid split)",0.01,matched,cfar,tpr_uniform,17,17,17,0,0.02477
+"E5 original (clamped matching, iid split)",0.01,matched,cfar,sel_informed,17,4,0,0,0.02477
+"E5 original (clamped matching, iid split)",0.01,matched,maxdet,tpr_uniform,17,17,17,0,0.03024
+"E5 original (clamped matching, iid split)",0.01,nominal,stack,sel_informed,17,17,0,0,0.03583
+"E5 original (clamped matching, iid split)",0.01,nominal,cfar,tpr_uniform,17,17,17,0,0.02841
+"E5 original (clamped matching, iid split)",0.01,nominal,cfar,sel_informed,17,8,0,0,0.02841
+"E5 original (clamped matching, iid split)",0.01,nominal,maxdet,tpr_uniform,17,17,17,0,0.04142
+"E5 original (clamped matching, iid split)",0.05,matched,stack,sel_informed,17,13,0,0,0.05308
+"E5 original (clamped matching, iid split)",0.05,matched,cfar,tpr_uniform,17,11,3,0,0.05068
+"E5 original (clamped matching, iid split)",0.05,matched,cfar,sel_informed,17,6,0,0,0.05068
+"E5 original (clamped matching, iid split)",0.05,matched,maxdet,tpr_uniform,17,17,5,0,0.0559
+"E5 original (clamped matching, iid split)",0.05,nominal,stack,sel_informed,17,15,0,0,0.07998
+"E5 original (clamped matching, iid split)",0.05,nominal,cfar,tpr_uniform,17,16,5,0,0.06095
+"E5 original (clamped matching, iid split)",0.05,nominal,cfar,sel_informed,17,8,0,0,0.06095
+"E5 original (clamped matching, iid split)",0.05,nominal,maxdet,tpr_uniform,17,17,17,0,0.08823
+corrected iid,0.01,matched,stack,sel_informed,0,0,0,0,0.01
+corrected iid,0.01,matched,cfar,tpr_uniform,0,0,0,0,0.01
+corrected iid,0.01,matched,cfar,sel_informed,0,0,0,0,0.01
+corrected iid,0.01,matched,maxdet,tpr_uniform,0,0,0,0,0.01
+corrected iid,0.01,nominal,stack,sel_informed,17,17,0,0,0.03583
+corrected iid,0.01,nominal,cfar,tpr_uniform,17,17,17,0,0.02841
+corrected iid,0.01,nominal,cfar,sel_informed,17,8,0,0,0.02841
+corrected iid,0.01,nominal,maxdet,tpr_uniform,17,17,17,0,0.04142
+corrected iid,0.05,matched,stack,sel_informed,17,13,0,0,0.05
+corrected iid,0.05,matched,cfar,tpr_uniform,17,12,3,0,0.05
+corrected iid,0.05,matched,cfar,sel_informed,17,6,0,0,0.05
+corrected iid,0.05,matched,maxdet,tpr_uniform,17,14,4,0,0.05
+corrected iid,0.05,nominal,stack,sel_informed,17,15,0,0,0.07998
+corrected iid,0.05,nominal,cfar,tpr_uniform,17,16,5,0,0.06095
+corrected iid,0.05,nominal,cfar,sel_informed,17,8,0,0,0.06095
+corrected iid,0.05,nominal,maxdet,tpr_uniform,17,17,17,0,0.08823
+corrected grouped,0.01,matched,stack,sel_informed,0,0,0,0,0.01
+corrected grouped,0.01,matched,cfar,tpr_uniform,0,0,0,0,0.01
+corrected grouped,0.01,matched,cfar,sel_informed,0,0,0,0,0.01
+corrected grouped,0.01,matched,maxdet,tpr_uniform,0,0,0,0,0.01
+corrected grouped,0.01,nominal,stack,sel_informed,17,16,0,0,0.03759
+corrected grouped,0.01,nominal,cfar,tpr_uniform,17,17,16,0,0.0299
+corrected grouped,0.01,nominal,cfar,sel_informed,17,10,0,0,0.0299
+corrected grouped,0.01,nominal,maxdet,tpr_uniform,17,17,17,0,0.04193
+corrected grouped,0.05,matched,stack,sel_informed,17,10,0,0,0.05
+corrected grouped,0.05,matched,cfar,tpr_uniform,17,12,2,0,0.05
+corrected grouped,0.05,matched,cfar,sel_informed,17,5,0,0,0.05
+corrected grouped,0.05,matched,maxdet,tpr_uniform,17,14,4,0,0.05
+corrected grouped,0.05,nominal,stack,sel_informed,17,14,0,0,0.08054
+corrected grouped,0.05,nominal,cfar,tpr_uniform,17,16,4,0,0.06287
+corrected grouped,0.05,nominal,cfar,sel_informed,17,7,0,0,0.06287
+corrected grouped,0.05,nominal,maxdet,tpr_uniform,17,17,16,0,0.08714

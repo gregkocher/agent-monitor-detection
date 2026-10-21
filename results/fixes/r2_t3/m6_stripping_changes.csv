@@ -1,0 +1,15 @@
+arm,n,n_streams_changed,n_changed_in_paired126
+nothing,150,0,0
+r1_max,145,2,2
+r1_cusum,131,1,1
+r1_multichart,143,4,4
+r1_max_r0,145,2,2
+r1_cusum_r0,131,0,0
+r1_multichart_r0,143,2,2
+pace_max,150,2,0
+pace_cusum,150,2,1
+pace_multichart,150,0,0
+pace_max_r0,150,2,0
+pace_cusum_r0,150,2,1
+pace_multichart_r0,150,0,0
+rewrite_control,150,1,1
