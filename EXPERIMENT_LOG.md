@@ -231,3 +231,45 @@ Tables/figures/CSV in `results/t3/` (full write-up handed back to the coordinato
 - Caveat: results are conditioned on a weak monitor (AUROC≈0.76–0.83); the small evasion headroom and
   the refiner's condensation behavior drive the negative result. Fabricated new-step outputs affect
   `full` more than `none` (results are consistent across both modes).
+
+## 2026-10-21: T2 ROUND 2 (per-context thresholds: transfer, spread poisoning, severity, adaptive attackers)
+
+Code `tracks/r2_t2/` (`r2lib.py` + 8 tests; `e1_transfer.py`, `e2_multipoison.py`, `e3_severity.py`,
+`e4_adaptive.py`, `e5_new_streams.py`, `make_report.py`); results `results/r2_t2/` (`tables.md`, CSVs, PDF figures);
+raw replicates `data/processed/r2_t2_runs/`. Spend $0 (track `r2t2` unused). The harness refused the
+`FINDINGS.md` write-up (subagent report-file block), so the narrative is in the hand-back; all numbers are in
+`results/r2_t2/tables.md`.
+
+New rules in `r2lib`:
+- weighted / shrunk ROC hulls (Stackelberg with pseudo-count m0 or fraction λ toward the pooled attacks;
+  λ = 1 ⇒ global);
+- exact minimax over (context × side-task) cells of expected undetected damage;
+- OS-CFAR tails: frozen-reference, median, low-quantile, trimmed, capped, guarded;
+- normal-score offset transfer;
+- probing attacker.
+
+- **E1a attack shift.** Stackelberg fit on another attack *policy* or month keeps its in-distribution level
+  (ControlArena p1→p2 matched 0.66 / 0.95 at B = 1% / 5% vs in-dist. 0.61 / 0.96). Fit on *other side tasks*,
+  it is worse than global: 7 settings 0.43 vs 0.62 at 1%; ControlArena 0.58 vs 0.83 at 5%. Shrinkage moves it
+  monotonically toward global (λ = .5: 0.54) and costs ≤ 0.05 in-distribution.
+- **E1b new agent model.** Per-context thresholds fit on other agents realize 0.2–3.0% spend at B = 1% and
+  1.2–12.3% at 5% (source CFAR 2.5× on gpt-5). Source offsets + one target-recalibrated level hold
+  1.0–1.9% / 4.6–5.7%.
+- **E1c cross-monitor.** Env offsets from the other 11 LinuxArena-sweep monitors cut the SD of per-env FPR vs
+  global from 0.060 to 0.050 (5%) and from 0.114 to 0.066 (10%), better on 75–83% of target monitors.
+  Selection safety drops like CFAR at 5% (0.45 vs 0.65).
+- **E2 spread poisoning.** Poison in all other contexts breaks round 1's OS-CFAR LOCO tail at ε ≈ B (LinuxArena
+  env 0.88 → 0.44 at 2%, 0.25 at 5%). An OS-CFAR with tail from the frozen trusted reference holds worst-case
+  0.70–0.88 at 1% up to ε = 10%. It tracks location drift but overspends 2.0–2.9× under genuine
+  deployment-wide tail drift. Median / low-quantile / guarded tails resist minority poisoning only; all-context
+  poisoning is indistinguishable from deployment-wide drift without a trusted refresh.
+- **E3 severity.** Adjudicated aksh-n `overall_severity` (Spearman 0.43–0.51 with the monitor score). Cell-level
+  severity minimax (shrunk) gives 0.92 / 0.95 vs global 0.64 / 0.71 (7 settings / ControlArena, 5%, cell-choosing
+  damage-maximizer), but loses to context-level severity Stackelberg against a context-choosing attacker.
+  Side-task taxonomy weights are a poor proxy (≤ global).
+- **E4 adaptive.** 3–5 free probes per context recover most of the selection gain against CFAR (ControlArena 1%:
+  0.83 → 0.25; exact knowledge 0.18); Stackelberg is flat (0.77 → 0.73). Costly probes give ≈ 1.00 on strong
+  monitors. Stackelberg needs ~10–20 attacks/context to match global; m0 = 10 shrinkage removes the
+  small-sample penalty.
+- **E5** (white-box / gpt-4.1 strong-monitor panels): script ready and smoke-tested. No per-step probe streams or
+  full gpt-4.1 Honest-550/attack files existed yet (only 40 + 40 pilots), so it has not run.
