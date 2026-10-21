@@ -28,6 +28,8 @@ def main(argv=None):
     ap.add_argument("--r1-variants", default="adapt", help="adapt,r0")
     ap.add_argument("--modes", default="none")
     ap.add_argument("--concurrency", type=int, default=24)
+    ap.add_argument("--r1-limit", type=int, default=None,
+                    help="only re-score round-1 refined trajectories whose base attack is in selection[:N]")
     ap.add_argument("--yes", action="store_true")
     a = ap.parse_args(argv)
     model = a.monitor_model
@@ -51,9 +53,16 @@ def main(argv=None):
             for v in a.r1_variants.split(","):
                 suff = "" if v == "adapt" else "_r0"
                 srcs += [f"t3_refined/{arm}{suff}" for arm in ("max", "cusum", "multichart")]
+            keep = set(sel[: a.r1_limit]) if a.r1_limit else None
             for src in srcs:
+                extra = []
+                if keep is not None:
+                    from amd.common.schema import load_trajectories
+                    ids = [t.traj_id for t in load_trajectories(src) if t.meta.get("orig_traj_id") in keep]
+                    extra = ["--traj-ids", ",".join(ids),
+                             "--out-name", f"scores_{model.replace('/', '_')}_{mode}.jsonl"]
                 print(f"\n##### r1 arm {src} [{mode}] #####", flush=True)
-                rc = run.main(["--source", src] + common) or rc
+                rc = run.main(["--source", src] + extra + common) or rc
     return rc
 
 
