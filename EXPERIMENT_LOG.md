@@ -273,3 +273,90 @@ New rules in `r2lib`:
   small-sample penalty.
 - **E5** (white-box / gpt-4.1 strong-monitor panels): script ready and smoke-tested. No per-step probe streams or
   full gpt-4.1 Honest-550/attack files existed yet (only 40 + 40 pilots), so it has not run.
+
+## 2026-10-21: Idea 1 round 2 (track r2t1): cross-session accumulation across monitors, MOLE, rule chooser
+
+Code `tracks/r2_t1/`; tables and PDFs `results/r2_t1/` (`ps_tables*.md`, `mole_tables.md`, `chooser_*`,
+`hybrid_summary.md`). OpenRouter r2t1 spend **$147.89 / $200**: MOLE gpt-4.1-mini $79.9 (gpt53 single-day +
+multiday $35.9, DeepSeek-V4 single-day $44.0); persistent-state re-scoring gpt-4.1-mini $27.6, Gemini 2.5 Flash
+$28.8, Qwen3-235B-2507 $11.5. The write-up below stands in for FINDINGS.md: the subagent harness blocks writing
+report files, as it did for REPORT.md.
+
+**Persistent state, re-scored.**
+- Data: all 691 runs (5 PRs each). Full diffs re-read from the HF `.eval` files (68 MB; the processed data kept
+  3k chars of a median 39k).
+- Prompt: the paper's PR-diff review prompt; output `SCORE: 1-10`, logprob-expected where available. Two
+  history modes: `current_only` and `full_diffs`. Diffs truncated to 60k (current) / 20k (each previous) chars.
+- Analysis: paired sets of 155 honest / 120 gradual / 397 positional runs; matched run-level FPR, 20 splits.
+- History-free monitor, gradual attacks, top-3 sum − max at FPR 0.05:
+
+  | monitor | gain | TPR (max → top-3 sum) |
+  |---|---|---|
+  | gpt-4.1-mini | **+0.145 [0.13, 0.16]** | 0.59 → 0.73 |
+  | Gemini 2.5 Flash | +0.021 [0.01, 0.04] | |
+  | Qwen3-235B | −0.025 [−0.04, −0.01] | |
+  | GPT-4o, original scores | +0.101 [0.09, 0.12] | |
+
+- At FPR 0.01: gpt-4.1-mini SR +0.063 [0.04, 0.08]; Gemini top-3 sum +0.043.
+- Positional (single-PR) attacks: max is best for all new monitors (gpt-4.1-mini top-3 sum −0.163, 2nd-max −0.40).
+- Difference-in-differences of the top-3 gain, history-free minus history-aware (gradual, FPR 0.05):
+
+  | monitor | DiD |
+  |---|---|
+  | GPT-4o | +0.173 [0.10, 0.25] |
+  | Qwen | +0.127 [0.04, 0.21] |
+  | Gemini | −0.03 (ns) |
+  | gpt-4.1-mini | **−0.169 [−0.27, −0.06]** |
+
+  With all prior diffs, gpt-4.1-mini keeps re-flagging attacks while honest PRs stay at 1. Max drops to 0.35 and
+  accumulators reach 0.66–0.70.
+- So "history-aware kills the gain" holds for two of four monitors.
+- What tracks the gain is the repeat-spike LR: gpt-4.1-mini 2.0–2.2, Gemini 1.0, Qwen 0.3–0.4 (with 2× the honest
+  persistence), GPT-4o full_diffs < 0.
+- No runs with more than 5 PRs and matching honest runs exist (only about 40 eight-PR attack runs), so longer
+  horizons were not testable here.
+
+**MOLE (HF forgelab/mole), 30 workdays, 112 routine accounts per corpus.**
+- Monitors: history-free gpt-4.1-mini account-day monitor (MOLE judge prompt + taxonomy, `SCORE: 0-10`, audit
+  observability) and MOLE's z-score / peer-fit ($0).
+- **gpt53 single-day** (30 solo insiders × 3–4 attack days), account-level FPR 0.10:
+  - LLM: max 0.30 [0.10, 0.57] → 3rd-max 0.43 (+0.131 [0.11, 0.15]); top-4 sum +0.086.
+  - LLM at FPR 0.05: +0.088.
+  - Peer-fit: 0.17 → 0.35 (+0.172).
+- **gpt53 multiday** (public release: one attack session per insider): max best (LLM 0.31 vs 3rd-max 0.13).
+- **Replication on DeepSeek-V4 single-day FAILS:** LLM max 0.29 vs 3rd-max 0.25 (−0.039); peer-fit max 0.43 vs
+  −0.16 for 3rd-max. Its repeat-spike LR is 0.19 vs 0.41 for gpt53, and the first-spike LR is higher for
+  classical monitors.
+- Insider accounts are also off-profile on non-attack days (LLM day AUROC 0.65). Removing attack days leaves
+  +0.053 of the gpt53 3rd-max gain, so about 60% comes from the repeated attack days.
+- Accumulators alarm 7–15 workdays later than max (median from the first attack day).
+- Under MOLE's daily top-K review budget, running statistics never beat today's score. gpt53 single-day LLM,
+  R@10/day: today 0.395, running max 0.28, top-3 sum 0.31, CUSUM k=1.5 0.41. Our gpt-4.1-mini gets 0.395 vs
+  MOLE's reported 0.244.
+- Raw MOLE audit/transcript downloads were deleted after processing. Transcripts were read column-projected
+  (no messages).
+
+**Rule chooser** (`chooser.py`), out of sample on 67 stream sets:
+- Sets: the 46 from round 1, 12 new persistent-state, 9 MOLE.
+- Input to the chooser: honest calibration half + 20 labeled attacks. Candidates: max / 2nd-max / top-3 sum /
+  CUSUM(k ∈ 0.5–2.5).
+
+| chooser | gain over always-max, FPR 0.01 | FPR 0.05 | notes |
+|---|---|---|---|
+| empirical (labeled-attack TPR, margin 1/n_lab) | **+0.023 [0.012, 0.038]** | +0.014 [0.005, 0.028] | 26 wins / 7 losses, worst set −0.013 |
+| empirical, 40 labeled attacks | +0.028 [0.015, 0.044] | | 32 / 0 |
+| empirical, 10 labeled attacks | +0.017 | | |
+| LOSO ridge meta-chooser | +0.019 | | heavier tail losses |
+| fixed mechanism rule | −0.022 | | |
+| CUSUM with k tuned on labeled attacks | −0.024 | | LinuxArena −0.072, aksh-n −0.008 |
+| always top-3 sum | −0.040 | | |
+| oracle | +0.045 | | |
+
+- Mechanism across 67 sets: top-3 gain vs repeat-spike LR Spearman +0.29 (p = 0.018); CUSUM(0.5) gain vs honest
+  persistence −0.55.
+
+**Length-aware + top-k hybrid (negative).** Length-tercile conformal calibration of max / 2nd-max / top-3 sum
+loses 0.11–0.15 TPR at FPR 0.01 (tail resolution). The analytic length-aware max remains the only length fix
+that helps.
+
+**Library change.** None; all code is new under `tracks/r2_t1/`.
