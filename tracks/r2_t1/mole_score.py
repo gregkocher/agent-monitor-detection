@@ -82,6 +82,9 @@ def main():
     ap.add_argument("--concurrency", type=int, default=32)
     ap.add_argument("--no-logprobs", action="store_true")
     ap.add_argument("--price-in", type=float, default=0.4)
+    ap.add_argument("--track", default="r2t1")
+    ap.add_argument("--require-params", action="store_true",
+                    help="route only to providers supporting every request parameter (keeps logprobs)")
     a = ap.parse_args()
     d = PROCESSED / "r2_mole" / a.corpus
     D = pd.read_parquet(d / "accountdays.parquet")
@@ -109,8 +112,9 @@ def main():
         print(items[0][1][0][1][1]["content"][:1500])
         return
     cache = PromptCache(CACHE)
-    asyncio.run(score_chains(items, a.model, cache, concurrency=a.concurrency, max_tokens=MAX_TOKENS,
-                             logprobs=not a.no_logprobs, tag=f"r2t1:mole:{a.corpus}"))
+    extra = (lambda cid: {"provider": {"require_parameters": True}}) if a.require_params else None
+    asyncio.run(score_chains(items, a.model, cache, track=a.track, concurrency=a.concurrency, max_tokens=MAX_TOKENS,
+                             logprobs=not a.no_logprobs, extra_fn=extra, tag=f"{a.track}:mole:{a.corpus}"))
     rows = []
     for (acct, day), k in keymap.items():
         rec = cache.get(k)

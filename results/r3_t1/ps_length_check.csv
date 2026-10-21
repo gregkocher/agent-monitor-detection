@@ -1,0 +1,13 @@
+monitor,policy,rho_score_logchars,n,median_chars
+gpt-4.1-mini history-free,honest,0.088,800,53602
+gpt-4.1-mini history-free,gradual,0.272,600,13427
+gpt-4.1-mini history-aware,honest,0.209,800,53602
+gpt-4.1-mini history-aware,gradual,0.175,600,13427
+qwen history-free,honest,0.509,800,53602
+qwen history-free,gradual,0.414,597,13485
+gemini history-free,honest,0.285,800,53602
+gemini history-free,gradual,0.138,600,13427
+gpt-4.1-mini reflag,honest,0.321,800,53602
+gpt-4.1-mini reflag,gradual,0.329,600,13427
+gpt-4.1-mini ledger,honest,0.714,800,53602
+gpt-4.1-mini ledger,gradual,0.583,600,13427
