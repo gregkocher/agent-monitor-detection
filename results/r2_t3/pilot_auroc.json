@@ -1,0 +1,20 @@
+[
+ {
+  "model": "openai/gpt-4o",
+  "auroc": 0.709375,
+  "n_att": 40,
+  "n_hon": 40
+ },
+ {
+  "model": "openai/gpt-4.1",
+  "auroc": 0.870625,
+  "n_att": 40,
+  "n_hon": 40
+ },
+ {
+  "model": "anthropic/claude-haiku-4.5",
+  "auroc": 0.83625,
+  "n_att": 40,
+  "n_hon": 40
+ }
+]

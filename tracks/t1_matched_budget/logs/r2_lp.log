@@ -1,0 +1,3 @@
+== full: honest 550, attack 775
+== none: honest 550, attack 775
+wrote /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/results/t1/round2/score_lpge1 ['matched', 'gains_by_structure', 'tpr_by_structure', 'autocorr', 'thresholds', 'lengths', 'did']

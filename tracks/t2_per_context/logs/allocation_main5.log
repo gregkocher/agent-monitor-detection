@@ -1,0 +1,30 @@
+la_env_local                                  ncal=[np.int64(-1)] rows=4200 t=51s
+la_env_cum                                    ncal=[np.int64(-1)] rows=4200 t=51s
+la_taskcat_local                              ncal=[np.int64(-1)] rows=4200 t=51s
+la_model_local                                ncal=[np.int64(-1)] rows=4200 t=53s
+akshn_setting                                 ncal=[np.int64(-1)] rows=4200 t=53s
+ca_setting_model                              ncal=[np.int64(-1)] rows=4200 t=53s
+mb_gpt-4.1-nano_trajectory                    ncal=[np.int64(-1)] rows=4200 t=58s
+mb_gpt-4.1-mini_trajectory                    ncal=[np.int64(-1)] rows=4200 t=58s
+nominal
+rule                              cfar  global  maxdet  mondrian  os_shift  pooled_cv  pooled_eb  stackelberg  stackelberg_dw  tm_scale
+panel                      B                                                                                                           
+akshn_setting              0.05  0.947   0.964   0.984     0.920     0.967      0.948      0.955        0.972           0.966     0.944
+ca_setting_model           0.05  0.939   0.961   0.988     0.902     0.971      0.940      0.952        0.984           0.981     0.935
+la_env_cum                 0.05  0.982   0.985   0.981     0.964     0.981      0.984      0.984        0.971           0.966     0.909
+la_env_local               0.05  0.982   0.982   0.982     0.963     0.983      0.982      0.983        0.972           0.965     0.982
+la_model_local             0.05  0.986   0.986   0.982     0.957     0.981      0.986      0.987        0.964           0.964     0.971
+la_taskcat_local           0.05  0.972   0.977   0.971     0.922     0.975      0.975      0.977        0.961           0.955     0.960
+mb_gpt-4.1-mini_trajectory 0.05  0.238   0.186   0.319     0.172     0.178      0.189      0.188        0.244           0.245     0.193
+mb_gpt-4.1-nano_trajectory 0.05  0.126   0.076   0.260     0.070     0.061      0.084      0.100        0.145           0.162     0.078
+matched
+rule                              cfar  global  maxdet  mondrian  os_shift  pooled_cv  pooled_eb  stackelberg  stackelberg_dw  tm_scale
+panel                      B                                                                                                           
+akshn_setting              0.05  0.946   0.965   0.984     0.940     0.967      0.947      0.954        0.971           0.965     0.943
+ca_setting_model           0.05  0.935   0.960   0.985     0.939     0.968      0.937      0.949        0.982           0.979     0.927
+la_env_cum                 0.05  0.980   0.985   0.979     0.981     0.982      0.984      0.984        0.970           0.964     0.870
+la_env_local               0.05  0.979   0.982   0.980     0.978     0.982      0.981      0.982        0.971           0.963     0.964
+la_model_local             0.05  0.982   0.986   0.981     0.950     0.980      0.986      0.986        0.963           0.963     0.946
+la_taskcat_local           0.05  0.970   0.977   0.970     0.954     0.974      0.974      0.976        0.961           0.954     0.935
+mb_gpt-4.1-mini_trajectory 0.05  0.219   0.186   0.249     0.193     0.180      0.190      0.188        0.214           0.216     0.190
+mb_gpt-4.1-nano_trajectory 0.05  0.106   0.079   0.162     0.094     0.063      0.084      0.096        0.101           0.115     0.084

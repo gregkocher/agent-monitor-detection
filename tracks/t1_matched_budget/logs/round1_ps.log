@@ -1,0 +1,9 @@
+  ps:diff_current_only:gradual: n_h=167 n_a=120 (iid split) 1s
+  ps:diff_current_only:positional: n_h=167 n_a=398 (iid split) 2s
+  ps:diff_full_diffs:gradual: n_h=167 n_a=120 (iid split) 1s
+  ps:diff_full_diffs:positional: n_h=167 n_a=398 (iid split) 2s
+  ps:diff_task_sequence:gradual: n_h=167 n_a=120 (iid split) 1s
+  ps:diff_task_sequence:positional: n_h=167 n_a=397 (iid split) 2s
+  ps:traj:gradual: n_h=167 n_a=120 (iid split) 1s
+  ps:traj:positional: n_h=167 n_a=397 (iid split) 2s
+done ['matched', 'gain', 'logit_roc', 'streaming', 'localization', 'autocorr', 'lengths', 'length_matched']

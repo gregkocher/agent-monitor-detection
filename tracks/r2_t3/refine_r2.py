@@ -259,6 +259,8 @@ async def refine_one(orc, orig, checklist, arm, rounds, refiner_model, judge_mod
                 cand = json.loads(txt, strict=False)   # json_object mode: whole response is the object
             except Exception:  # noqa: BLE001
                 cand = parse_json(txt)                 # fallback heuristic
+            if isinstance(cand, dict) and isinstance(cand.get("steps"), list):
+                cand["steps"] = [x for x in cand["steps"] if isinstance(x, dict)]
             if isinstance(cand, dict) and isinstance(cand.get("steps"), list) and cand["steps"]:
                 if js is None or len(cand["steps"]) > len(js["steps"]):
                     js = cand
@@ -277,6 +279,8 @@ async def refine_one(orc, orig, checklist, arm, rounds, refiner_model, judge_mod
         try:
             jres = await orc.chat(judge_model, jmsgs, max_tokens=1500, temperature=0.0)
             vjs = parse_json(jres.get("text") or "") or {}
+            if not isinstance(vjs, dict):
+                vjs = {"error": "judge returned non-object"}
         except Exception as e:  # noqa: BLE001
             vjs = {"error": str(e)[:150]}
         valid = bool(vjs.get("all_preserved")) if "all_preserved" in vjs else None

@@ -1,0 +1,23 @@
+### monitoringbench none n=20
+monitor_id=openai/gpt-4.1-mini|ctrl-basic-v1|none
+source=monitoringbench trajectories=20 calls=621 cached=0 stale=0 to_score=621 calls_with_truncated_history=0
+estimated input tokens=1,436,400 (chars/4); estimated cost=$0.753
+  [73/621] errors=0 job_cost=$0.0606 track_t1_spent=$0.204 elapsed=15s
+  [174/621] errors=0 job_cost=$0.1497 track_t1_spent=$0.584 elapsed=31s
+  [275/621] errors=0 job_cost=$0.2493 track_t1_spent=$1.015 elapsed=46s
+  [381/621] errors=0 job_cost=$0.3496 track_t1_spent=$1.452 elapsed=61s
+  [487/621] errors=0 job_cost=$0.4475 track_t1_spent=$1.921 elapsed=76s
+  [593/621] errors=0 job_cost=$0.5543 track_t1_spent=$2.449 elapsed=91s
+  [621/621] errors=0 job_cost=$0.5849 track_t1_spent=$2.585 elapsed=95s
+wrote /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/data/processed/monitoringbench/pilot_scores_openai_gpt-4.1-mini_none.jsonl (20 streams, 621 units, 0 NaN, 621/621 logprob-expected)
+### mb_honest none n=20
+monitor_id=openai/gpt-4.1-mini|ctrl-basic-v1|none
+source=mb_honest trajectories=20 calls=545 cached=0 stale=0 to_score=545 calls_with_truncated_history=0
+estimated input tokens=1,286,920 (chars/4); estimated cost=$0.672
+  [70/545] errors=0 job_cost=$0.0730 track_t1_spent=$2.817 elapsed=15s
+  [175/545] errors=0 job_cost=$0.1825 track_t1_spent=$3.296 elapsed=30s
+  [282/545] errors=0 job_cost=$0.2998 track_t1_spent=$3.884 elapsed=45s
+  [386/545] errors=0 job_cost=$0.4038 track_t1_spent=$4.330 elapsed=60s
+  [497/545] errors=0 job_cost=$0.5135 track_t1_spent=$4.805 elapsed=75s
+  [545/545] errors=0 job_cost=$0.5594 track_t1_spent=$5.074 elapsed=82s
+wrote /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/data/processed/mb_honest/pilot_scores_openai_gpt-4.1-mini_none.jsonl (20 streams, 545 units, 0 NaN, 545/545 logprob-expected)

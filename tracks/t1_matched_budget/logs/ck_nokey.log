@@ -1,0 +1,10 @@
+### monitoringbench full n=6
+[chain] monitoringbench openai/gpt-4.1-mini|ctrl-basic-v1|full: calls=239 to_score=239 in 6 chains; list-price estimate $0.69
+  [72/239] errors=0 job_cost=$0.102 track_t1_spent=$12.79 elapsed=30s
+  [144/239] errors=0 job_cost=$0.288 track_t1_spent=$13.29 elapsed=60s
+  [203/239] errors=0 job_cost=$0.470 track_t1_spent=$13.77 elapsed=90s
+  [239/239] errors=0 job_cost=$0.595 track_t1_spent=$14.10 elapsed=117s
+monitor_id=openai/gpt-4.1-mini|ctrl-basic-v1|full
+source=monitoringbench trajectories=6 calls=239 cached=239 stale=0 to_score=0 calls_with_truncated_history=0
+estimated input tokens=0 (chars/4); estimated cost=$0.000
+wrote /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/data/processed/monitoringbench/ck_nokey.jsonl (6 streams, 239 units, 0 NaN, 239/239 logprob-expected)

@@ -1,0 +1,35 @@
+691 runs; 0 with a missing full-diff file
+current_only: 2598 unique calls, ~25.2M input tokens, list ~$10.10
+[r2t1:ps:current_only] openai/gpt-4.1-mini: 2538 calls in 678 chains (60 cached)
+  [215/2538] err=0 job=$1.06 r2t1=$37.87 30s
+  [436/2538] err=0 job=$2.08 r2t1=$39.04 60s
+  [671/2538] err=0 job=$3.10 r2t1=$40.18 90s
+  [905/2538] err=0 job=$3.93 r2t1=$41.13 121s
+  [1126/2538] err=0 job=$4.36 r2t1=$41.69 151s
+  [1353/2538] err=0 job=$4.87 r2t1=$42.31 181s
+  [1555/2538] err=0 job=$5.81 r2t1=$43.40 211s
+  [1752/2538] err=0 job=$6.72 r2t1=$44.43 241s
+  [1939/2538] err=0 job=$7.62 r2t1=$45.42 271s
+  [2127/2538] err=0 job=$8.58 r2t1=$46.50 301s
+  [2323/2538] err=0 job=$9.57 r2t1=$47.61 332s
+  [2512/2538] err=0 job=$10.53 r2t1=$48.69 362s
+  [2538/2538] err=0 job=$10.64 r2t1=$48.81 367s
+wrote r2_scores_openai_gpt-4.1-mini_current_only.jsonl: 691 runs, 3401/3455 PRs scored
+full_diffs: 2600 unique calls, ~46.6M input tokens, list ~$18.65
+[r2t1:ps:full_diffs] openai/gpt-4.1-mini: 2540 calls in 678 chains (60 cached)
+  [196/2540] err=0 job=$1.38 r2t1=$50.29 30s
+  [396/2540] err=0 job=$2.67 r2t1=$51.66 60s
+  [588/2540] err=0 job=$3.97 r2t1=$53.02 90s
+  [793/2540] err=0 job=$5.19 r2t1=$54.28 120s
+  [1004/2540] err=0 job=$6.14 r2t1=$55.25 150s
+  [1224/2540] err=0 job=$6.77 r2t1=$55.93 180s
+  [1427/2540] err=0 job=$7.83 r2t1=$57.06 210s
+  [1619/2540] err=0 job=$9.05 r2t1=$58.39 241s
+  [1808/2540] err=0 job=$10.46 r2t1=$59.92 272s
+  [1984/2540] err=0 job=$11.67 r2t1=$61.25 302s
+  [2146/2540] err=0 job=$12.96 r2t1=$62.66 333s
+  [2300/2540] err=0 job=$14.25 r2t1=$64.08 363s
+  [2467/2540] err=0 job=$15.79 r2t1=$65.74 393s
+  [2539/2540] err=0 job=$16.46 r2t1=$66.62 440s
+  [2540/2540] err=0 job=$16.47 r2t1=$66.64 443s
+wrote r2_scores_openai_gpt-4.1-mini_full_diffs.jsonl: 691 runs, 3401/3455 PRs scored

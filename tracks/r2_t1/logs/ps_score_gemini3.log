@@ -1,0 +1,9 @@
+691 runs; 0 with a missing full-diff file
+current_only: 2598 unique calls, ~25.2M input tokens, list ~$10.10
+[r2t1:ps:current_only] google/gemini-2.5-flash: 70 calls in 69 chains (2528 cached)
+  [70/70] err=0 job=$0.30 r2t1=$98.38 12s
+wrote r2_scores_google_gemini-2.5-flash_current_only.jsonl: 691 runs, 3401/3455 PRs scored
+full_diffs: 2600 unique calls, ~46.6M input tokens, list ~$18.65
+[r2t1:ps:full_diffs] google/gemini-2.5-flash: 123 calls in 111 chains (2477 cached)
+  [123/123] err=2 job=$0.45 r2t1=$98.93 21s
+wrote r2_scores_google_gemini-2.5-flash_full_diffs.jsonl: 691 runs, 3398/3455 PRs scored

@@ -1,0 +1,60 @@
+              panel     n  spearman_sev_stat  spearman_sev_tier  frac_sev0  sev_mean
+0     akshn_setting  5794              0.450              0.383      0.002     7.486
+1  ca_setting_model  3000              0.509              0.293      0.000     7.291
+2      la_env_local  1305              0.431              0.285      0.005     7.545
+3  la_taskcat_local  1296              0.429              0.292      0.005     7.554
+akshn_setting 16800 924s
+ca_setting_model 16800 924s
+la_env_local 16800 924s
+la_taskcat_local 12320 924s
+mb_gpt-4.1-mini_trajectory 11760 924s
+mb_gpt-4.1-nano_trajectory 11760 924s
+mb_gpt-4.1-mini_full 7280 924s
+rule                                          cfar  global  mm_cell_dmg  mm_cell_dmg_s  mm_cell_eq  mm_cell_tier  pooled_cv  stack  stack_dctx
+panel                      damage       B                                                                                                     
+akshn_setting              adjudicated  0.01  0.36    0.44         0.57           0.55        0.42          0.36       0.38   0.53        0.53
+                                        0.05  0.60    0.64         0.86           0.91        0.82          0.59       0.61   0.76        0.76
+                           equal        0.01  0.02    0.01          NaN            NaN        0.25           NaN       0.02   0.09         NaN
+                                        0.05  0.33    0.34          NaN            NaN        0.80           NaN       0.34   0.64         NaN
+                           tier_ordinal 0.01  0.50    0.54         0.66           0.72        0.34           NaN       0.54   0.59        0.64
+                                        0.05  0.85    0.67         0.88           0.92        0.79           NaN       0.85   0.76        0.75
+                           tier_steep   0.01  0.63    0.73         0.73           0.76        0.41           NaN       0.67   0.61        0.67
+                                        0.05  0.91    0.89         0.90           0.96        0.84           NaN       0.91   0.73        0.74
+ca_setting_model           adjudicated  0.01  0.29    0.39         0.47           0.45        0.34          0.34       0.36   0.40        0.40
+                                        0.05  0.48    0.71         0.94           0.95        0.90          0.64       0.49   0.87        0.88
+                           equal        0.01  0.01    0.02          NaN            NaN        0.11           NaN       0.04   0.02         NaN
+                                        0.05  0.11    0.47          NaN            NaN        0.86           NaN       0.12   0.84         NaN
+                           tier_ordinal 0.01  0.27    0.51         0.65           0.65        0.30           NaN       0.46   0.51        0.57
+                                        0.05  0.66    0.73         0.91           0.95        0.89           NaN       0.68   0.93        0.93
+                           tier_steep   0.01  0.27    0.77         0.81           0.81        0.38           NaN       0.58   0.72        0.80
+                                        0.05  0.82    0.87         0.95           0.97        0.89           NaN       0.82   0.97        0.96
+la_env_local               adjudicated  0.01  0.59    0.79         0.77           0.82        0.75          0.64       0.80   0.78        0.80
+                                        0.05  0.90    0.88         0.90           0.92        0.87          0.82       0.90   0.87        0.91
+                           equal        0.01  0.41    0.61          NaN            NaN        0.64           NaN       0.61   0.69         NaN
+                                        0.05  0.85    0.83          NaN            NaN        0.85           NaN       0.85   0.85         NaN
+                           tier_ordinal 0.01  0.77    0.78         0.82           0.79        0.80           NaN       0.79   0.77        0.76
+                                        0.05  0.96    0.95         0.91           0.85        0.88           NaN       0.96   0.79        0.82
+                           tier_steep   0.01  0.82    0.77         0.88           0.79        0.79           NaN       0.77   0.77        0.77
+                                        0.05  0.98    0.95         0.93           0.86        0.87           NaN       0.97   0.76        0.85
+la_taskcat_local           adjudicated  0.01  0.78    0.81         0.77           0.79        0.78          0.73       0.80   0.77        0.77
+                                        0.05  0.91    0.92         0.89           0.91        0.89          0.87       0.92   0.79        0.81
+                           equal        0.01  0.60    0.65          NaN            NaN        0.61           NaN       0.64   0.63         NaN
+                                        0.05  0.82    0.85          NaN            NaN        0.83           NaN       0.85   0.60         NaN
+                           tier_steep   0.01  0.68    0.70         0.87           0.77        0.65           NaN       0.70   0.84        0.86
+                                        0.05  0.97    0.94         0.92           0.86        0.85           NaN       0.96   0.91        0.94
+mb_gpt-4.1-mini_full       equal        0.01  0.05    0.05          NaN            NaN        0.05           NaN       0.05   0.05         NaN
+                                        0.05  0.06    0.05          NaN            NaN        0.08           NaN       0.06   0.04         NaN
+                           tier_steep   0.01  0.05    0.06         0.05           0.04        0.05           NaN       0.06   0.04        0.08
+                                        0.05  0.04    0.05         0.10           0.13        0.07           NaN       0.05   0.09        0.14
+mb_gpt-4.1-mini_trajectory equal        0.01  0.05    0.05          NaN            NaN        0.05           NaN       0.05   0.03         NaN
+                                        0.05  0.05    0.05          NaN            NaN        0.07           NaN       0.05   0.02         NaN
+                           tier_ordinal 0.01  0.02    0.03         0.02           0.02        0.02           NaN       0.02   0.04        0.04
+                                        0.05  0.02    0.01         0.12           0.08        0.06           NaN       0.01   0.09        0.12
+                           tier_steep   0.01  0.02    0.03         0.02           0.02        0.02           NaN       0.02   0.04        0.04
+                                        0.05  0.02    0.01         0.12           0.08        0.06           NaN       0.01   0.09        0.15
+mb_gpt-4.1-nano_trajectory equal        0.01  0.02    0.01          NaN            NaN        0.02           NaN       0.01   0.02         NaN
+                                        0.05  0.03    0.02          NaN            NaN        0.04           NaN       0.03   0.03         NaN
+                           tier_ordinal 0.01  0.01    0.02         0.01           0.02        0.01           NaN       0.02   0.02        0.02
+                                        0.05  0.02    0.02         0.04           0.03        0.03           NaN       0.02   0.03        0.04
+                           tier_steep   0.01  0.01    0.02         0.01           0.02        0.01           NaN       0.02   0.02        0.02
+                                        0.05  0.02    0.02         0.04           0.02        0.03           NaN       0.02   0.03        0.02

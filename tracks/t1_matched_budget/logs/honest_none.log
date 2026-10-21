@@ -1,0 +1,86 @@
+### mb_honest none n=all
+[chain] mb_honest openai/gpt-4.1-mini|ctrl-basic-v1|none: calls=13797 to_score=13252 in 530 chains; list-price estimate $16.62
+  [200/13252] errors=0 job_cost=$0.183 track_t1_spent=$6.38 elapsed=30s
+  [389/13252] errors=0 job_cost=$0.370 track_t1_spent=$6.88 elapsed=60s
+  [580/13252] errors=6 job_cost=$0.554 track_t1_spent=$7.53 elapsed=90s
+  [780/13252] errors=11 job_cost=$0.740 track_t1_spent=$8.17 elapsed=120s
+  [973/13252] errors=15 job_cost=$0.915 track_t1_spent=$8.87 elapsed=150s
+  [1177/13252] errors=18 job_cost=$1.104 track_t1_spent=$9.62 elapsed=181s
+  [1382/13252] errors=20 job_cost=$1.293 track_t1_spent=$10.41 elapsed=211s
+  [1578/13252] errors=29 job_cost=$1.463 track_t1_spent=$11.21 elapsed=241s
+  [1764/13252] errors=31 job_cost=$1.634 track_t1_spent=$11.95 elapsed=271s
+  [1985/13252] errors=37 job_cost=$1.831 track_t1_spent=$12.38 elapsed=301s
+  [2207/13252] errors=38 job_cost=$2.036 track_t1_spent=$12.73 elapsed=331s
+  [2436/13252] errors=39 job_cost=$2.260 track_t1_spent=$13.22 elapsed=361s
+  [2675/13252] errors=40 job_cost=$2.484 track_t1_spent=$13.72 elapsed=391s
+  [2889/13252] errors=40 job_cost=$2.690 track_t1_spent=$14.09 elapsed=421s
+  [3127/13252] errors=42 job_cost=$2.916 track_t1_spent=$14.35 elapsed=451s
+### mb_honest none n=all
+[chain] mb_honest openai/gpt-4.1-mini|ctrl-basic-v1|none: calls=13797 to_score=9984 in 507 chains; list-price estimate $12.60
+  [183/9984] errors=0 job_cost=$0.181 track_t1_spent=$14.91 elapsed=30s
+  [379/9984] errors=0 job_cost=$0.367 track_t1_spent=$15.34 elapsed=60s
+  [515/9984] errors=3 job_cost=$0.495 track_t1_spent=$15.62 elapsed=91s
+  [636/9984] errors=6 job_cost=$0.605 track_t1_spent=$15.87 elapsed=121s
+  [745/9984] errors=6 job_cost=$0.709 track_t1_spent=$16.13 elapsed=152s
+  [866/9984] errors=6 job_cost=$0.822 track_t1_spent=$16.41 elapsed=183s
+  [992/9984] errors=6 job_cost=$0.935 track_t1_spent=$16.70 elapsed=213s
+  [1114/9984] errors=6 job_cost=$1.043 track_t1_spent=$16.97 elapsed=243s
+  [1225/9984] errors=6 job_cost=$1.151 track_t1_spent=$17.24 elapsed=274s
+  [1353/9984] errors=7 job_cost=$1.275 track_t1_spent=$17.56 elapsed=304s
+  [1459/9984] errors=8 job_cost=$1.384 track_t1_spent=$17.88 elapsed=334s
+  [1604/9984] errors=8 job_cost=$1.533 track_t1_spent=$18.30 elapsed=364s
+  [1758/9984] errors=9 job_cost=$1.684 track_t1_spent=$18.68 elapsed=394s
+  [1892/9984] errors=15 job_cost=$1.815 track_t1_spent=$18.97 elapsed=425s
+  [2038/9984] errors=18 job_cost=$1.960 track_t1_spent=$19.30 elapsed=455s
+  [2179/9984] errors=19 job_cost=$2.103 track_t1_spent=$19.62 elapsed=485s
+  [2315/9984] errors=22 job_cost=$2.240 track_t1_spent=$19.95 elapsed=515s
+  [2509/9984] errors=23 job_cost=$2.441 track_t1_spent=$20.44 elapsed=546s
+  [2695/9984] errors=31 job_cost=$2.616 track_t1_spent=$20.92 elapsed=576s
+  [2894/9984] errors=35 job_cost=$2.818 track_t1_spent=$21.45 elapsed=606s
+  [3070/9984] errors=37 job_cost=$2.993 track_t1_spent=$21.89 elapsed=636s
+  [3271/9984] errors=43 job_cost=$3.183 track_t1_spent=$22.37 elapsed=666s
+  [3460/9984] errors=47 job_cost=$3.353 track_t1_spent=$22.83 elapsed=696s
+  [3653/9984] errors=51 job_cost=$3.536 track_t1_spent=$23.28 elapsed=726s
+  [3855/9984] errors=57 job_cost=$3.724 track_t1_spent=$23.78 elapsed=756s
+  [4048/9984] errors=59 job_cost=$3.910 track_t1_spent=$24.23 elapsed=787s
+  [4225/9984] errors=62 job_cost=$4.082 track_t1_spent=$24.68 elapsed=817s
+  [4404/9984] errors=64 job_cost=$4.252 track_t1_spent=$25.09 elapsed=847s
+  [4581/9984] errors=66 job_cost=$4.424 track_t1_spent=$25.51 elapsed=877s
+  [4651/9984] errors=67 job_cost=$4.488 track_t1_spent=$25.65 elapsed=908s
+  [4796/9984] errors=67 job_cost=$4.627 track_t1_spent=$25.95 elapsed=938s
+  [4926/9984] errors=67 job_cost=$4.752 track_t1_spent=$26.26 elapsed=969s
+  [5106/9984] errors=67 job_cost=$4.922 track_t1_spent=$26.69 elapsed=999s
+  [5278/9984] errors=69 job_cost=$5.088 track_t1_spent=$27.09 elapsed=1029s
+  [5451/9984] errors=75 job_cost=$5.257 track_t1_spent=$27.51 elapsed=1059s
+  [5614/9984] errors=79 job_cost=$5.415 track_t1_spent=$27.90 elapsed=1089s
+  [5777/9984] errors=83 job_cost=$5.572 track_t1_spent=$28.33 elapsed=1119s
+  [5960/9984] errors=86 job_cost=$5.760 track_t1_spent=$28.76 elapsed=1149s
+  [6145/9984] errors=90 job_cost=$5.941 track_t1_spent=$29.20 elapsed=1179s
+  [6345/9984] errors=94 job_cost=$6.139 track_t1_spent=$29.66 elapsed=1209s
+  [6546/9984] errors=97 job_cost=$6.344 track_t1_spent=$30.11 elapsed=1240s
+  [6738/9984] errors=98 job_cost=$6.535 track_t1_spent=$30.53 elapsed=1270s
+  [6917/9984] errors=102 job_cost=$6.709 track_t1_spent=$30.93 elapsed=1300s
+  [7103/9984] errors=105 job_cost=$6.898 track_t1_spent=$31.35 elapsed=1330s
+  [7300/9984] errors=110 job_cost=$7.095 track_t1_spent=$31.80 elapsed=1361s
+  [7483/9984] errors=113 job_cost=$7.283 track_t1_spent=$32.19 elapsed=1391s
+  [7666/9984] errors=117 job_cost=$7.463 track_t1_spent=$32.62 elapsed=1421s
+  [7834/9984] errors=119 job_cost=$7.625 track_t1_spent=$33.02 elapsed=1451s
+  [8007/9984] errors=121 job_cost=$7.798 track_t1_spent=$33.41 elapsed=1482s
+  [8194/9984] errors=123 job_cost=$7.988 track_t1_spent=$33.85 elapsed=1512s
+  [8387/9984] errors=125 job_cost=$8.195 track_t1_spent=$34.31 elapsed=1542s
+  [8570/9984] errors=128 job_cost=$8.390 track_t1_spent=$34.75 elapsed=1572s
+  [8772/9984] errors=130 job_cost=$8.598 track_t1_spent=$35.21 elapsed=1602s
+  [8968/9984] errors=132 job_cost=$8.799 track_t1_spent=$35.65 elapsed=1633s
+  [9136/9984] errors=136 job_cost=$8.962 track_t1_spent=$36.03 elapsed=1663s
+  [9334/9984] errors=138 job_cost=$9.168 track_t1_spent=$36.50 elapsed=1693s
+  [9519/9984] errors=144 job_cost=$9.351 track_t1_spent=$36.93 elapsed=1723s
+  [9690/9984] errors=148 job_cost=$9.521 track_t1_spent=$37.34 elapsed=1753s
+  [9872/9984] errors=150 job_cost=$9.695 track_t1_spent=$37.76 elapsed=1783s
+  [9984/9984] errors=152 job_cost=$9.795 track_t1_spent=$38.15 elapsed=1815s
+monitor_id=openai/gpt-4.1-mini|ctrl-basic-v1|none
+source=mb_honest trajectories=550 calls=13797 cached=13645 stale=0 to_score=152 calls_with_truncated_history=0
+estimated input tokens=371,355 (chars/4); estimated cost=$0.192
+  [47/152] errors=0 job_cost=$0.0453 track_t1_spent=$38.338 elapsed=16s
+  [140/152] errors=0 job_cost=$0.1355 track_t1_spent=$38.543 elapsed=31s
+  [152/152] errors=1 job_cost=$0.1460 track_t1_spent=$38.956 elapsed=73s
+wrote /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/data/processed/mb_honest/scores_openai_gpt-4.1-mini_none.jsonl (550 streams, 13797 units, 1 NaN, 13796/13797 logprob-expected)

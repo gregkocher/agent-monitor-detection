@@ -1,0 +1,64 @@
+  la:claude-haiku-4-5 len_ratio=0.86
+  la:claude-opus-4-6 len_ratio=0.77
+  la:claude-sonnet-4-6 len_ratio=0.74
+  la:gemini-3-flash len_ratio=0.74
+  la:gemini-3.1-pro len_ratio=0.75
+  la:glm-5 len_ratio=0.74
+  la:gpt-4.1-nano len_ratio=0.74
+  la:gpt-5-mini len_ratio=0.74
+  la:gpt-5-nano len_ratio=0.77
+  la:gpt-5.4 len_ratio=0.77
+  la:gpt-oss-120b len_ratio=0.74
+  la:kimi-k2.5 len_ratio=0.74
+  akshn_bash:cumulative len_ratio=0.90
+  akshn_bash:local len_ratio=0.90
+  akshn_agentdojo:cumulative len_ratio=1.56
+  akshn_agentdojo:local len_ratio=1.56
+  akshn_iac:cumulative len_ratio=1.18
+  akshn_iac:local len_ratio=1.18
+  akshn_shade:cumulative len_ratio=1.02
+  akshn_shade:local len_ratio=1.02
+  akshn_basharena_opus46:cumulative len_ratio=0.59
+  akshn_basharena_opus46:local len_ratio=0.59
+  akshn_basharena_sonnet45:cumulative len_ratio=0.39
+  akshn_basharena_sonnet45:local len_ratio=0.39
+  akshn_linuxarena:cumulative len_ratio=0.71
+  akshn_linuxarena:local len_ratio=0.71
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_5+likert_reminder_v2_superaware len_ratio=0.65
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_5+likert_reminder_v2_unaware len_ratio=0.93
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_5 len_ratio=0.65
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_7+likert_reminder_v2_superaware len_ratio=1.38
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_7+likert_reminder_v2_unaware len_ratio=1.38
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_7 len_ratio=1.14
+  ps:diff_current_only:gradual len_ratio=1.05
+  ps:diff_current_only:positional len_ratio=1.04
+  ps:diff_full_diffs:gradual len_ratio=1.05
+  ps:diff_full_diffs:positional len_ratio=1.04
+  ps:diff_task_sequence:gradual len_ratio=1.05
+  ps:diff_task_sequence:positional len_ratio=1.05
+  ps:traj:gradual len_ratio=1.05
+  ps:traj:positional len_ratio=1.05
+  mb:gpt-4.1-mini:full:expected len_ratio=1.31
+  mb:gpt-4.1-mini:none:expected len_ratio=1.31
+  mb:gpt-4.1-mini:full:int len_ratio=1.31
+  mb:gpt-4.1-mini:none:int len_ratio=1.31
+  mb:gpt-4.1-nano:none:expected len_ratio=1.31
+  mb:gpt-4.1-nano:none:int len_ratio=1.31
+# Length-aware hybrids: mean TPR gain over max across stream sets
+
+| alpha | detector | all sets: mean gain | sets with |log len ratio| > 0.2: mean gain (n) | win/loss (>0.01) |
+|---|---|---|---|---|
+| 0.01 | kth2 | -0.026 | -0.027 (29) | 18/23 |
+| 0.01 | lenbin(kth2) | -0.111 | -0.116 (29) | 9/33 |
+| 0.01 | lenbin(max) | -0.122 | -0.142 (29) | 5/39 |
+| 0.01 | lenbin(top3sum) | -0.152 | -0.187 (29) | 7/35 |
+| 0.01 | max_lenaware | -0.011 | +0.008 (29) | 19/23 |
+| 0.01 | top3sum | -0.032 | -0.045 (29) | 16/24 |
+| 0.05 | kth2 | -0.032 | -0.024 (29) | 10/28 |
+| 0.05 | lenbin(kth2) | -0.047 | -0.025 (29) | 9/32 |
+| 0.05 | lenbin(max) | -0.028 | -0.024 (29) | 7/21 |
+| 0.05 | lenbin(top3sum) | -0.019 | -0.021 (29) | 14/24 |
+| 0.05 | max_lenaware | +0.013 | +0.028 (29) | 13/15 |
+| 0.05 | top3sum | -0.010 | -0.020 (29) | 13/26 |
+
+Realized FPR (mean over sets) at alpha: kth2@0.01: 0.014, lenbin(kth2)@0.01: 0.011, lenbin(max)@0.01: 0.010, lenbin(top3sum)@0.01: 0.011, max@0.01: 0.012, max_lenaware@0.01: 0.011, top3sum@0.01: 0.013, kth2@0.05: 0.053, lenbin(kth2)@0.05: 0.049, lenbin(max)@0.05: 0.048, lenbin(top3sum)@0.05: 0.050, max@0.05: 0.051, max_lenaware@0.05: 0.050, top3sum@0.05: 0.051

@@ -23,22 +23,56 @@ import httpx
 
 from .schema import REPO
 
-KEY_PATH = Path(os.environ.get(
-    "AMD_OPENROUTER_KEY_PATH",
-    "/Users/gkocher/Desktop/RESEARCH/MATS_SUMMER_2026/openrouter_api_key_weekly1000.txt"))
+_KEY_DIR = Path("/Users/gkocher/Desktop/MATS_SUMMER_2026")
+# Key chain, tried in order. The first two draw on the shared MATS account; the last is the personal
+# account (fallback only, used automatically when the MATS keys hit a credit / weekly-limit error).
+KEY_CHAIN = [Path(p) for p in os.environ.get("AMD_OPENROUTER_KEY_CHAIN", "").split(":") if p] or [
+    _KEY_DIR / "openrouter_api_key_weekly1000.txt",
+    _KEY_DIR / "openrouter_api_key_weekly3000.txt",
+    _KEY_DIR / "openrouter_api_key.txt",
+]
+KEY_PATH = Path(os.environ["AMD_OPENROUTER_KEY_PATH"]) if os.environ.get("AMD_OPENROUTER_KEY_PATH") else KEY_CHAIN[0]
 LEDGER = REPO / "results" / "spend_ledger.jsonl"
 URL = "https://openrouter.ai/api/v1/chat/completions"
 
-GLOBAL_CAP_USD = 500.0
-TRACK_CAPS_USD = {"t1": 130.0, "t2": 70.0, "t3": 200.0, "dev": 15.0, "reserve": 100.0}
+# Round 1 (2026-10-20): $500 cap, spent $195.56. Round 2 (2026-10-21, overnight): +$700.
+GLOBAL_CAP_USD = 1100.0  # raised 2026-10-21 (user OK with going over the $700 round-2 plan)
+TRACK_CAPS_USD = {"t1": 130.0, "t2": 70.0, "t3": 200.0, "dev": 15.0, "reserve": 100.0,
+                  # round 2
+                  "wb": 120.0, "r2t1": 200.0, "r2t2": 60.0, "r2t3": 350.0, "dev2": 20.0, "reserve2": 50.0}
 
 
 class BudgetExceeded(RuntimeError):
     pass
 
 
+_KEY_STATE = REPO / "results" / ".key_index"
+
+
+def _key_index() -> int:
+    if os.environ.get("AMD_OPENROUTER_KEY_PATH"):
+        return -1
+    try:
+        return min(int(_KEY_STATE.read_text().strip() or 0), len(KEY_CHAIN) - 1)
+    except (FileNotFoundError, ValueError):
+        return 0
+
+
 def _key() -> str:
-    return KEY_PATH.read_text().strip()
+    i = _key_index()
+    return (KEY_PATH if i < 0 else KEY_CHAIN[i]).read_text().strip()
+
+
+def _advance_key(reason: str) -> bool:
+    """Move to the next key in the chain (shared across processes). Returns False if none left."""
+    i = _key_index()
+    if i < 0 or i >= len(KEY_CHAIN) - 1:
+        return False
+    _KEY_STATE.parent.mkdir(parents=True, exist_ok=True)
+    _KEY_STATE.write_text(str(i + 1))
+    _append({"t": time.time(), "track": "_keyswitch", "tag": reason[:200], "model": "", "cost": 0.0,
+             "key_file": KEY_CHAIN[i + 1].name})
+    return True
 
 
 _LEDGER_STATE: dict = {"path": None, "ino": None, "offset": 0, "tot": 0.0, "per": {}}
@@ -133,6 +167,9 @@ class OpenRouter:
                         "Authorization": f"Bearer {_key()}",
                         "HTTP-Referer": "https://github.com/gregkocher/agent-monitor-detection",
                         "X-Title": "agent-monitor-detection"})
+                    if r.status_code in (402, 403) and any(w in r.text.lower() for w in ("credit", "limit", "insufficient", "quota")):
+                        if _advance_key(f"{r.status_code}: {r.text[:150]}"):
+                            continue
                     if r.status_code in (429, 500, 502, 503, 504, 408):
                         raise httpx.HTTPStatusError(f"status {r.status_code}", request=r.request, response=r)
                     r.raise_for_status()

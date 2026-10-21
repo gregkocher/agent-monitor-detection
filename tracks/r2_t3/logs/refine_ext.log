@@ -1,0 +1,3 @@
+monitor=openai/gpt-4.1 attacks=150 arms=['pace_max', 'pace_cusum', 'pace_multichart'] rounds=2 honest_streams=550
+r2t3 spent so far $204.53
+refining 154 (attack,arm) pairs (296 already done)

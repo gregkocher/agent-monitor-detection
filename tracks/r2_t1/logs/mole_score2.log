@@ -1,0 +1,18 @@
+gpt53_single_day: 4442 account-days, ~37.5M input tokens, list ~$15.01
+[r2t1:mole:gpt53_single_day] openai/gpt-4.1-mini: 281 calls in 281 chains (4161 cached)
+  [281/281] err=0 job=$1.14 r2t1=$17.86 23s
+wrote llm_openai_gpt-4.1-mini.parquet: 4442/4442 scored
+gpt53_multiday: 4443 account-days, ~38.2M input tokens, list ~$15.27
+[r2t1:mole:gpt53_multiday] openai/gpt-4.1-mini: 4443 calls in 4443 chains (0 cached)
+  [399/4443] err=0 job=$1.52 r2t1=$19.38 30s
+  [818/4443] err=0 job=$3.30 r2t1=$21.16 60s
+  [1236/4443] err=0 job=$4.99 r2t1=$22.85 90s
+  [1655/4443] err=0 job=$6.84 r2t1=$24.70 120s
+  [2071/4443] err=0 job=$8.61 r2t1=$26.47 151s
+  [2490/4443] err=0 job=$10.26 r2t1=$28.12 181s
+  [2891/4443] err=0 job=$11.78 r2t1=$29.64 211s
+  [3301/4443] err=0 job=$13.58 r2t1=$31.44 241s
+  [3718/4443] err=0 job=$15.21 r2t1=$33.07 271s
+  [4142/4443] err=0 job=$16.90 r2t1=$34.76 301s
+  [4443/4443] err=0 job=$18.09 r2t1=$35.95 325s
+wrote llm_openai_gpt-4.1-mini.parquet: 4443/4443 scored

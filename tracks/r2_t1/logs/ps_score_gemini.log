@@ -1,0 +1,25 @@
+691 runs; 0 with a missing full-diff file
+current_only: 2598 unique calls, ~25.2M input tokens, list ~$10.10
+[r2t1:ps:current_only] google/gemini-2.5-flash: 2598 calls in 690 chains (0 cached)
+  [331/2598] err=8 job=$1.56 r2t1=$68.40 30s
+  [670/2598] err=25 job=$3.07 r2t1=$70.01 60s
+  [1031/2598] err=38 job=$4.28 r2t1=$71.34 90s
+  [1423/2598] err=49 job=$5.19 r2t1=$72.37 120s
+  [1767/2598] err=56 job=$6.70 r2t1=$74.01 151s
+  [2063/2598] err=73 job=$8.15 r2t1=$75.57 181s
+  [2341/2598] err=87 job=$9.63 r2t1=$77.19 211s
+  [2598/2598] err=106 job=$10.93 r2t1=$78.61 240s
+wrote r2_scores_google_gemini-2.5-flash_current_only.jsonl: 691 runs, 3246/3455 PRs scored
+full_diffs: 2600 unique calls, ~46.6M input tokens, list ~$18.65
+[r2t1:ps:full_diffs] google/gemini-2.5-flash: 2600 calls in 690 chains (0 cached)
+  [304/2600] err=10 job=$1.89 r2t1=$80.67 30s
+  [548/2600] err=29 job=$3.38 r2t1=$82.28 60s
+  [820/2600] err=37 job=$4.85 r2t1=$83.88 90s
+  [1153/2600] err=49 job=$6.08 r2t1=$85.19 120s
+  [1452/2600] err=64 job=$7.21 r2t1=$86.43 150s
+  [1766/2600] err=73 job=$9.02 r2t1=$88.42 180s
+  [1970/2600] err=94 job=$10.40 r2t1=$89.95 211s
+  [2186/2600] err=125 job=$11.88 r2t1=$91.58 241s
+  [2377/2600] err=155 job=$13.24 r2t1=$93.07 271s
+  [2600/2600] err=177 job=$14.67 r2t1=$94.61 301s
+wrote r2_scores_google_gemini-2.5-flash_full_diffs.jsonl: 691 runs, 3191/3455 PRs scored

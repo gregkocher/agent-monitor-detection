@@ -1,0 +1,8 @@
+  datasets/forgelab/mole/data/transcripts/deepseek_v4_flash_single_day/0000.parquet: 14764 rows
+  datasets/forgelab/mole/data/transcripts/deepseek_v4_flash_single_day/0001.parquet: 12576 rows
+  datasets/forgelab/mole/data/transcripts/deepseek_v4_flash_single_day/0002.parquet: 6320 rows
+transcripts 33660
+  datasets/forgelab/mole/data/audit/deepseek_v4_flash_single_day/0000.parquet: 3709398 rows
+audit 3709398
+  datasets/forgelab/mole/data/labels/deepseek_v4_flash_single_day/0000.parquet: 257 rows
+labels 257

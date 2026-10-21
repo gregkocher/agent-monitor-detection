@@ -1,0 +1,41 @@
+  la:claude-haiku-4-5: n_h=200 n_a=101 (grouped by main_task) 3s
+  la:claude-opus-4-6: n_h=200 n_a=142 (grouped by main_task) 14s
+  la:claude-sonnet-4-6: n_h=200 n_a=137 (grouped by main_task) 3s
+  la:gemini-3-flash: n_h=200 n_a=137 (grouped by main_task) 3s
+  la:gemini-3.1-pro: n_h=200 n_a=132 (grouped by main_task) 3s
+  la:glm-5: n_h=200 n_a=137 (grouped by main_task) 3s
+  la:gpt-4.1-nano: n_h=200 n_a=137 (grouped by main_task) 4s
+  la:gpt-5-mini: n_h=200 n_a=137 (grouped by main_task) 3s
+  la:gpt-5-nano: n_h=200 n_a=142 (grouped by main_task) 19s
+  la:gpt-5.4: n_h=200 n_a=142 (grouped by main_task) 3s
+  la:gpt-oss-120b: n_h=199 n_a=137 (grouped by main_task) 3s
+  la:kimi-k2.5: n_h=200 n_a=137 (grouped by main_task) 3s
+  akshn_bash:cumulative: n_h=750 n_a=750 (grouped by main_task) 12s
+  akshn_bash:local: n_h=750 n_a=750 (grouped by main_task) 12s
+  akshn_agentdojo:cumulative: n_h=750 n_a=750 (iid split) 5s
+  akshn_agentdojo:local: n_h=750 n_a=750 (iid split) 5s
+  akshn_iac:cumulative: n_h=750 n_a=750 (iid split) 6s
+  akshn_iac:local: n_h=750 n_a=750 (iid split) 5s
+  akshn_shade:cumulative: n_h=747 n_a=750 (iid split) 12s
+  akshn_shade:local: n_h=747 n_a=750 (iid split) 11s
+  akshn_basharena_opus46:cumulative: n_h=468 n_a=564 (grouped by main_task) 4s
+  akshn_basharena_opus46:local: n_h=468 n_a=564 (grouped by main_task) 4s
+  akshn_basharena_sonnet45:cumulative: n_h=335 n_a=925 (grouped by main_task) 16s
+  akshn_basharena_sonnet45:local: n_h=335 n_a=925 (grouped by main_task) 16s
+  akshn_linuxarena:cumulative: n_h=1396 n_a=1305 (grouped by main_task) 33s
+  akshn_linuxarena:local: n_h=1396 n_a=1305 (grouped by main_task) 33s
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_5+likert_reminder_v2_superaware: n_h=321 n_a=680 (iid split) 4s
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_5+likert_reminder_v2_unaware: n_h=269 n_a=680 (iid split) 4s
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_5: n_h=320 n_a=680 (iid split) 4s
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_7+likert_reminder_v2_superaware: n_h=75 n_a=75 (iid split) 1s
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_7+likert_reminder_v2_unaware: n_h=75 n_a=75 (iid split) 1s
+  mrt:claude-3-5-sonnet-20241022|mrt_sequential_7: n_h=125 n_a=109 (iid split) 1s
+  ps:diff_current_only:gradual: n_h=167 n_a=120 (iid split) 1s
+  ps:diff_current_only:positional: n_h=167 n_a=398 (iid split) 2s
+  ps:diff_full_diffs:gradual: n_h=167 n_a=120 (iid split) 1s
+  ps:diff_full_diffs:positional: n_h=167 n_a=398 (iid split) 2s
+  ps:diff_task_sequence:gradual: n_h=167 n_a=120 (iid split) 1s
+  ps:diff_task_sequence:positional: n_h=167 n_a=397 (iid split) 2s
+  ps:traj:gradual: n_h=167 n_a=120 (iid split) 1s
+  ps:traj:positional: n_h=167 n_a=397 (iid split) 2s
+done ['matched', 'gain', 'logit_roc', 'streaming', 'localization', 'autocorr', 'lengths', 'length_matched', 'arl']

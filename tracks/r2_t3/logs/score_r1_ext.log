@@ -1,0 +1,6 @@
+
+##### r1 arm t3_refined/max [none] #####
+monitor_id=openai/gpt-4.1|ctrl-basic-v1|none
+source=t3_refined/max trajectories=145 calls=2569 cached=1743 stale=0 to_score=826 calls_with_truncated_history=0
+estimated input tokens=1,780,020 (chars/4); estimated cost=$4.749
+  [71/826] errors=0 job_cost=$0.2163 track_r2t3_spent=$204.746 elapsed=15s

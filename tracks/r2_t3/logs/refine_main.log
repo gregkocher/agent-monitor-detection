@@ -1,0 +1,53 @@
+monitor=openai/gpt-4.1 attacks=100 arms=['pace_max', 'pace_cusum', 'pace_multichart'] rounds=2 honest_streams=550
+r2t3 spent so far $104.42
+refining 276 (attack,arm) pairs (24 already done)
+  [6/276] r2t3=$108.02 elapsed=99s
+  [12/276] r2t3=$110.05 elapsed=153s
+  [18/276] r2t3=$111.44 elapsed=190s
+  [24/276] r2t3=$113.47 elapsed=242s
+  [30/276] r2t3=$119.32 elapsed=406s
+  [36/276] r2t3=$124.40 elapsed=538s
+  [42/276] r2t3=$127.51 elapsed=619s
+  [48/276] r2t3=$130.54 elapsed=699s
+  [54/276] r2t3=$132.34 elapsed=751s
+  [60/276] r2t3=$135.72 elapsed=843s
+  [66/276] r2t3=$140.76 elapsed=976s
+  [72/276] r2t3=$143.65 elapsed=1059s
+  [78/276] r2t3=$145.30 elapsed=1139s
+  [84/276] r2t3=$147.08 elapsed=1232s
+  [90/276] r2t3=$148.62 elapsed=1302s
+  [96/276] r2t3=$150.66 elapsed=1398s
+  [102/276] r2t3=$152.72 elapsed=1496s
+  [108/276] r2t3=$155.34 elapsed=1624s
+  [114/276] r2t3=$157.03 elapsed=1722s
+  [120/276] r2t3=$159.37 elapsed=1846s
+  [126/276] r2t3=$161.11 elapsed=1923s
+  [132/276] r2t3=$164.22 elapsed=2086s
+  [138/276] r2t3=$166.29 elapsed=2197s
+  [144/276] r2t3=$168.10 elapsed=2282s
+  [150/276] r2t3=$169.56 elapsed=2359s
+  [156/276] r2t3=$171.40 elapsed=2452s
+  [162/276] r2t3=$172.51 elapsed=2503s
+  pair (jMLMqE,pace_multichart) failed: AttributeError: 'str' object has no attribute 'get'
+  [168/276] r2t3=$175.29 elapsed=2646s
+  [174/276] r2t3=$177.89 elapsed=2776s
+  [180/276] r2t3=$179.53 elapsed=2854s
+  pair (PM2s2X,pace_max) failed: AttributeError: 'str' object has no attribute 'get'
+  [186/276] r2t3=$181.36 elapsed=2957s
+  [192/276] r2t3=$183.05 elapsed=3043s
+  [198/276] r2t3=$184.88 elapsed=3116s
+  pair (fBxGxt,pace_max) failed: AttributeError: 'str' object has no attribute 'get'
+  [204/276] r2t3=$187.82 elapsed=3258s
+  [210/276] r2t3=$189.39 elapsed=3345s
+  [216/276] r2t3=$190.87 elapsed=3412s
+  [222/276] r2t3=$192.64 elapsed=3498s
+  [228/276] r2t3=$193.74 elapsed=3555s
+  [234/276] r2t3=$194.93 elapsed=3604s
+  [240/276] r2t3=$196.69 elapsed=3695s
+  [246/276] r2t3=$198.00 elapsed=3766s
+  [252/276] r2t3=$199.53 elapsed=3837s
+  [258/276] r2t3=$201.15 elapsed=3915s
+  [264/276] r2t3=$203.36 elapsed=4018s
+  pair (Z7rVYP,pace_multichart) failed: AttributeError: 'str' object has no attribute 'get'
+  [270/276] r2t3=$204.28 elapsed=4068s
+DONE. r2t3 total $204.53

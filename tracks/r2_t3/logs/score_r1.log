@@ -1,0 +1,86 @@
+
+##### r1 arm t3_refined/max [none] #####
+monitor_id=openai/gpt-4.1|ctrl-basic-v1|none
+source=t3_refined/max trajectories=96 calls=1743 cached=0 stale=0 to_score=1743 calls_with_truncated_history=0
+estimated input tokens=3,739,930 (chars/4); estimated cost=$9.990
+  [66/1743] errors=0 job_cost=$0.2128 track_r2t3_spent=$104.630 elapsed=15s
+  [151/1743] errors=0 job_cost=$0.4691 track_r2t3_spent=$105.355 elapsed=30s
+  [227/1743] errors=0 job_cost=$0.7157 track_r2t3_spent=$105.912 elapsed=45s
+  [308/1743] errors=0 job_cost=$0.9641 track_r2t3_spent=$106.357 elapsed=60s
+  [381/1743] errors=0 job_cost=$1.1761 track_r2t3_spent=$106.954 elapsed=75s
+  [451/1743] errors=0 job_cost=$1.3915 track_r2t3_spent=$107.479 elapsed=91s
+  [540/1743] errors=0 job_cost=$1.6741 track_r2t3_spent=$108.299 elapsed=106s
+  [621/1743] errors=0 job_cost=$1.9226 track_r2t3_spent=$108.821 elapsed=121s
+  [697/1743] errors=0 job_cost=$2.1601 track_r2t3_spent=$109.461 elapsed=136s
+  [775/1743] errors=0 job_cost=$2.4032 track_r2t3_spent=$109.962 elapsed=151s
+  [853/1743] errors=0 job_cost=$2.6423 track_r2t3_spent=$110.667 elapsed=166s
+  [928/1743] errors=0 job_cost=$2.8489 track_r2t3_spent=$111.144 elapsed=182s
+  [993/1743] errors=0 job_cost=$3.0255 track_r2t3_spent=$111.667 elapsed=197s
+  [1073/1743] errors=0 job_cost=$3.2782 track_r2t3_spent=$112.136 elapsed=212s
+  [1148/1743] errors=0 job_cost=$3.5077 track_r2t3_spent=$112.733 elapsed=228s
+  [1227/1743] errors=0 job_cost=$3.7808 track_r2t3_spent=$113.462 elapsed=243s
+  [1312/1743] errors=0 job_cost=$4.0574 track_r2t3_spent=$114.091 elapsed=259s
+  [1392/1743] errors=0 job_cost=$4.3071 track_r2t3_spent=$114.604 elapsed=274s
+  [1476/1743] errors=0 job_cost=$4.5778 track_r2t3_spent=$115.035 elapsed=289s
+  [1559/1743] errors=0 job_cost=$4.8311 track_r2t3_spent=$115.572 elapsed=304s
+  [1641/1743] errors=0 job_cost=$5.0775 track_r2t3_spent=$116.110 elapsed=319s
+  [1724/1743] errors=0 job_cost=$5.3459 track_r2t3_spent=$116.874 elapsed=335s
+  [1743/1743] errors=0 job_cost=$5.4096 track_r2t3_spent=$117.257 elapsed=351s
+wrote /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/data/processed/t3_refined/max/scores_openai_gpt-4.1_none.jsonl (96 streams, 1743 units, 0 NaN, 1743/1743 logprob-expected)
+
+##### r1 arm t3_refined/cusum [none] #####
+monitor_id=openai/gpt-4.1|ctrl-basic-v1|none
+source=t3_refined/cusum trajectories=88 calls=2145 cached=0 stale=0 to_score=2145 calls_with_truncated_history=0
+estimated input tokens=4,666,173 (chars/4); estimated cost=$12.421
+  [73/2145] errors=0 job_cost=$0.2324 track_r2t3_spent=$117.703 elapsed=15s
+  [158/2145] errors=0 job_cost=$0.4773 track_r2t3_spent=$118.289 elapsed=31s
+  [247/2145] errors=0 job_cost=$0.7610 track_r2t3_spent=$118.836 elapsed=46s
+  [335/2145] errors=0 job_cost=$1.0173 track_r2t3_spent=$119.525 elapsed=61s
+  [415/2145] errors=0 job_cost=$1.2779 track_r2t3_spent=$120.183 elapsed=76s
+  [500/2145] errors=0 job_cost=$1.5417 track_r2t3_spent=$120.754 elapsed=91s
+  [595/2145] errors=0 job_cost=$1.8186 track_r2t3_spent=$121.354 elapsed=107s
+  [675/2145] errors=0 job_cost=$2.0798 track_r2t3_spent=$121.957 elapsed=122s
+  [760/2145] errors=0 job_cost=$2.3209 track_r2t3_spent=$122.457 elapsed=137s
+  [848/2145] errors=0 job_cost=$2.5900 track_r2t3_spent=$122.969 elapsed=152s
+  [938/2145] errors=0 job_cost=$2.8566 track_r2t3_spent=$123.652 elapsed=167s
+  [1016/2145] errors=0 job_cost=$3.1054 track_r2t3_spent=$124.111 elapsed=182s
+  [1105/2145] errors=0 job_cost=$3.3931 track_r2t3_spent=$124.821 elapsed=197s
+  [1192/2145] errors=0 job_cost=$3.6721 track_r2t3_spent=$125.400 elapsed=213s
+  [1281/2145] errors=0 job_cost=$3.9390 track_r2t3_spent=$125.981 elapsed=228s
+  [1358/2145] errors=0 job_cost=$4.1886 track_r2t3_spent=$126.532 elapsed=243s
+  [1434/2145] errors=0 job_cost=$4.4203 track_r2t3_spent=$127.080 elapsed=258s
+  [1518/2145] errors=0 job_cost=$4.6536 track_r2t3_spent=$127.664 elapsed=273s
+  [1606/2145] errors=0 job_cost=$4.9458 track_r2t3_spent=$128.285 elapsed=288s
+  [1688/2145] errors=0 job_cost=$5.1980 track_r2t3_spent=$128.854 elapsed=303s
+  [1770/2145] errors=0 job_cost=$5.4451 track_r2t3_spent=$129.389 elapsed=318s
+  [1841/2145] errors=0 job_cost=$5.6655 track_r2t3_spent=$129.839 elapsed=334s
+  [1920/2145] errors=0 job_cost=$5.9161 track_r2t3_spent=$130.529 elapsed=349s
+  [2001/2145] errors=0 job_cost=$6.1605 track_r2t3_spent=$131.157 elapsed=364s
+  [2082/2145] errors=0 job_cost=$6.4144 track_r2t3_spent=$131.619 elapsed=379s
+  [2145/2145] errors=0 job_cost=$6.6131 track_r2t3_spent=$132.342 elapsed=401s
+wrote /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/data/processed/t3_refined/cusum/scores_openai_gpt-4.1_none.jsonl (88 streams, 2145 units, 0 NaN, 2145/2145 logprob-expected)
+
+##### r1 arm t3_refined/multichart [none] #####
+monitor_id=openai/gpt-4.1|ctrl-basic-v1|none
+source=t3_refined/multichart trajectories=96 calls=1547 cached=0 stale=0 to_score=1547 calls_with_truncated_history=0
+estimated input tokens=3,339,889 (chars/4); estimated cost=$8.907
+  [82/1547] errors=0 job_cost=$0.2639 track_r2t3_spent=$132.776 elapsed=15s
+  [168/1547] errors=0 job_cost=$0.5081 track_r2t3_spent=$133.456 elapsed=30s
+  [246/1547] errors=0 job_cost=$0.7497 track_r2t3_spent=$133.926 elapsed=46s
+  [328/1547] errors=0 job_cost=$1.0226 track_r2t3_spent=$134.657 elapsed=61s
+  [408/1547] errors=0 job_cost=$1.2714 track_r2t3_spent=$135.149 elapsed=76s
+  [485/1547] errors=0 job_cost=$1.4889 track_r2t3_spent=$135.727 elapsed=91s
+  [568/1547] errors=0 job_cost=$1.7567 track_r2t3_spent=$136.222 elapsed=106s
+  [651/1547] errors=0 job_cost=$2.0091 track_r2t3_spent=$136.844 elapsed=121s
+  [734/1547] errors=0 job_cost=$2.2705 track_r2t3_spent=$137.426 elapsed=137s
+  [818/1547] errors=0 job_cost=$2.5186 track_r2t3_spent=$137.950 elapsed=152s
+  [895/1547] errors=0 job_cost=$2.7671 track_r2t3_spent=$138.445 elapsed=167s
+  [978/1547] errors=0 job_cost=$3.0426 track_r2t3_spent=$139.033 elapsed=182s
+  [1065/1547] errors=0 job_cost=$3.3395 track_r2t3_spent=$139.674 elapsed=198s
+  [1149/1547] errors=0 job_cost=$3.5751 track_r2t3_spent=$140.365 elapsed=213s
+  [1230/1547] errors=0 job_cost=$3.8464 track_r2t3_spent=$140.958 elapsed=228s
+  [1317/1547] errors=0 job_cost=$4.1185 track_r2t3_spent=$141.551 elapsed=243s
+  [1396/1547] errors=0 job_cost=$4.3747 track_r2t3_spent=$141.997 elapsed=259s
+  [1469/1547] errors=0 job_cost=$4.6068 track_r2t3_spent=$142.775 elapsed=274s
+  [1547/1547] errors=0 job_cost=$4.8392 track_r2t3_spent=$143.276 elapsed=289s
+wrote /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/data/processed/t3_refined/multichart/scores_openai_gpt-4.1_none.jsonl (96 streams, 1547 units, 0 NaN, 1547/1547 logprob-expected)

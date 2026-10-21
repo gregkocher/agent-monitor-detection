@@ -1,0 +1,17 @@
+deepseek_v4_flash_single_day: 4442 account-days, ~81.3M input tokens, list ~$32.53
+[r2t1:mole:deepseek_v4_flash_single_day] openai/gpt-4.1-mini: 4442 calls in 4442 chains (0 cached)
+  [288/4442] err=0 job=$2.92 r2t1=$106.80 30s
+  [625/4442] err=0 job=$6.25 r2t1=$110.12 60s
+  [969/4442] err=0 job=$9.70 r2t1=$113.58 90s
+  [1308/4442] err=0 job=$13.02 r2t1=$116.89 120s
+  [1658/4442] err=0 job=$16.43 r2t1=$120.30 150s
+  [1997/4442] err=0 job=$19.71 r2t1=$123.59 180s
+  [2355/4442] err=0 job=$23.29 r2t1=$127.17 211s
+  [2699/4442] err=0 job=$26.72 r2t1=$130.59 241s
+  [3038/4442] err=0 job=$30.13 r2t1=$134.00 271s
+  [3373/4442] err=0 job=$33.49 r2t1=$137.36 301s
+  [3710/4442] err=0 job=$36.76 r2t1=$140.64 331s
+  [4052/4442] err=0 job=$40.12 r2t1=$144.00 361s
+  [4396/4442] err=0 job=$43.57 r2t1=$147.45 391s
+  [4442/4442] err=0 job=$44.01 r2t1=$147.89 395s
+wrote llm_openai_gpt-4.1-mini.parquet: 4442/4442 scored
