@@ -355,7 +355,7 @@ async def amain(a):
     slug = a.monitor_model.replace("/", "_").replace(":", "_")
     sfile = f"scores_{slug}_none.jsonl"
 
-    async with OpenRouter(track=TRACK, concurrency=a.concurrency, tag="r2t3:refine") as orc:
+    async with OpenRouter(track=a.track, concurrency=a.concurrency, tag=f"{a.track}:refine") as orc:
         todo_ck = [t for t in origs if t.traj_id not in ck_cache]
         if todo_ck:
             print(f"building {len(todo_ck)} checklists with {a.checklist_model} ...", flush=True)
@@ -369,7 +369,7 @@ async def amain(a):
                                         "structure": t.meta.get("structural_strategy"), "effects": eff})
 
         done = set()
-        log_path = REFINED / "refine_log_r2.jsonl"
+        log_path = REFINED / f"refine_log{a.dir_suffix}.jsonl"
         if log_path.exists() and not a.redo:
             for d in (json.loads(l) for l in open(log_path) if l.strip()):
                 if any("error" not in at for at in d.get("attempts", [])):
@@ -393,13 +393,13 @@ async def amain(a):
                     return
             async with write_lock:
                 if out["final_traj"] is not None:
-                    _append_traj(REFINED / f"{arm}_r2" / "trajectories.jsonl", out["final_traj"])
+                    _append_traj(REFINED / f"{arm}{a.dir_suffix}" / "trajectories.jsonl", out["final_traj"])
                     if out["final_stream"] is not None:
-                        _append_stream(REFINED / f"{arm}_r2" / sfile, out["final_stream"])
+                        _append_stream(REFINED / f"{arm}{a.dir_suffix}" / sfile, out["final_stream"])
                 if out["round0_traj"] is not None:
-                    _append_traj(REFINED / f"{arm}_r2_r0" / "trajectories.jsonl", out["round0_traj"])
+                    _append_traj(REFINED / f"{arm}{a.dir_suffix}_r0" / "trajectories.jsonl", out["round0_traj"])
                     if out["round0_stream"] is not None:
-                        _append_stream(REFINED / f"{arm}_r2_r0" / sfile, out["round0_stream"])
+                        _append_stream(REFINED / f"{arm}{a.dir_suffix}_r0" / sfile, out["round0_stream"])
                 _append_jsonl(log_path,
                               {"orig": orig.traj_id, "arm": arm, "side_task": orig.context.get("side_task"),
                                "structure": orig.meta.get("structural_strategy"),
@@ -430,6 +430,8 @@ def main(argv=None):
     ap.add_argument("--pair-concurrency", type=int, default=6)
     ap.add_argument("--redo", action="store_true")
     ap.add_argument("--max-restarts", type=int, default=20)
+    ap.add_argument("--track", default="r2t3")
+    ap.add_argument("--dir-suffix", default="_r2")
     ap.add_argument("--yes", action="store_true")
     a = ap.parse_args(argv)
     for attempt in range(a.max_restarts + 1):
