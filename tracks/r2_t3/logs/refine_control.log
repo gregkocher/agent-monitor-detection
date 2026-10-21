@@ -1,0 +1,29 @@
+monitor=openai/gpt-4.1 attacks=150 arms=['rewrite_control'] rounds=0 honest_streams=550
+r2t3 spent so far $207.61
+refining 150 (attack,arm) pairs (300 already done)
+  [6/150] r2t3=$211.71 elapsed=78s
+  [12/150] r2t3=$215.25 elapsed=151s
+  [18/150] r2t3=$219.70 elapsed=234s
+  [24/150] r2t3=$222.85 elapsed=295s
+  [30/150] r2t3=$227.13 elapsed=377s
+  [36/150] r2t3=$231.03 elapsed=454s
+  [42/150] r2t3=$233.99 elapsed=512s
+  [48/150] r2t3=$237.98 elapsed=593s
+  [54/150] r2t3=$241.25 elapsed=654s
+  [60/150] r2t3=$244.57 elapsed=728s
+  [66/150] r2t3=$248.18 elapsed=798s
+  [72/150] r2t3=$250.87 elapsed=855s
+  [78/150] r2t3=$254.71 elapsed=929s
+  [84/150] r2t3=$258.39 elapsed=999s
+  [90/150] r2t3=$261.41 elapsed=1056s
+  [96/150] r2t3=$265.01 elapsed=1124s
+  [102/150] r2t3=$268.49 elapsed=1188s
+  [108/150] r2t3=$271.68 elapsed=1248s
+  [114/150] r2t3=$274.57 elapsed=1309s
+  [120/150] r2t3=$277.91 elapsed=1380s
+  [126/150] r2t3=$280.72 elapsed=1436s
+  [132/150] r2t3=$284.52 elapsed=1509s
+  [138/150] r2t3=$288.17 elapsed=1577s
+  [144/150] r2t3=$292.04 elapsed=1656s
+  [150/150] r2t3=$294.93 elapsed=1708s
+DONE. r2t3 total $294.93

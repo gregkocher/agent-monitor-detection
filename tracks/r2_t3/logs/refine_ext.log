@@ -1,3 +1,30 @@
 monitor=openai/gpt-4.1 attacks=150 arms=['pace_max', 'pace_cusum', 'pace_multichart'] rounds=2 honest_streams=550
 r2t3 spent so far $204.53
 refining 154 (attack,arm) pairs (296 already done)
+  [6/154] r2t3=$209.07 elapsed=124s
+  [12/154] r2t3=$212.50 elapsed=197s
+  [18/154] r2t3=$215.68 elapsed=257s
+  [24/154] r2t3=$218.53 elapsed=308s
+  [30/154] r2t3=$221.06 elapsed=358s
+  [36/154] r2t3=$223.50 elapsed=407s
+  [42/154] r2t3=$227.62 elapsed=484s
+  [48/154] r2t3=$233.89 elapsed=610s
+  [54/154] r2t3=$237.32 elapsed=677s
+  [60/154] r2t3=$243.84 elapsed=811s
+  [66/154] r2t3=$247.48 elapsed=884s
+  [72/154] r2t3=$251.03 elapsed=957s
+  [78/154] r2t3=$257.90 elapsed=1089s
+  [84/154] r2t3=$262.85 elapsed=1180s
+  [90/154] r2t3=$267.10 elapsed=1258s
+  [96/154] r2t3=$269.51 elapsed=1308s
+  [102/154] r2t3=$272.70 elapsed=1371s
+  [108/154] r2t3=$283.90 elapsed=1595s
+  [114/154] r2t3=$287.30 elapsed=1660s
+  [120/154] r2t3=$290.11 elapsed=1713s
+  [126/154] r2t3=$292.74 elapsed=1772s
+  [132/154] r2t3=$295.84 elapsed=1834s
+  [138/154] r2t3=$300.75 elapsed=1985s
+  [144/154] r2t3=$302.42 elapsed=2067s
+  [150/154] r2t3=$304.05 elapsed=2151s
+  [154/154] r2t3=$304.77 elapsed=2192s
+DONE. r2t3 total $304.77
