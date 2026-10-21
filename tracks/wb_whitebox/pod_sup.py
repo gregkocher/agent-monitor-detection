@@ -6,7 +6,8 @@
           (heuristic first_attack_step, else attack_step) through the execution step; negatives: all
           honest steps; other attack steps are not used for training. Every step is scored by the fold
           model that did not see its trajectory's task. Output out/<src>_<mode>_sup.jsonl.
-          With --transfer-from mb: fit on all of MonitoringBench (same mode) and score another source.
+          The fold run also saves a full-data model (sup_model_<src>_<mode>.pt); with --transfer-from mb
+          that MonitoringBench model scores another source (stream sup_from_mb).
   decode  J-lens decoding of probe directions: for each linear probe w at layer l, the top / bottom
           tokens of W_U diag(g) J_l w (final-norm gain g; the RMS scale is dropped for a direction).
 
@@ -85,13 +86,8 @@ def sup(src, mode, transfer_from=None):
     X, ti = load_acts(src, mode, [r["traj_id"] for r in recs])
     pred = np.zeros(len(X), np.float32)
     if transfer_from:
-        tr = [json.loads(l) for l in open(f"{WORK}/inputs/{transfer_from}.jsonl")]
-        tr = [r for r in tr if r["n_steps"] > 0]
-        Xt, _ = load_acts(transfer_from, mode, [r["traj_id"] for r in tr])
-        yt = np.concatenate(labels(tr))
-        keep = yt >= 0
-        wpos = (yt[keep] == 0).sum() / max((yt[keep] == 1).sum(), 1)
-        beta, b0 = fit_lr(Xt[keep], yt[keep], np.where(yt[keep] == 1, wpos, 1.0))
+        ck = torch.load(f"{WORK}/sup_model_{transfer_from}_{mode}.pt", weights_only=False)
+        beta, b0 = ck["beta"].cuda(), ck["b0"].cuda()
         pred = (torch.tensor(X, device="cuda") @ beta + b0).cpu().numpy()
         tag = f"sup_from_{transfer_from}"
     else:
@@ -109,6 +105,11 @@ def sup(src, mode, transfer_from=None):
             pred[te] = (torch.tensor(X[te], device="cuda") @ beta + b0).cpu().numpy()
             print("fold", k, "train pos", int((y[tr] == 1).sum()), "neg", int((y[tr] == 0).sum()), flush=True)
         tag = "sup"
+        # full-data model for transfer to other sources (applied with --transfer-from)
+        keep = y >= 0
+        wpos = (y[keep] == 0).sum() / max((y[keep] == 1).sum(), 1)
+        beta, b0 = fit_lr(X[keep], y[keep], np.where(y[keep] == 1, wpos, 1.0))
+        torch.save({"beta": beta.cpu(), "b0": b0.cpu(), "layers": SUP_LAYERS}, f"{WORK}/sup_model_{src}_{mode}.pt")
     out = f"{WORK}/out/{src}_{mode}_sup.jsonl"
     mode_w = "a" if transfer_from and os.path.exists(out) else "w"
     with open(out, mode_w) as fo:
