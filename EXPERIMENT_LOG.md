@@ -162,3 +162,46 @@ repeat-spike LR Spearman +0.47 (p=0.001); CUSUM gain vs honest spike persistence
 **T1 final spend: $109.56** (cap $130). REPORT.md: the subagent harness refused to write report files, so the write-up
 is not in `results/t1/REPORT.md`; all numbers are in `results/t1/tables/` (r1_tpr.md, r2_main.md, r2_score_int.md,
 r2_nano.md) and the entries above.
+
+## 2026-10-20: T2 per-context thresholds (Rounds 1–2)
+
+**Setup.** Code in `tracks/t2_per_context/` (`t2lib.py` rules/evaluation/attackers/robust estimators, 8 tests;
+`panels.py`; `r1_heterogeneity.py`; `r1_allocation.py`; `r2_poisoning.py`; `r2_boiling.py`; `make_tables.py`;
+`figures.py`). Results in `results/t2/` (CSVs, `tables.md`, PDF figures). Panels = dataset × monitor × context key,
+statistic = trajectory max: aksh-n LinuxArena env/task type/agent model (Gemini local + cumulative), 7 aksh-n settings,
+ControlArena setting × agent, LinuxArena sweep (12 monitors × 10 envs, 20 honest each), MRT CUA tasks (claude-3.5 N5,
+3 prompts), MonitoringBench/Honest-550 task clusters (TF-IDF k-means, 7 clusters with ≥ 20 honest) for T1's per-step
+gpt-4.1-mini full/none + nano none (submit step stripped) and T2's trajectory-mode gpt-4.1-mini/nano on all 2,644
+attacks + 550 honest. **T2 spend: $17.11** (trajectory scoring only).
+
+**Design decisions.** All allocation rules are budget-matched on calibration data with randomized thresholds (so
+differences are allocation, not ties). New rules: randomized Stackelberg on ROC hulls (bisection on payoff level;
+equal and logU[1,10] damage), partial pooling with n0 by beta-binomial EB or 5-fold CV, OS-CFAR (p75 offset) and
+TM-CFAR (10% trim) with leave-one-context-out tail. 60 plain 50/50 splits (points) + 150 split-then-bootstrap
+replicates (95% intervals, paired differences vs global). Two modes: nominal, and spend-matched (nominal level swept
+B×[0.25, 2], metrics interpolated at realized test spend = B; `matched_ok` flags extrapolation). Attackers: uniform,
+informed context selection (from own calibration attacks), threshold-only, oracle, (context × attack type) cells,
+damage-weighted.
+
+**Results.**
+- Heterogeneity: across deployments sharing one monitor+rubric, a global 5% threshold gives 0–9.0% per-setting FPR
+  (τ = 1.34 logit, p < 0.001) and 0–15.8% across ControlArena setting × agent (τ = 1.75); within LinuxArena 2.1–7.2%
+  across envs (τ n.s. at 5%, 0.45 at 10%), none across 8 agent models (ICC 0). Context explains 0.1–9% of per-step
+  variance (MRT 8–38%). LinuxArena-sweep env effects are shared across the 12 monitors (mean Spearman 0.70; env ×
+  monitor interaction ≤ noise).
+- Allocation: CFAR is worst against an informed attacker on heterogeneous panels (7 settings at 1%: 0.40 vs 0.64
+  global, paired −0.47..−0.10; ControlArena 0.22 vs 0.60, −0.58..−0.11; at 5% spend-matched 0.56 vs 0.91,
+  −0.63..−0.06). Stackelberg best against selection (7 settings 0.79 vs 0.64 at 1%, +0.06..+0.24; 0.97 vs 0.89 at
+  5%, +0.03..+0.12) at ≤ 0.02 uniform-TPR cost; maxdet best for uniform TPR. Homogeneous LinuxArena panels: all rules
+  within ±0.02. Weak monitors (BashArena clusters): CFAR/maxdet raise uniform TPR (nano trajectory 0.079 → 0.106 /
+  0.162 at 5%), selection safety stays low for all. Cell-level selection costs 0.2–0.4 more.
+- Small n: plug-in CFAR spends ≈ 1/(n_c+1): 6.2–7.7× budget at n = 10, 2.5–2.9× at 30, 1.4–1.6× at 100; Mondrian
+  never alarms below n ≈ 1/B; partial pooling with CV n0 holds 1.1–1.3× (1.4–2.9× at n = 10) at equal TPR.
+- Poisoning (B = 1%): CFAR breaks at ε ≈ B (LinuxArena target TPR 0.95 → 0.37 at 2%, 0.16 at 5%); global at
+  ε ≈ B/w_t (0.93 at 5%, 0.79 at 10%); EB pooling ~2–5B; OS-CFAR with LOCO tail holds 0.81–0.86 up to 10%. Boiling
+  frog: outlier filters only delay (same end state), cumulative cap bounds loss (0.54–0.78) but under genuine +2
+  drift overspends 3–5×; OS-CFAR (LOCO) is the only defense robust to poisoning that also tracks real drift (FPR
+  0.6–1.1%).
+
+**REPORT.md.** The subagent harness refused to write `results/t2/REPORT.md`; the full write-up text is in the T2
+hand-back message, and all numbers are in `results/t2/tables.md` and the CSVs.

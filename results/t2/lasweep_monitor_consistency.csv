@@ -1,0 +1,7 @@
+,value
+mean_pairwise_spearman,0.6973
+min_pairwise_spearman,0.4303
+var_env_main,0.1482
+var_env_x_monitor,0
+noise_per_cell,0.03659
+share_common,1
