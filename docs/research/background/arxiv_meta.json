@@ -1,0 +1,996 @@
+[
+ {
+  "id": "2502.03407",
+  "title": "Detecting Strategic Deception Using Linear Probes",
+  "date": "2025-02-05",
+  "authors": [
+   "Nicholas Goldowsky-Dill",
+   "Bilal Chughtai",
+   "Stefan Heimersheim",
+   "Marius Hobbhahn"
+  ]
+ },
+ {
+  "id": "2509.17778",
+  "title": "Quickest Change Detection in Continuous-Time in Presence of a Covert Adversary",
+  "date": "2025-09-22",
+  "authors": [
+   "Amir Reza Ramtin",
+   "Philippe Nain",
+   "Don Towsley"
+  ]
+ },
+ {
+  "id": "2605.29178",
+  "title": "The Best-Laid SCHEMEs: Coordinated Sabotage and Monitoring in Multi-Agent Systems",
+  "date": "2026-05-27",
+  "authors": [
+   "Nikolay Radev",
+   "Lennart Haas",
+   "Benjamin Arnav",
+   "Pablo Bernabeu-P\u00e9rez"
+  ]
+ },
+ {
+  "id": "2606.10456",
+  "title": "The Distributed Detectability Band Against Marginal-Preserving Attacks",
+  "date": "2026-06-09",
+  "authors": [
+   "Zhang Qinqin",
+   "Gao Yuze"
+  ]
+ },
+ {
+  "id": "2601.05427",
+  "title": "Anytime Detection of Strategic Deviations in Multi-Agent Systems",
+  "date": "2026-01-08",
+  "authors": [
+   "Etienne Gauthier",
+   "Francis Bach",
+   "Michael I. Jordan"
+  ]
+ },
+ {
+  "id": "2604.15384",
+  "title": "LinuxArena: A Control Setting for AI Agents in Live Production Software Environments",
+  "date": "2026-04-16",
+  "authors": [
+   "Tyler Tracy",
+   "Ram Potham",
+   "Nick Kuhn",
+   "Myles Heller",
+   "et al."
+  ]
+ },
+ {
+  "id": "2604.11806",
+  "title": "Detecting Safety Violations Across Many Agent Traces",
+  "date": "2026-04-13",
+  "authors": [
+   "Adam Stein",
+   "Davis Brown",
+   "Hamed Hassani",
+   "Mayur Naik",
+   "et al."
+  ]
+ },
+ {
+  "id": "2605.09684",
+  "title": "MonitoringBench: Semi-Automated Red-Teaming for Agent Monitoring",
+  "date": "2026-05-10",
+  "authors": [
+   "Monika Jotautait\u0117",
+   "Maria Angelica Martinez",
+   "Ollie Matthews",
+   "Tyler Tracy"
+  ]
+ },
+ {
+  "id": "2506.05296",
+  "title": "Control Tax: The Price of Keeping AI in Check",
+  "date": "2025-06-05",
+  "authors": [
+   "Mikhail Terekhov",
+   "Zhen Ning David Liu",
+   "Caglar Gulcehre",
+   "Samuel Albanie"
+  ]
+ },
+ {
+  "id": "2607.06596",
+  "title": "Calibration-Family Overfit: Why Trusted Sabotage Monitors Don't Transfer Across Lineages",
+  "date": "2026-07-06",
+  "authors": [
+   "Lucas Pinto"
+  ]
+ },
+ {
+  "id": "2608.27348",
+  "title": "INTENT-AS-A-TOOL Makes it Easy to Track Agentic Misalignment",
+  "date": "2026-08-27",
+  "authors": [
+   "Yutong Zhang",
+   "Jianshuo Dong",
+   "Peng Xu",
+   "Long Wang",
+   "et al."
+  ]
+ },
+ {
+  "id": "2606.06223",
+  "title": "From Reward-Hack Activations to Agentic Risk States: Context-Calibrated Mechanistic Monitoring in LLM Agents",
+  "date": "2026-06-04",
+  "authors": [
+   "Patrick Wilhelm",
+   "Odej Kao"
+  ]
+ },
+ {
+  "id": "2608.09087",
+  "title": "Joint Lyapunov Certificates for K-Agent Generative AI Governance: Stochastic Stability, Emergent Ensemble Risk, and Zero-Knowledge Governance Attestation",
+  "date": "2026-08-10",
+  "authors": [
+   "Sriram Nagaraj"
+  ]
+ },
+ {
+  "id": "2607.02514",
+  "title": "Distributed Attacks in Persistent-State AI Control",
+  "date": "2026-07-02",
+  "authors": [
+   "Josh Hills",
+   "Ida Caspary",
+   "Asa Cooper Stickland"
+  ]
+ },
+ {
+  "id": "2606.06529",
+  "title": "Attack Selection in Agentic AI Control Evaluations Meaningfully Decreases Safety",
+  "date": "2026-06-03",
+  "authors": [
+   "Catherine Ge-Wang",
+   "Tyler Crosse",
+   "Benjamin Hadad",
+   "Joachim Schaeffer",
+   "et al."
+  ]
+ },
+ {
+  "id": "2606.19386",
+  "title": "Bistable by Construction: Wall-Clock-Calibrated State Monitors Have No Moment-Detection Regime at Agent Cadence",
+  "date": "2026-06-15",
+  "authors": [
+   "Manvendra Modgil"
+  ]
+ },
+ {
+  "id": "2610.11843",
+  "title": "Anytime-valid detection of LLM weight exfiltration",
+  "date": "2026-10-08",
+  "authors": [
+   "Ines Ortega-Fernandez",
+   "Mateusz Kowalczyk",
+   "Keri Warr"
+  ]
+ },
+ {
+  "id": "2610.14365",
+  "title": "ConformalGuard: False-Positive-Controlled Action Gating for LM Classifiers",
+  "date": "2026-10-09",
+  "authors": [
+   "Bishnu Bista",
+   "Dhanraj Haibatrao Jadhav",
+   "Vibha Choudhary",
+   "Gaurav Saxena",
+   "et al."
+  ]
+ },
+ {
+  "id": "2610.03818",
+  "title": "Control OSWorld: An AI Control Environment for GUI Computer Use Agents",
+  "date": "2026-10-02",
+  "authors": [
+   "Maria Sanchez del Rio",
+   "Mikhail Terekhov"
+  ]
+ },
+ {
+  "id": "2002.02741",
+  "title": "Can't Boil This Frog: Robustness of Online-Trained Autoencoder-Based Anomaly Detectors to Adversarial Poisoning Attacks",
+  "date": "2020-02-07",
+  "authors": [
+   "Moshe Kravchik",
+   "Asaf Shabtai"
+  ]
+ },
+ {
+  "id": "2410.20247",
+  "title": "Model Equality Testing: Which Model Is This API Serving?",
+  "date": "2024-10-26",
+  "authors": [
+   "Irena Gao",
+   "Percy Liang",
+   "Carlos Guestrin"
+  ]
+ },
+ {
+  "id": "2504.10374",
+  "title": "Ctrl-Z: Controlling AI Agents via Resampling",
+  "date": "2025-04-14",
+  "authors": [
+   "Aryan Bhatt",
+   "Cody Rushing",
+   "Adam Kaufman",
+   "Tyler Tracy",
+   "et al."
+  ]
+ },
+ {
+  "id": "2505.01420",
+  "title": "Evaluating Frontier Models for Stealth and Situational Awareness",
+  "date": "2025-05-02",
+  "authors": [
+   "Mary Phuong",
+   "Roland S. Zimmermann",
+   "Ziyue Wang",
+   "David Lindner",
+   "et al."
+  ]
+ },
+ {
+  "id": "2512.02157",
+  "title": "Factor(T,U): Factored Cognition Strengthens Monitoring of Untrusted AI",
+  "date": "2025-12-01",
+  "authors": [
+   "Aaron Sandoval",
+   "Cody Rushing"
+  ]
+ },
+ {
+  "id": "2511.09904",
+  "title": "CTRL-ALT-DECEIT: Sabotage Evaluations for Automated AI R&amp;D",
+  "date": "2025-11-13",
+  "authors": [
+   "Francis Rhys Ward",
+   "Teun van der Weij",
+   "Hanna G\u00e1bor",
+   "Sam Martin",
+   "et al."
+  ]
+ },
+ {
+  "id": "2604.11072",
+  "title": "Hodoscope: Unsupervised Monitoring for AI Misbehaviors",
+  "date": "2026-04-13",
+  "authors": [
+   "Ziqian Zhong",
+   "Shashwat Saxena",
+   "Aditi Raghunathan"
+  ]
+ },
+ {
+  "id": "2605.26047",
+  "title": "Retrying vs Resampling in AI Control",
+  "date": "2026-05-25",
+  "authors": [
+   "James Lucassen",
+   "Adam Kaufman"
+  ]
+ },
+ {
+  "id": "2605.19779",
+  "title": "Distribution-Free Uncertainty Quantification for Continuous AI Agent Evaluation",
+  "date": "2026-05-19",
+  "authors": [
+   "Yuxuan Gao",
+   "Megan Wang",
+   "Yi Ling Yu"
+  ]
+ },
+ {
+  "id": "2511.02997",
+  "title": "Evaluating Control Protocols for Untrusted AI Agents",
+  "date": "2025-11-04",
+  "authors": [
+   "Jon Kutasov",
+   "Chloe Loughridge",
+   "Yuqi Sun",
+   "Henry Sleight",
+   "et al."
+  ]
+ },
+ {
+  "id": "2512.13526",
+  "title": "Async Control: Stress-testing Asynchronous Control Measures for LLM Agents",
+  "date": "2025-12-15",
+  "authors": [
+   "Asa Cooper Stickland",
+   "Jan Michelfeit",
+   "Arathi Mani",
+   "Charlie Griffin",
+   "et al."
+  ]
+ },
+ {
+  "id": "2607.20129",
+  "title": "CUSUM-Shaped Inference-Time Monitoring and Targeted Re-Decoding for Quantized Small Language Model Reasoning",
+  "date": "2026-07-22",
+  "authors": [
+   "El Hassane Ettifouri",
+   "Ayoub Belfatmi",
+   "Mahaman Sanoussi Yahaya Alassan",
+   "Walid Dahhane"
+  ]
+ },
+ {
+  "id": "2607.13087",
+  "title": "GDM AI Control Roadmap",
+  "date": "2026-07-13",
+  "authors": [
+   "Mary Phuong",
+   "Erik Jenner",
+   "Laurent Simon",
+   "Lewis Ho",
+   "et al."
+  ]
+ },
+ {
+  "id": "2512.03109",
+  "title": "E-valuator: Reliable Agent Verifiers with Sequential Hypothesis Testing",
+  "date": "2025-12-02",
+  "authors": [
+   "Shuvom Sadhuka",
+   "Drew Prinster",
+   "Clara Fannjiang",
+   "Gabriele Scalia",
+   "et al."
+  ]
+ },
+ {
+  "id": "2609.06966",
+  "title": "MOLE: Detecting Insider Threats in AI Agents",
+  "date": "2026-09-07",
+  "authors": [
+   "Aashiq Muhamed",
+   "Virginia Smith"
+  ]
+ },
+ {
+  "id": "2607.07368",
+  "title": "Multi-Agent AI Control: Distributed Attacks Hamper Per-Instance Monitors",
+  "date": "2026-07-08",
+  "authors": [
+   "Oliver Makins",
+   "Orazio Angelini",
+   "Zohreh Shams",
+   "Mary Phuong"
+  ]
+ },
+ {
+  "id": "2412.13678",
+  "title": "Clio: Privacy-Preserving Insights into Real-World AI Use",
+  "date": "2024-12-18",
+  "authors": [
+   "Alex Tamkin",
+   "Miles McCain",
+   "Kunal Handa",
+   "Esin Durmus",
+   "et al."
+  ]
+ },
+ {
+  "id": "2410.21514",
+  "title": "Sabotage Evaluations for Frontier Models",
+  "date": "2024-10-28",
+  "authors": [
+   "Joe Benton",
+   "Misha Wagner",
+   "Eric Christiansen",
+   "Cem Anil",
+   "et al."
+  ]
+ },
+ {
+  "id": "2602.16935",
+  "title": "DeepContext: Stateful Real-Time Detection of Multi-Turn Adversarial Intent Drift in LLMs",
+  "date": "2026-02-18",
+  "authors": [
+   "Justin Albrethsen",
+   "Yash Datta",
+   "Kunal Kumar",
+   "Sharath Rajasekar"
+  ]
+ },
+ {
+  "id": "2605.19193",
+  "title": "Sequential Consensus for Multi-Agent LLM Debates: A Wald-SPRT compute governor with calibration-based failure detection",
+  "date": "2026-05-18",
+  "authors": [
+   "Andrea Morandi"
+  ]
+ },
+ {
+  "id": "2605.29601",
+  "title": "Training Deliberative Monitors for Black-Box Scheming Detection",
+  "date": "2026-05-28",
+  "authors": [
+   "Aditya Sinha",
+   "Akshat Naik",
+   "Victor Gillioz",
+   "Simon Storf",
+   "et al."
+  ]
+ },
+ {
+  "id": "1306.2086",
+  "title": "Byzantine Fault Tolerant Distributed Quickest Change Detection",
+  "date": "2013-06-10",
+  "authors": [
+   "Erhan Bayraktar",
+   "Lifeng Lai"
+  ]
+ },
+ {
+  "id": "1606.06707",
+  "title": "Optimal Thresholds for Anomaly-Based Intrusion Detection in Dynamical Environments",
+  "date": "2016-06-21",
+  "authors": [
+   "Amin Ghafouri",
+   "Waseem Abbas",
+   "Aron Laszka",
+   "Yevgeniy Vorobeychik",
+   "et al."
+  ]
+ },
+ {
+  "id": "2605.12947",
+  "title": "When Should an AI Workflow Release? Always-Valid Inference for Black-Box Generate-Verify Systems",
+  "date": "2026-05-13",
+  "authors": [
+   "Young Hyun Cho",
+   "Will Wei Sun"
+  ]
+ },
+ {
+  "id": "2505.23575",
+  "title": "CoT Red-Handed: Stress Testing Chain-of-Thought Monitoring",
+  "date": "2025-05-29",
+  "authors": [
+   "Benjamin Arnav",
+   "Pablo Bernabeu-P\u00e9rez",
+   "Nathan Helm-Burger",
+   "Tim Kostolansky",
+   "et al."
+  ]
+ },
+ {
+  "id": "2506.10949",
+  "title": "Monitoring Decomposition Attacks in LLMs with Lightweight Sequential Monitors",
+  "date": "2025-06-12",
+  "authors": [
+   "Chen Yueh-Han",
+   "Nitish Joshi",
+   "Yulin Chen",
+   "Maksym Andriushchenko",
+   "et al."
+  ]
+ },
+ {
+  "id": "2508.19461",
+  "title": "Reliable Weak-to-Strong Monitoring of LLM Agents",
+  "date": "2025-08-26",
+  "authors": [
+   "Neil Kale",
+   "Chen Bo Calvin Zhang",
+   "Kevin Zhu",
+   "Ankit Aich",
+   "et al."
+  ]
+ },
+ {
+  "id": "2503.17587",
+  "title": "ConSol: Sequential Probability Ratio Testing to Find Consistent LLM Reasoning Paths Efficiently",
+  "date": "2025-03-22",
+  "authors": [
+   "Jaeyeon Lee",
+   "Guantong Qi",
+   "Matthew Brady Neeley",
+   "Zhandong Liu",
+   "et al."
+  ]
+ },
+ {
+  "id": "2411.17693",
+  "title": "Adaptive Deployment of Untrusted LLMs Reduces Distributed Threats",
+  "date": "2024-11-26",
+  "authors": [
+   "Jiaxin Wen",
+   "Vivek Hebbar",
+   "Caleb Larson",
+   "Aryan Bhatt",
+   "et al."
+  ]
+ },
+ {
+  "id": "2506.15740",
+  "title": "SHADE-Arena: Evaluating Sabotage and Monitoring in LLM Agents",
+  "date": "2025-06-17",
+  "authors": [
+   "Jonathan Kutasov",
+   "Yuqi Sun",
+   "Paul Colognese",
+   "Teun van der Weij",
+   "et al."
+  ]
+ },
+ {
+  "id": "2512.22154",
+  "title": "Practical challenges of control monitoring in frontier AI deployments",
+  "date": "2025-12-15",
+  "authors": [
+   "David Lindner",
+   "Charlie Griffin",
+   "Tomek Korbak",
+   "Roland S. Zimmermann",
+   "et al."
+  ]
+ },
+ {
+  "id": "2510.09462",
+  "title": "Adaptive Attacks on Trusted Monitors Subvert AI Control Protocols",
+  "date": "2025-10-10",
+  "authors": [
+   "Mikhail Terekhov",
+   "Alexander Panfilov",
+   "Daniil Dzenhaliou",
+   "Caglar Gulcehre",
+   "et al."
+  ]
+ },
+ {
+  "id": "2602.10153",
+  "title": "Basic Legibility Protocols Improve Trusted Monitoring",
+  "date": "2026-02-09",
+  "authors": [
+   "Ashwin Sreevatsa",
+   "Sebastian Prasanna",
+   "Cody Rushing"
+  ]
+ },
+ {
+  "id": "2601.20022",
+  "title": "Quickest Change Detection in Discrete-Time in Presence of a Covert Adversary",
+  "date": "2026-01-27",
+  "authors": [
+   "Amir Reza Ramtin",
+   "Philippe Nain",
+   "Don Towsley"
+  ]
+ },
+ {
+  "id": "2607.02510",
+  "title": "Online Safety Monitoring for LLMs",
+  "date": "2026-07-02",
+  "authors": [
+   "Mona Schirmer",
+   "Metod Jazbec",
+   "Alexander Timans",
+   "Christian Naesseth",
+   "et al."
+  ]
+ },
+ {
+  "id": "0911.2551",
+  "title": "Minimax Robust Quickest Change Detection",
+  "date": "2009-11-13",
+  "authors": [
+   "Jayakrishnan Unnikrishnan",
+   "Venugopal V. Veeravalli",
+   "Sean Meyn"
+  ]
+ },
+ {
+  "id": "2104.04186",
+  "title": "Sequential (Quickest) Change Detection: Classical Results and New Directions",
+  "date": "2021-04-09",
+  "authors": [
+   "Liyan Xie",
+   "Shaofeng Zou",
+   "Yao Xie",
+   "Venugopal V. Veeravalli"
+  ]
+ },
+ {
+  "id": "2503.11926",
+  "title": "Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation",
+  "date": "2025-03-14",
+  "authors": [
+   "Bowen Baker",
+   "Joost Huizinga",
+   "Leo Gao",
+   "Zehao Dou",
+   "et al."
+  ]
+ },
+ {
+  "id": "2312.06942",
+  "title": "AI Control: Improving Safety Despite Intentional Subversion",
+  "date": "2023-12-12",
+  "authors": [
+   "Ryan Greenblatt",
+   "Buck Shlegeris",
+   "Kshitij Sachan",
+   "Fabien Roger"
+  ]
+ },
+ {
+  "id": "2507.05246",
+  "title": "When Chain of Thought is Necessary, Language Models Struggle to Evade Monitors",
+  "date": "2025-07-07",
+  "authors": [
+   "Scott Emmons",
+   "Erik Jenner",
+   "David K. Elson",
+   "Rif A. Saurous",
+   "et al."
+  ]
+ },
+ {
+  "id": "2604.11309",
+  "title": "The Salami Slicing Threat: Exploiting Cumulative Risks in LLM Systems",
+  "date": "2026-04-13",
+  "authors": [
+   "Yihao Zhang",
+   "Kai Wang",
+   "Jiangrong Wu",
+   "Haolin Wu",
+   "et al."
+  ]
+ },
+ {
+  "id": "2602.04930",
+  "title": "Attack Selection Reduces Safety in Concentrated AI Control Settings against Trusted Monitoring",
+  "date": "2026-02-04",
+  "authors": [
+   "Joachim Schaeffer",
+   "Arjun Khandelwal",
+   "Tyler Tracy"
+  ]
+ },
+ {
+  "id": "2602.11247",
+  "title": "Peak + Accumulation: A Proxy-Level Scoring Formula for Multi-Turn LLM Attack Detection",
+  "date": "2026-02-11",
+  "authors": [
+   "J Alex Corll"
+  ]
+ },
+ {
+  "id": "2604.23425",
+  "title": "When the Agent Is the Adversary: Architectural Requirements for Agentic AI Containment After the April 2026 Frontier Model Escape",
+  "date": "2026-04-25",
+  "authors": [
+   "Richard Joseph Mitchell"
+  ]
+ },
+ {
+  "id": "2604.16824",
+  "title": "SafeDream: Safety World Model for Proactive Early Jailbreak Detection",
+  "date": "2026-04-18",
+  "authors": [
+   "Bo Yan",
+   "Weikai Lin",
+   "Yada Zhu",
+   "Song Wang"
+  ]
+ },
+ {
+  "id": "2605.19966",
+  "title": "Detecting Fluent Optimization-Based Adversarial Prompts via Sequential Entropy Changes",
+  "date": "2026-05-19",
+  "authors": [
+   "Mohammed Alshaalan",
+   "Miguel R. D. Rodrigues"
+  ]
+ },
+ {
+  "id": "2605.16626",
+  "title": "SLEIGHT-Bench: A Benchmark of Evasion Attacks Against Agent Monitors",
+  "date": "2026-05-15",
+  "authors": [
+   "Elle Najt",
+   "Colin Toft",
+   "Tyler Tracy",
+   "Fabien Roger",
+   "et al."
+  ]
+ },
+ {
+  "id": "2607.19321",
+  "title": "ResearchArena: Evaluating Sabotage and Monitoring in Automated AI R&amp;D",
+  "date": "2026-07-21",
+  "authors": [
+   "Lena Libon",
+   "Ben Rank",
+   "Jehyeok Yeon",
+   "David Schmotz",
+   "et al."
+  ]
+ },
+ {
+  "id": "2608.27808",
+  "title": "CURA: Certified Runtime Alarms for Computer-Use Agents",
+  "date": "2026-08-28",
+  "authors": [
+   "Divake Kumar",
+   "Sina Tayebati",
+   "Devashri Naik",
+   "Amanda Sofie Rios",
+   "et al."
+  ]
+ },
+ {
+  "id": "2505.04608",
+  "title": "WATCH: Adaptive Monitoring for AI Deployments via Weighted-Conformal Martingales",
+  "date": "2025-05-07",
+  "authors": [
+   "Drew Prinster",
+   "Xing Han",
+   "Anqi Liu",
+   "Suchi Saria"
+  ]
+ },
+ {
+  "id": "2605.15377",
+  "title": "Ensemble Monitoring for AI Control: Diverse Signals Outweigh More Compute",
+  "date": "2026-05-14",
+  "authors": [
+   "Eugene Koran",
+   "Yejun Yun",
+   "Samantha Tetef",
+   "Benjamin Arnav",
+   "et al."
+  ]
+ },
+ {
+  "id": "2605.31593",
+  "title": "Stateful Online Monitoring Catches Distributed Agent Attacks",
+  "date": "2026-05-29",
+  "authors": [
+   "Davis Brown",
+   "Samarth Bhargav",
+   "Arav Santhanam",
+   "Kasper Hong",
+   "et al."
+  ]
+ },
+ {
+  "id": "2606.07789",
+  "title": "A Framework for Evaluating and Benchmarking Concept Drift Detection Methods",
+  "date": "2026-06-05",
+  "authors": [
+   "Vitor Cerqueira",
+   "Heitor Murilo Gomes",
+   "Marco Heyden",
+   "Bernhard Pfahringer",
+   "et al."
+  ]
+ },
+ {
+  "id": "2606.07054",
+  "title": "TRACE: Trajectory Reasoning through Adaptive Cross-Step Evidence Aggregation for LLM Agents",
+  "date": "2026-06-05",
+  "authors": [
+   "Vijitha Mittapalli",
+   "Shreyaa Jayant Dani",
+   "Satya Srujana Pilli",
+   "Snigdha Ansu",
+   "et al."
+  ]
+ },
+ {
+  "id": "2607.19361",
+  "title": "Stateful Guardrails for Multi-Turn LLM Systems: A Conversational Risk Accumulation Framework",
+  "date": "2026-06-03",
+  "authors": [
+   "Sanjay Mishra",
+   "Divya Chukkapalli",
+   "Ganesh R. Naik"
+  ]
+ },
+ {
+  "id": "2607.14570",
+  "title": "Democratizing Agent Deployment Safety: A Structural Monitoring Approach",
+  "date": "2026-07-16",
+  "authors": [
+   "Preeti Ravindra",
+   "Rahul Tiwari",
+   "Vincent Wolowski"
+  ]
+ },
+ {
+  "id": "2608.17445",
+  "title": "Decomposition Attacks Across Unlinkable Identities: Limits of Stateful Defenses for LLM Services",
+  "date": "2026-08-18",
+  "authors": [
+   "Bowen Sun",
+   "Zhengyue Zhao",
+   "Xiaogeng Liu",
+   "Yinzhi Cao",
+   "et al."
+  ]
+ },
+ {
+  "id": "2608.25379",
+  "title": "Adaptive Triggering for Bias Correction in LLM Reasoning",
+  "date": "2026-08-26",
+  "authors": [
+   "Nayoung Kim",
+   "Mickey Mancenido",
+   "Huan Liu"
+  ]
+ },
+ {
+  "id": "1204.1935",
+  "title": "New Sequential Methods for Detecting Portscanners",
+  "date": "2012-04-09",
+  "authors": [
+   "Xinjia Chen"
+  ]
+ },
+ {
+  "id": "2404.19452",
+  "title": "How to Sustainably Monitor ML-Enabled Systems? Accuracy and Energy Efficiency Tradeoffs in Concept Drift Detection",
+  "date": "2024-04-30",
+  "authors": [
+   "Rafiullah Omar",
+   "Justus Bogner",
+   "Joran Leest",
+   "Vincenzo Stoico",
+   "et al."
+  ]
+ },
+ {
+  "id": "2507.15886",
+  "title": "Combining Cost-Constrained Runtime Monitors for AI Safety",
+  "date": "2025-07-19",
+  "authors": [
+   "Tim Tian Hua",
+   "James Baskerville",
+   "Henri Lemoine",
+   "Mia Hopman",
+   "et al."
+  ]
+ },
+ {
+  "id": "2606.08892",
+  "title": "Diffuse AI Control on Fuzzy Tasks",
+  "date": "2026-06-08",
+  "authors": [
+   "Mikhail Terekhov",
+   "Caglar Gulcehre",
+   "Vivek Hebbar",
+   "Joe Benton"
+  ]
+ },
+ {
+  "id": "2606.11998",
+  "title": "Bootstrapped Monitoring: Leveraging Transparent Reasoning to Oversee Stronger AI Agents",
+  "date": "2026-06-10",
+  "authors": [
+   "Frank Xiao",
+   "Mary Phuong"
+  ]
+ },
+ {
+  "id": "2603.00829",
+  "title": "Constitutional Black-Box Monitoring for Scheming in LLM Agents",
+  "date": "2026-02-28",
+  "authors": [
+   "Simon Storf",
+   "Rich Barton-Cooper",
+   "James Peters-Gill",
+   "Marius Hobbhahn"
+  ]
+ },
+ {
+  "id": "2512.15688",
+  "title": "BashArena: A Control Setting for Highly Privileged AI Agents",
+  "date": "2025-12-17",
+  "authors": [
+   "Adam Kaufman",
+   "James Lucassen",
+   "Tyler Tracy",
+   "Cody Rushing",
+   "et al."
+  ]
+ },
+ {
+  "id": "2601.21112",
+  "title": "How does information access affect LLM monitors' ability to detect sabotage?",
+  "date": "2026-01-28",
+  "authors": [
+   "Rauno Arike",
+   "Raja Mehta Moreno",
+   "Rohan Subramani",
+   "Shubhorup Biswas",
+   "et al."
+  ]
+ },
+ {
+  "id": "2605.07002",
+  "title": "Adaptive auditing of AI systems with anytime-valid guarantees",
+  "date": "2026-05-07",
+  "authors": [
+   "Siyu Zhou",
+   "Patrick Vossler",
+   "Venkatesh Sivaraman",
+   "Yifan Mai",
+   "et al."
+  ]
+ },
+ {
+  "id": "2409.07985",
+  "title": "Games for AI Control: Models of Safety Evaluations of AI Deployment Protocols",
+  "date": "2024-09-12",
+  "authors": [
+   "Charlie Griffin",
+   "Louis Thomson",
+   "Buck Shlegeris",
+   "Alessandro Abate"
+  ]
+ },
+ {
+  "id": "2606.10747",
+  "title": "The Arbiter Agent: Continually Monitoring Multi-Agent Conversations to Detect Emergent Misalignment",
+  "date": "2026-06-09",
+  "authors": [
+   "Filippo Tonini",
+   "Federico Torrielli",
+   "Anton Danholt Lautrup",
+   "Peter Schneider-Kamp",
+   "et al."
+  ]
+ },
+ {
+  "id": "2608.02464",
+  "title": "Real-Time Detection and Repair of LLM Agent Failures",
+  "date": "2026-08-03",
+  "authors": [
+   "Sunny Dubey"
+  ]
+ },
+ {
+  "id": "2608.23941",
+  "title": "More Rejective, Not More Discriminative: The Unit of Verification in Pre-Execution LLM Oversight",
+  "date": "2026-08-25",
+  "authors": [
+   "Yuchen Han",
+   "Cheng Yan",
+   "Wuyang Zhang"
+  ]
+ },
+ {
+  "id": "2609.30217",
+  "title": "Instrumental Monitor Evasion Emerges Under Ordinary Task Pressure",
+  "date": "2026-09-24",
+  "authors": [
+   "David Schmotz",
+   "Derck Prinzhorn",
+   "Luca Beurer-Kellner",
+   "Anselm Paulus",
+   "et al."
+  ]
+ },
+ {
+  "id": "2610.24052",
+  "title": "Red-Teaming Multi-Agent Attacks for Loss-of-Control Risks",
+  "date": "2026-10-16",
+  "authors": [
+   "John Kitaoka",
+   "Thao Amelia Pham",
+   "Carlos Rafael Giudice",
+   "Jacob Merizian"
+  ]
+ }
+]

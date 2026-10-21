@@ -1,0 +1,289 @@
+\documentclass[11pt]{article}
+\input{preamble}
+\title{\textbf{Idea 2: Per-Context Thresholds for AI-Agent Monitors}\\[4pt]
+\large Heterogeneity, CFAR vs global vs Stackelberg allocation, attack selection, and baseline poisoning}
+\date{October 2026}
+\begin{document}
+\maketitle
+\vspace{-1.5em}
+
+\keybox{\textbf{Summary.} Honest monitor-score distributions differ across contexts, so one global threshold over-audits some contexts and under-audits others. Radar's answer is CFAR: hold the false-alarm rate constant in every context. We tested CFAR and alternatives on real monitor data (Gemini-3.1-Pro streaming judges on 7 settings, the 12-monitor LinuxArena sweep, MRT, MonitoringBench) at a fixed \emph{global} audit budget, against uniform, context-selecting and poisoning attackers.
+\begin{enumerate}[leftmargin=1.2em]
+\item \textbf{Heterogeneity is real across deployments, small within one.} When one monitor and rubric serve different deployments, a single global 5\% threshold gives 0--9\% per-setting FPR (random-effects $\tau=1.34$ logit, $p<0.001$) and 0--16\% across setting$\times$agent. Within LinuxArena it is 2--7\% across environments, and agent model does not matter.
+\item \textbf{CFAR is the worst rule against an attacker who chooses where to attack.} Safety at a 1\% budget is 0.40 vs 0.64 for global on 7 settings, and 0.22 vs 0.60 on ControlArena. CFAR hands the attacker the loose contexts.
+\item \textbf{Damage-equalizing (Stackelberg) thresholds are best against attack selection.} Safety is 0.79 vs 0.64 at 1\% and 0.97 vs 0.89 at 5\%, at $\le0.02$ cost against a uniform attacker.
+\item \textbf{Per-context quantiles break with few honest runs.} At $n=10$ per context they spend 7$\times$ the budget. Partial pooling with cross-validated strength stays near budget.
+\item \textbf{CFAR recalibration is easy to poison.} 2\% poisoned calibration drops the target context's TPR from 0.95 to 0.37. A robust order-statistic CFAR with its tail estimated from the other contexts holds 0.77--0.86 and still tracks genuine drift.
+\end{enumerate}
+Spend: \$17.11 OpenRouter (trajectory-mode re-scoring of MonitoringBench).}
+
+\tableofcontents
+
+\section{Question}
+How much do honest monitor-score distributions vary by context (environment, setting, task type, agent model, monitor)? At a \textbf{fixed global audit budget} $B$ (fraction of honest traffic audited), do per-context thresholds beat a single global threshold? How do they compare with a detection-maximizing allocation and a damage-equalizing Stackelberg allocation:
+\begin{itemize}
+\item against a uniform attacker;
+\item against an attacker who knows the thresholds and chooses its context;
+\item against an attacker who poisons its own context's honest calibration data?
+\end{itemize}
+And do robust estimators defend?
+
+\textbf{Prior expectations.} Per-context thresholds are requested by several research agendas: \emph{Salient Directions}, Scale MRT, UK AISI Async Control, and GDM's UEBA mention. Pinto (2607.06596) shows a 1\% threshold transferred across model families yields 0--94\% realized audit spend. But detection theory (Ghafouri et al.) predicts that against a threshold-aware attacker the optimal per-context thresholds equalize worst-case \emph{damage}, not FPR. CFAR may therefore be exploitable.
+
+\section{Data and contexts}
+Each \emph{panel} is a dataset $\times$ monitor $\times$ context key. The trajectory statistic is the max of per-step (or per-chunk) scores.
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{2.7cm}cc@{}}
+\toprule
+Panel & Monitor (scale) & Context (\#) & Honest / attack & Honest per ctx\\
+\midrule
+la\_env (local / cum.) & Gemini-3.1-Pro streaming (aksh-n LinuxArena gold set; 0--10) & environment (10) & 1{,}396 / 1{,}305 & 87--197\\
+la\_taskcat & same & task category (5) & 1{,}332 / 1{,}296 & 75--620\\
+la\_model & same & agent model (8) & 1{,}155 / 1{,}298 & 45--583\\
+akshn\_setting (``7 settings'') & Gemini-3.1-Pro local, same rubric & setting (7) & 5{,}189 / 5{,}794 & 328--1{,}396\\
+ca\_setting\_model & same & ControlArena setting $\times$ agent (12) & 2{,}997 / 3{,}000 & 247--250\\
+lasweep\_\{m\} & 12 LinuxArena sweep monitors (0--100) & environment (10) & 200 / 101--142 & 20\\
+mrt\_\{m\} & claude-3.5-sonnet sequential $N=5$, 3 prompts (1--5) & CUA task (15) & 150 / 675 & 10\\
+mb\_\{m\} & gpt-4.1-mini / nano (trajectory and per-step) & BashArena task cluster (7, TF-IDF k-means) & 535 / 752--2{,}584 & 30--207\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The Gemini panels are strong monitors (AUROC $\approx0.99$); the MonitoringBench panels are weak (AUROC 0.59--0.76). BashArena ``honest\_summarized'' rows are excluded.
+
+\section{Methods}
+\subsection{Heterogeneity}
+\begin{itemize}
+\item One-way random-effects ANOVA of honest trajectory max (ICC), and nested ANOVA of per-step scores.
+\item Per-context realized FPR under one traffic-weighted global threshold at 1/5/10\% (Wilson CIs).
+\item A logit-normal random-effects model of per-context exceedance counts. Its $\tau$ is the SD of logit-FPR net of binomial noise, with an LR test of $\tau=0$. Reported at 5\% and 10\%; not identifiable at 1\%.
+\item Cross-monitor agreement of LinuxArena environment effects.
+\end{itemize}
+
+\subsection{Allocation rules}
+All rules are budget-matched with randomized thresholds, so calibration spend $\sum_c w_c\FPR_c=B$ exactly ($w_c$ = traffic share).
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Rule & Definition\\
+\midrule
+global & one traffic-weighted randomized quantile\\
+CFAR & per-context randomized plug-in quantile (constant FPR per context)\\
+Mondrian & per-context conformal quantile (finite-sample valid)\\
+pooled\_eb / pooled\_cv & per-context quantile of $(n_c\hat F_c+n_0\hat F)/(n_c+n_0)$; $n_0$ by beta-binomial empirical Bayes or 5-fold CV\\
+maxdet & fractional knapsack on per-context ROC hulls maximizing uniform-attacker TPR\\
+Stackelberg & randomized thresholds on ROC hulls minimizing $\max_c D_c(1-\TPR_c)$ (bisection on the payoff); $D_c\equiv1$, or $D_c\sim\log U[1,10]$ for the damage-weighted variant\\
+OS-CFAR / TM-CFAR & per-context robust location (p75 offset / 10\%-trimmed mean, winsorized SD) with a common tail level\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Evaluation}
+\begin{itemize}
+\item \textbf{Splits.} 60 stratified 50/50 splits (point estimates) and 150 split-then-bootstrap replicates (95\% intervals; paired differences vs global). Honest runs are split by context; attacks by context $\times$ attack type.
+\item \textbf{Attackers:}
+  \begin{itemize}
+  \item \emph{uniform};
+  \item \emph{informed selection}: picks the context with the highest undetected-success probability, estimated from its own calibration attacks under the published thresholds;
+  \item \emph{threshold-only};
+  \item \emph{oracle};
+  \item \emph{cell-level}: picks a context $\times$ attack-type cell;
+  \item \emph{damage-weighted}.
+  \end{itemize}
+\item \textbf{Two reporting modes:}
+  \begin{itemize}
+  \item \emph{nominal};
+  \item \emph{spend-matched}: the nominal level is swept over $B\times[0.25,2]$ and metrics are interpolated at test spend $=B$. This is an evaluation device only.
+  \end{itemize}
+\item \textbf{Small samples.} Calibration is subsampled to $n\in\{10,30,100\}$ honest runs per context.
+\end{itemize}
+
+\subsection{Poisoning}
+\begin{itemize}
+\item \textbf{Splits.} Honest runs per context are split into a trusted reference, a new window, and test (1/3 each).
+\item \textbf{Attack.} The attacker adds a fraction $\varepsilon$ of the target's new window at value $v$: either the attacker's own maximum calibration attack score, or the panel's honest maximum (plausibly benign). Every context is targeted in turn, 40 replicates.
+\item \textbf{Boiling frog.} 30 recalibration rounds with a 10-round sliding window, $B=1\%$. The attacker injects $\varepsilon$ just above the current threshold. A genuine-drift control shifts the target by $+2$ score points from round 10.
+\item \textbf{Defenses:}
+  \begin{itemize}
+  \item global; CFAR; pooled\_eb;
+  \item OS/TM-CFAR with a leave-one-context-out (LOCO) tail;
+  \item 50/50 reference mix; frozen reference;
+  \item drift cap (reference $+10\%$ of range);
+  \item outlier filter; cumulative cap.
+  \end{itemize}
+\end{itemize}
+
+\section{Results}
+\subsection{Heterogeneity}
+\begin{table}[H]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lccc@{}}
+\toprule
+Panel & ICC (max) & Per-context FPR at global 5\% & $\tau$ at 5\% ($p$)\\
+\midrule
+7 settings & 0.17 (0.31 normal scores) & 0--9.0\% & 1.34 ($<0.001$)\\
+ControlArena setting $\times$ agent & 0.28 & 0--15.8\% & 1.75 ($<0.001$)\\
+LinuxArena environment & 0.05 & 2.1--7.2\% & 0.14 (0.38); 0.45 at 10\% ($<0.001$)\\
+LinuxArena task category & 0.04 & 3.7--12.8\% & 0.40 (0.04)\\
+LinuxArena agent model & 0.00 & 2.1--8.0\% & 0.19 (0.28)\\
+LinuxArena sweep (20 honest/env) & 0.05--0.31 & 0--25\% & 0--1.46\\
+MRT (10 honest/task) & 0.06--0.46 & 0--49\% & 0--1.94\\
+BashArena clusters (gpt-4.1 per-step) & $\le0.03$ & 0--12\% & n.s.\\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\end{table}
+\begin{itemize}
+\item Context explains only 0.1--9\% of \emph{per-step} variance (MRT 8--38\%). The heterogeneity lives in the trajectory tails.
+\item \textbf{Agent model is not a useful context.}
+\item LinuxArena environment effects are shared across all 12 monitors: mean pairwise Spearman 0.70 (range 0.43--0.97). The environment$\times$monitor interaction is no larger than noise (common-effect variance 0.148 vs cell noise 0.037). The heterogeneity therefore comes from the \emph{trajectories} (some environments are intrinsically sensitive-looking), not from monitor quirks.
+\end{itemize}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{t2/figures/r1_forest_global_5pct.pdf}
+\caption{Realized per-context FPR under a single global 5\% threshold (Wilson 95\% CIs), for four panels.}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.75\linewidth]{t2/figures/r1_lasweep_env_by_monitor.pdf}
+\caption{LinuxArena sweep: standardized honest environment effects by monitor. The same environments run hot for every monitor.}
+\end{figure}
+
+\subsection{Allocation at a fixed global budget}
+\begin{table}[H]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}llcccc@{}}
+\toprule
+Panel, $B$ & Rule & Spend & Uniform TPR & Selection safety & $\Delta$ vs global (95\%)\\
+\midrule
+7 settings, 1\% (nominal) & global & 1.01\% & 0.853 & 0.645 [0.53, 0.70] & --\\
+& CFAR & 1.13\% & 0.821 & \textbf{0.404} [0.18, 0.56] & $-0.47..-0.10$\\
+& max-detect & 1.12\% & \textbf{0.891} & 0.641 [0.47, 0.86] & $-0.09..+0.21$\\
+& Stackelberg & 1.07\% & 0.834 & \textbf{0.791} [0.69, 0.89] & $+0.06..+0.24$\\
+& Mondrian & 0.36\% & 0.689 & 0.125 & --\\
+& pooled\_cv & 1.10\% & 0.829 & 0.439 & --\\
+ControlArena, 1\% (nominal) & global & 0.97\% & 0.798 & 0.601 & --\\
+& CFAR & 1.34\% & 0.837 & \textbf{0.218} & $-0.58..-0.11$\\
+& Stackelberg & 1.38\% & 0.863 & \textbf{0.729} & $-0.07..+0.27$\\
+7 settings, 5\% (spend-matched) & global & 5\% & 0.965 & 0.890 & --\\
+& CFAR & 5\% & 0.946 & 0.753 & $-0.30..+0.01$\\
+& max-detect & 5\% & \textbf{0.984} & 0.958 & $+0.02..+0.12$\\
+& Stackelberg & 5\% & 0.971 & \textbf{0.966} & $+0.03..+0.12$\\
+ControlArena, 5\% (spend-matched) & global / CFAR / Stackelberg & 5\% & 0.960 / 0.935 / 0.982 & 0.908 / 0.561 / 0.973 & CFAR $-0.63..-0.06$\\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\caption{``Selection safety'' is the TPR in the context an informed attacker picks. Nominal-mode rules can over-spend out of sample. The spend-matched rows remove this; their conclusions are the same.}
+\end{table}
+
+\begin{itemize}
+\item \textbf{Damage-weighted Stackelberg} under a damage-weighted attacker (5\%): 0.984 vs 0.937 (7 settings) and 0.989 vs 0.930 (ControlArena), $+0.01..+0.12$.
+\item \textbf{Homogeneous panels} (LinuxArena): all rules are within $\pm0.02$ uniform TPR and $\pm0.1$ selection safety of global. Allocation does not matter when contexts do not differ.
+\item \textbf{Weak monitors} (MonitoringBench clusters): CFAR and max-detect raise uniform TPR (nano trajectory at 5\%: $0.079\to0.106$ / $0.162$), but selection safety stays low under every rule.
+\item \textbf{Cell-level selection} (choosing an attack type within a context) costs another 0.2--0.4: LinuxArena environment at 1\% falls from 0.90 to 0.61 (global) and from 0.95 to 0.70 (Stackelberg).
+\end{itemize}
+
+\begin{figure}[p]\centering
+\includegraphics[height=0.86\textheight,width=\linewidth,keepaspectratio]{t2/figures/r1_allocation_B1pct.pdf}
+\caption{Allocation rules at $B=1\%$, all panels. Columns: realized audit spend, uniform-attacker TPR, safety against attack selection, safety against damage-weighted selection (filled: nominal; open: spend-matched).}
+\end{figure}
+
+\subsection{Small samples per context}
+\begin{table}[H]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lccccc@{}}
+\toprule
+$n$ per ctx & global & CFAR & Mondrian & pooled\_eb & pooled\_cv\\
+\midrule
+10 & 1.61$\times$ / 0.81 / 0.63 & \textbf{7.26$\times$} / 0.91 / 0.59 & 0 / 0 / 0 & 2.45$\times$ / 0.85 / 0.63 & 1.72$\times$ / 0.83 / 0.64\\
+30 & 1.16$\times$ / 0.83 / 0.63 & 2.90$\times$ / 0.85 / 0.43 & 0 / 0 / 0 & 1.60$\times$ / 0.85 / 0.60 & 1.30$\times$ / 0.84 / 0.61\\
+100 & 1.01$\times$ / 0.84 / 0.64 & 1.48$\times$ / 0.84 / 0.40 & 0.46$\times$ / 0.68 / 0.08 & 1.25$\times$ / 0.85 / 0.52 & 1.13$\times$ / 0.84 / 0.58\\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\caption{Spend/$B$ / uniform TPR / selection safety, 7 settings, $B=1\%$.}
+\end{table}
+\begin{itemize}
+\item The plug-in per-context quantile spends $\approx1/(n_c+1)$ per context regardless of target.
+\item Mondrian conformal is valid but \emph{never alarms} below $n_c\approx1/B$.
+\item Partial pooling with cross-validated $n_0$ stays within 1.1--1.3$\times$ of budget (1.4--2.9$\times$ at $n=10$) at equal TPR.
+\item On the LinuxArena sweep and MRT (10 calibration runs per context, nominal 5\%): CFAR spends 7.8--12.3\%, max-detect and Stackelberg 9--14\%, global and pooled\_cv 4.6--6.5\%.
+\end{itemize}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.95\linewidth]{t2/figures/r1_small_sample.pdf}
+\caption{Small-sample regime: spend/$B$, SD of per-context FPR/$B$, uniform TPR and selection safety vs honest calibration runs per context.}
+\end{figure}
+
+\subsection{Poisoning}
+\begin{table}[H]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Poisoned share $\varepsilon$ & 0 & 1\% & 2\% & 5\% & 10\% & 20\%\\
+\midrule
+global & .945 & .942 & .941 & .933 & .785 & .415\\
+CFAR & .949 & .758 & \textbf{.366} & .157 & .079 & .039\\
+pooled\_eb & .947 & .940 & .931 & .759 & .360 & .072\\
+OS-CFAR (LOCO) & .896 & .890 & .887 & \textbf{.862} & \textbf{.807} & .383\\
+50/50 reference mix & .943 & .928 & .724 & .314 & .157 & .078\\
+CFAR + drift cap & .953 & .878 & .800 & .778 & .771 & .769\\
+frozen reference & .945 & .945 & .945 & .945 & .945 & .945\\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\caption{TPR in the poisoned context (LinuxArena environment, $B=1\%$, attack-max poison). The 7-settings panel is similar (CFAR 0.11, OS-CFAR 0.81 at 5\%). TM-CFAR is dominated: clean TPR is 0.2--0.3 lower, and it breaks at its trim fraction.}
+\end{table}
+
+\begin{itemize}
+\item \textbf{CFAR breaks once $\varepsilon\approx B$.} A per-context quantile at level $B$ is moved by any poison share $\ge B$.
+\item \textbf{Global breaks near $\varepsilon\approx B/w_t$.} The poison is diluted by the context's traffic share $w_t$.
+\item \textbf{OS-CFAR (LOCO)} takes its tail level from the \emph{other} contexts, so a single poisoned context cannot move it. It holds TPR at 0.77--0.86 up to 10\% poison.
+\end{itemize}
+
+\begin{table}[H]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcc@{}}
+\toprule
+Defense (boiling frog, $\varepsilon=5\%$, 30 rounds) & TPR (LA / 7 settings) & FPR under genuine $+2$ drift\\
+\midrule
+CFAR, no filter & 0.16 / 0.11 & 2.0\% / 1.1\%\\
+CFAR + outlier filter & 0.16 / 0.11 (only slower) & 4.6\% / 2.7\%\\
++ cumulative cap & 0.78 / 0.54 & 4.9\% / 3.3\%\\
+frozen-reference mix + filter & 0.33 / 0.31 & 4.3\% / 3.2\%\\
+global + filter & 0.94 / 0.65 & 4.0\% / 4.0\%\\
+OS-CFAR (LOCO) + filter & \textbf{0.82 / 0.80} & \textbf{1.1\% / 0.6\%}\\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\caption{Gradual poisoning vs genuine drift. Only OS-CFAR with a leave-one-context-out tail is both poisoning-robust and drift-tracking.}
+\end{table}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{t2/figures/r2_poisoning_attack_max.pdf}
+\caption{TPR in the poisoned context vs poisoned share of its calibration data, by defense and panel.}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{t2/figures/r2_boiling_frog.pdf}
+\caption{Boiling frog: TPR in the target context and FPR under genuine drift over 30 recalibration rounds.}
+\end{figure}
+
+\section{Recipe}
+\begin{enumerate}
+\item \textbf{Measure first.} Fit the random-effects $\tau$ on exceedances at a global 5--10\% threshold. If $\tau$ is not significant, use one global threshold.
+\item \textbf{Never use plain per-context quantiles with $n_c<\sim3/B$.} Use partial pooling with cross-validated $n_0$, which falls back to global automatically. Mondrian is valid but useless below $n_c\approx1/B$.
+\item \textbf{If contexts truly differ and the attacker can choose where to act, do not use CFAR.} Use Stackelberg (damage-equalizing) thresholds fit on held-out attack data, with damage weights when stakes differ by context. Without attack data, use global. Max-detection is right only against a non-strategic attacker.
+\item \textbf{If the policy can influence recalibration data}, use OS-CFAR with a leave-one-context-out tail, or global. Outlier filters only slow a boiling frog. Cumulative caps bound poisoning but over-spend under genuine drift.
+\item \textbf{Expect within-context attack-type selection to cost more} (0.2--0.4) than allocation can recover.
+\end{enumerate}
+
+\section{Limitations and negative results}
+\begin{itemize}
+\item \textbf{Monitor strength.} The Gemini panels are near-separable; the MonitoringBench monitors are weak.
+\item \textbf{Few attacks per context in the LinuxArena sweep} (5--18), so Stackelberg and max-detect overfit there.
+\item \textbf{Attacker modeling.} The informed attacker uses its own calibration-split scores. The oracle attacker is biased low (winner's curse). Damage weights are synthetic.
+\item \textbf{Untested.} Transfer of per-context thresholds across datasets. Poisoning across several contexts, which would weaken the global and LOCO defenses.
+\item \textbf{Negative results:}
+  \begin{itemize}
+  \item TM-CFAR is dominated;
+  \item empirical-Bayes $n_0$ is worse than cross-validated $n_0$;
+  \item agent model is not a useful context;
+  \item trajectory-mode gpt-4.1-mini/nano are weak monitors (AUROC $\approx0.6$).
+  \end{itemize}
+\end{itemize}
+
+\section*{Reproduction}
+Code: \texttt{agent-monitor-detection/tracks/t2\_per\_context/} (\texttt{t2lib.py}, \texttt{panels.py}, \texttt{r1\_heterogeneity.py}, \texttt{r1\_allocation.py}, \texttt{r2\_poisoning.py}, \texttt{r2\_boiling.py}, \texttt{make\_tables.py}, \texttt{figures.py}). Results: \texttt{results/t2/} (\texttt{tables.md}, CSVs, PDF figures). Repository: \url{https://github.com/gregkocher/agent-monitor-detection} (private).
+\end{document}
