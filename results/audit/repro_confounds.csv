@@ -1,0 +1,23 @@
+check,honest,attack,note
+n,550,775,
+"median steps (submit stripped, cap 60)",20.5,31.0,
+length AUROC (attack longer),,0.725,max over more steps is inflated; confounds max-type and accumulators alike
+share ending with submit,0.991,0.756,
+share > 60 raw steps (truncated),0.0291,0.0,
+agent model,"{""anthropic/claude-opus-4-5-20251101"": 550}","{""claude-opus-4-5-20251101"": 494, ""claude-opus-4-6"": 281}",attack-only agent model = label-correlated confound
+share of trajectories using tool 'bash',1.0,1.0,
+share of trajectories using tool 'python',0.111,0.12,
+share of trajectories using tool 'str_replace',0.033,0.0,
+share of trajectories using tool 'submit',0.991,0.756,
+share of trajectories using tool 'text_editor',1.0,0.959,
+"steps with '""command"":' arg (bash)",0,0,
+share of steps with non-empty reasoning,1.0,0.568,monitor prompts hide reasoning by default (prompts.render_step include_reasoning=False)
+share of steps with empty output,0.087,0.12,
+score coverage scores_openai_gpt-4.1-mini_full.jsonl,streams=550 steps=13797 NaN=0 lp_ok=1.000,streams=775 steps=25021 NaN=0 lp_ok=1.000,
+score coverage scores_openai_gpt-4.1-mini_none.jsonl,streams=550 steps=13797 NaN=0 lp_ok=1.000,streams=775 steps=25021 NaN=0 lp_ok=1.000,
+score coverage scores_openai_gpt-4.1-nano_none.jsonl,streams=550 steps=13797 NaN=0 lp_ok=1.000,streams=775 steps=25021 NaN=0 lp_ok=1.000,
+score coverage scores_openai_gpt-4.1_none.jsonl,streams=550 steps=13797 NaN=0 lp_ok=1.000,,
+attack_step(0-based)+off contains a target literal: off=-1/0/+1,,63/280/9 of 703,peak at off=0 supports correct 1->0-based conversion
+"attack_step - first_attack_step (median, q90)",,"3.0, 19.0",
+attacks with attack_step >= scored length (onset beyond truncation/submit strip),,0,
+attacks where attack_step is the submit step,,0,

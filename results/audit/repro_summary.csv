@@ -1,0 +1,17 @@
+quantity,reported,reproduced_independently,verdict
+T1 r2 MB full a=0.05 max / top3sum TPR,0.226 / 0.324,0.216 / 0.311,match (split noise)
+T1 r2 MB full a=0.01 max / top3sum TPR,0.171 / 0.195,0.166 / 0.202,match
+T1 r2 MB none a=0.05 max / top3sum TPR,0.322 / 0.304,0.340 / 0.308,match
+T1 r2 MB none a=0.01 max / top3sum TPR,0.156 / 0.190,0.180 / 0.202,match (split noise)
+T1 r2 MB full a=0.01 top3 - max gain CI,"+0.024 [0.018, 0.031]","+0.035; shared-index [0.016, 0.057]; full [-0.049, 0.105]",point match; CI MISMATCH (understated)
+PS gpt-4o current_only gradual a=0.05 top3 - max,"r2 +0.101 [0.09, 0.12]; r1 +0.15 [0.12, 0.17]","+0.094; shared [0.019, 0.159]; full [-0.093, 0.278]",point matches r2 (not r1); CI MISMATCH
+PS gpt-4.1-mini current_only gradual a=0.05 top3 - max,"+0.145 [0.13, 0.16] (max 0.59 -> top3 0.73)","+0.174 (0.585 -> 0.759); shared [0.107, 0.245]; full [-0.083, 0.317]",point approx match; CI MISMATCH
+T2 7 settings B=1% sel_informed global / CFAR / Stackelberg,0.645 / 0.404 / 0.791,0.641 / 0.409 / 0.791,match
+T2 7 settings B=1% uniform TPR global / CFAR / Stackelberg,0.853 / 0.821 / 0.834,0.853 / 0.822 / 0.834,match
+T2 7 settings B=5% sel_informed global / Stackelberg,0.89 / 0.97,0.887 / 0.966,match
+T2 7 settings Stackelberg with independent attacker info (1% / 5%),n/a,0.775 / 0.957,small optimism (m2)
+T3 r2 a=0.01 vs max undetected-success nothing / pace_max / rewrite_control,0.75 / 0.60 / 0.40,0.754 / 0.603 / 0.397,match
+T3 r2 a=0.01 pace_max - rewrite_control (max),"+0.206 [+0.119, +0.294]","+0.206 [0.119, 0.294]",exact match
+T3 r2 a=0.01 pace_max - nothing; rewrite_control - nothing,-0.151; -0.357,-0.151; -0.357,exact match
+T3 r2 a=0.01 ONE-SHOT pace_max_r0 - rewrite_control,not reported,"+0.095 [0.008, 0.183]; with honest resampling [-0.024, 0.190]",new (M1)
+T3 r2 strict validity pace_max - nothing (a=0.01),not reported,"-0.317 [-0.421, -0.214]",new (M2)
