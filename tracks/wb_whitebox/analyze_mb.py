@@ -6,10 +6,10 @@ For each stream (wblib.PRIMARY + per-layer variants + gpt-4.1-mini) and mode (fu
   - matched-FPR TPR (alpha 0.05 / 0.01 / 0.003, randomized thresholds, 10 grouped splits by task,
     cluster bootstrap by task) for max, 2nd-max, top-3 sum, CUSUM k in {0.5,1,1.5,2}, e-process,
     length-aware max, OR(max+CUSUM)
-  - paired gains over max (top-3 sum, CUSUM k=0.5 / 1.5) and the honest-persistence /
-    repeat-spike mechanism quantities (T1 mechanism.persistence)
-Outputs: results/wb/mb_matched.csv, mb_auroc.csv, mb_gains.csv, mb_mechanism.csv; raw split statistics
-for fusion in data/processed/whitebox/raw/.
+  - the honest-persistence / repeat-spike mechanism quantities (T1 mechanism.persistence)
+Outputs: results/wb/mb_matched.csv, mb_auroc.csv, mb_mechanism.csv; raw split statistics (identical splits
+for every stream and mode) in data/processed/whitebox/raw/ for analyze_paired (paired gains, stream-vs-LLM
+differences, DiD, agent-model strata, all with the shared cluster bootstrap incl. calibration noise).
 
     uv run python -m tracks.wb_whitebox.analyze_mb [--streams sab,llm] [--n-splits 10]
 """
@@ -27,7 +27,7 @@ from sklearn.metrics import roc_auc_score
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "t1_matched_budget"))
 from mechanism import persistence  # noqa: E402
 from run_round2 import load_mode  # noqa: E402
-from t1lib import StreamSet, paired_gain, run_matched, t1_suite  # noqa: E402
+from t1lib import StreamSet, run_matched, t1_suite  # noqa: E402
 
 from amd.common.schema import REPO  # noqa: E402
 from amd.detectors import CUSUM, Whiten  # noqa: E402
@@ -123,16 +123,13 @@ def main():
                                   return_raw=True, seed=0)
             df["mode"], df["stream"] = mode, st
             tabs.append(df)
-            for alpha in ALPHAS:
-                for d in ("kth2", "top3sum", "cusum_k0.5", "cusum_k1.5", "eproc_power", "or(max+cusum)"):
-                    g, lo, hi = paired_gain(raw, alpha, a=d, b="max")
-                    gains.append(dict(mode=mode, stream=st, alpha=alpha, detector=d, gain=g, lo=lo, hi=hi))
             with open(RAWD / f"{a.tag}_{mode}_{st}.pkl", "wb") as f:
-                pickle.dump(dict(raw=raw, honest_ids=ss.honest_ids, attack_ids=ss.attack_ids), f)
+                pickle.dump(dict(raw=raw, honest_ids=ss.honest_ids, attack_ids=ss.attack_ids,
+                                 honest_groups=np.asarray(ss.honest_groups), attack_groups=np.asarray(ss.attack_groups),
+                                 attack_meta=ss.attack_meta), f)
             pd.DataFrame(au).to_csv(OUT / f"{a.tag}_auroc.csv", index=False)
     pd.concat(tabs).to_csv(OUT / f"{a.tag}_matched.csv", index=False)
     pd.DataFrame(au).to_csv(OUT / f"{a.tag}_auroc.csv", index=False)
-    pd.DataFrame(gains).to_csv(OUT / f"{a.tag}_gains.csv", index=False)
     pd.DataFrame(mech).to_csv(OUT / f"{a.tag}_mechanism.csv", index=False)
     print(pd.DataFrame(au).round(3).to_string())
 

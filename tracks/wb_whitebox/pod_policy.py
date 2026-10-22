@@ -5,8 +5,8 @@ MOLE `qwen36_27b_single_day` (forgelab/mole): sessions of Qwen3.6-27B agents at 
 a random sample of benign sessions and compute, per assistant turn ("step"), probe scores pooled over the
 turn's tokens:
 
-  policy  Qwen/Qwen3.6-27B (the model that generated the transcripts) reads the session exactly in its own
-          chat format: system prompt (incl. the insider persona, as the policy saw it), user turns, its
+  policy  Qwen/Qwen3.6-27B (the model that generated the transcripts) reads the session in its own chat
+          format (one causal pass; a step = one assistant turn's tokens, <|im_start|>assistant .. <|im_end|>): system prompt (incl. the insider persona, as the policy saw it), user turns, its
           assistant turns (content + tool calls) and tool results. Reasoning tokens are not in the release;
           Qwen chat templates drop earlier turns' reasoning from the context anyway, so later turns' context
           is reproduced except the tool-schema block (not released) — a known mismatch.
@@ -160,6 +160,8 @@ def run(arm):
     out_p = f"{WORK}/out/mole_{arm}.jsonl"
     done = {json.loads(l)["task_id"] for l in open(out_p)} if os.path.exists(out_p) else set()
     sel = [json.loads(l) for l in open(f"{WORK}/mole_sel.jsonl")]
+    if os.environ.get("REVERSE"):        # a second pod works from the other end; outputs are merged by task_id
+        sel = sel[::-1]
     with open(out_p, "a") as fo:
         for si, s in enumerate(sel):
             if s["task_id"] in done:
@@ -168,38 +170,37 @@ def run(arm):
             msgs = s["messages"]
             recs = []
             if arm == "policy":
-                full = rd.tok.apply_chat_template(msgs, tokenize=False)
-                spans = []
-                for i, m in enumerate(msgs):            # token span of each assistant message
-                    if m["role"] != "assistant":
-                        continue
-                    a = len(rd.ids(rd.tok.apply_chat_template(msgs[:i], tokenize=False))) if i else 0
-                    b = len(rd.ids(rd.tok.apply_chat_template(msgs[:i + 1], tokenize=False)))
-                    spans.append((a, b))
-                ids_all = rd.ids(full)[:MAX_TOK]
-                cache = rd.fwd(ids_all[: spans[0][0]] if spans and spans[0][0] > 0 else ids_all[:1])
-                pos = spans[0][0] if spans and spans[0][0] > 0 else 1
-                for a, b in spans:
-                    if b > len(ids_all):
+                text = rd.tok.apply_chat_template(msgs, tokenize=False)
+                enc = rd.tok(text, add_special_tokens=False, return_offsets_mapping=True)
+                ids_all, offs = enc.input_ids, enc.offset_mapping
+                cspans, pos = [], 0
+                while True:                              # character span of each assistant turn
+                    a = text.find("<|im_start|>assistant\n", pos)
+                    if a < 0:
                         break
-                    if a > pos:
-                        rd.fwd(ids_all[pos:a], cache)
-                    rd.fwd(ids_all[a:b], cache)
+                    b = text.find("<|im_end|>", a)
+                    b = len(text) if b < 0 else b + len("<|im_end|>")
+                    cspans.append((a, b))
                     pos = b
-                    recs.append(PR.step_record(rd, b - a))
-                del cache
+                starts = np.array([o[0] for o in offs])
+                spans = [(int(np.searchsorted(starts, a)), int(np.searchsorted(starts, b))) for a, b in cspans]
             else:
                 prefix, steps = reader_render(msgs)
-                cache = rd.fwd(rd.ids(prefix))
-                n = len(rd.ids(prefix))
+                ids_all = rd.ids(prefix)
+                spans = []
                 for st in steps:
                     sid = rd.ids(st)
-                    if n + len(sid) > MAX_TOK:
-                        break
-                    rd.fwd(sid, cache)
-                    n += len(sid)
-                    recs.append(PR.step_record(rd, len(sid)))
-                del cache
+                    spans.append((len(ids_all), len(ids_all) + len(sid)))
+                    ids_all = ids_all + sid
+            ids_all = ids_all[:MAX_TOK]
+            spans = [(a, b) for a, b in spans if b <= len(ids_all) and b > a]
+            rd.fwd(ids_all)                              # one causal pass; per-turn features from token slices
+            full_caps = dict(rd.caps)
+            for a, b in spans:
+                rd.caps = {l: v[:, :b] for l, v in full_caps.items()}
+                recs.append(PR.step_record(rd, b - a))
+            rd.caps = {}
+            del full_caps
             keys = list(recs[0]) if recs else []
             fo.write(json.dumps({"task_id": s["task_id"], "label": s["label"], "outcome": s["outcome"],
                                  "account": s["account"], "day": s["day"], "n_steps": len(recs),

@@ -86,3 +86,67 @@ def jdump(obj, path):
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w") as f:
         json.dump(obj, f, indent=1, default=float)
+
+
+# ------------------------------------------------------------------------------------------------
+# Paired bootstrap with calibration noise (audit item C2): one cluster-bootstrap draw per replicate is
+# SHARED by every split, detector and stream; honest calibration is resampled by task cluster and every
+# threshold is recomputed; attacks are resampled by task cluster. Replicate value = mean over splits.
+# ------------------------------------------------------------------------------------------------
+def cluster_weights(groups, rng):
+    """Multinomial cluster-bootstrap counts per item (items of a drawn cluster all get its count)."""
+    groups = np.asarray(groups)
+    ug, inv = np.unique(groups, return_inverse=True)
+    cnt = np.bincount(rng.integers(0, len(ug), len(ug)), minlength=len(ug))
+    return cnt[inv]
+
+
+def _tpr_weighted(cal, wc, att, wa, alpha, method="randomized"):
+    from amd.evaluation import calibrate
+    c = np.repeat(np.asarray(cal, float), wc)
+    if len(c) == 0 or wa.sum() == 0:
+        return np.nan
+    th = calibrate(c, alpha, method)
+    return float((th.alarm_prob(np.asarray(att, float)) * wa).sum() / wa.sum())
+
+
+def by_split(raw, det):
+    return {r["split"]: r for r in raw if r["detector"] == det}
+
+
+def paired_full(raws: dict, hg, ag, alpha, pairs, B=500, seed=0, attack_mask=None, method="randomized"):
+    """raws: {key: raw list from run_matched(return_raw=True)}; key = (stream, detector) etc. Splits must be
+    identical across keys (same seed / ids / groups). pairs: list of (key_a, key_b) -> TPR(a) - TPR(b);
+    a pair (key, None) gives the absolute TPR of key. attack_mask restricts the attack test set (subgroup).
+    Returns list of dicts with point estimate, 95% CI and P(<= 0)."""
+    rng = np.random.default_rng(seed)
+    keys = sorted({k for p in pairs for k in p if k is not None})
+    S = {k: raws[k] for k in keys}
+    splits = sorted(S[keys[0]].keys())
+    for k in keys:  # identical splits across keys
+        for sp in splits:
+            assert np.array_equal(S[k][sp]["cal_idx"], S[keys[0]][sp]["cal_idx"]), (k, sp)
+            assert np.array_equal(S[k][sp]["attack_idx"], S[keys[0]][sp]["attack_idx"]), (k, sp)
+    am = np.ones(len(ag), bool) if attack_mask is None else np.asarray(attack_mask, bool)
+
+    def value(wh, wa):
+        out = {}
+        for k in keys:
+            v = []
+            for sp in splits:
+                r = S[k][sp]
+                ai = r["attack_idx"]
+                v.append(_tpr_weighted(r["cal"], wh[r["cal_idx"]], r["attack"], (wa * am)[ai], alpha, method))
+            out[k] = np.nanmean(v)
+        return out
+
+    point = value(np.ones(len(hg), int), np.ones(len(ag), int))
+    reps = [value(cluster_weights(hg, rng), cluster_weights(ag, rng)) for _ in range(B)]
+    res = []
+    for a, b in pairs:
+        pt = point[a] - (point[b] if b is not None else 0.0)
+        bs = np.array([r[a] - (r[b] if b is not None else 0.0) for r in reps])
+        bs = bs[np.isfinite(bs)]
+        res.append(dict(a=a, b=b, alpha=alpha, est=pt, lo=float(np.quantile(bs, 0.025)),
+                        hi=float(np.quantile(bs, 0.975)), p_le0=float((bs <= 0).mean())))
+    return res

@@ -243,7 +243,12 @@ def run(src, mode, limit=None, shard=None):
         log("probes:", rd.probe_names)
     else:
         log("WARNING: no probes.pt; only FIBS + J-lens")
-    recs = [json.loads(l) for l in open(f"{WORK}/inputs/{src}.jsonl")]
+    recs, seen = [], set()
+    for l in open(f"{WORK}/inputs/{src}.jsonl"):
+        r = json.loads(l)
+        if r["traj_id"] not in seen:          # T3 arms reuse identical round-0 trajectories under one id
+            seen.add(r["traj_id"])
+            recs.append(r)
     if shard:
         i, k = map(int, shard.split("/"))
         recs = recs[i::k]

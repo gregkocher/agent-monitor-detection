@@ -10,7 +10,10 @@ environments (10 envs, 20 honest each). Statistic = trajectory max of the per-st
 2. Allocation at a fixed global audit budget (T2 `r1_allocation.run_panel`, 60 plain + 150 bootstrap
    replicates): global, CFAR, Mondrian, partial pooling (EB / CV), max-detection, Stackelberg; metrics:
    uniform-attacker TPR and informed attack-selection safety (attacker picks the context with the lowest
-   estimated detection), nominal and spend-matched.
+   estimated detection), nominal and spend-matched. Budgets 5% and 10%: clusters hold 20-100 honest
+   trajectories (LinuxArena: 20 per env), so per-context quantiles cannot resolve 1-2% on a 50/50 split
+   (T2: plug-in CFAR spends about 1/(n_c+1)). Realized spend is reported for every row, and a 'matched' row
+   counts as matched only where matched_ok (the swept nominal levels bracket the target spend; audit C1).
 
     uv run python -m tracks.wb_whitebox.analyze_context [--quick]
 """
@@ -159,7 +162,7 @@ def main():
     pd.DataFrame(het).to_csv(OUT / "context_heterogeneity.csv", index=False)
     print(pd.DataFrame(het).round(3).to_string())
     n_plain, n_boot = (4, 6) if a.quick else (60, 150)
-    jobs = [(n, (0.02, 0.05), n_plain, n_boot, [None], 5000 + i) for i, n in enumerate(sorted(PANELS))]
+    jobs = [(n, (0.05, 0.10), n_plain, n_boot, [None], 5000 + i) for i, n in enumerate(sorted(PANELS))]
     parts = []
     RA.P.load = P.load
     with ProcessPoolExecutor(a.workers, initializer=_init, initargs=(PANELS,)) as ex:
@@ -172,7 +175,7 @@ def main():
     for mode in ("nominal", "matched"):
         print(mode)
         print(summ[summ["mode"] == mode].pivot_table(index=["panel", "B"], columns="rule",
-                                                     values=["tpr_uniform", "sel_informed"]).round(3).to_string())
+                                                     values=["tpr_uniform", "sel_informed", "spend"]).round(3).to_string())
 
 
 def _init(panels):

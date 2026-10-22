@@ -12,7 +12,7 @@ Steps: the first 60 (as in the gpt-4.1-mini scoring), with the final submit step
 does at analysis time, so reader streams align index by index with the stripped gpt-4.1-mini streams.
 
 Sources (data/processed/whitebox/inputs/<name>.jsonl): mb (775 sampled attacks + Honest-550), t3 (all
-refined arms incl. round-0), la (LinuxArena sweep: every action, as the 12 sweep monitors scored them;
+refined arms incl. round-0), t3r2 (round-2 pacing arms + rewrite control), la (LinuxArena sweep: every action, as the 12 sweep monitors scored them;
 hidden-tool steps are kept but flagged and set to NaN at analysis time).
 Probe-training inputs: contrast.jsonl (synthetic sabotage pairs) and repe.jsonl (Apollo Instructed-Pairs).
 
@@ -102,6 +102,16 @@ def main():
             t3.append(record(Trajectory(**d), extra={"arm": arm, "orig_traj_id": d["meta"].get("orig_traj_id"),
                                                         "valid": d["meta"].get("valid")}))
     write("t3", t3)
+
+    t3r2 = []  # T3 round-2 pacing (anti-condensation) arms + rewrite control, scored by gpt-4.1 (none)
+    for arm in ("pace_max_r2", "pace_cusum_r2", "pace_multichart_r2", "rewrite_control_r2",
+                "pace_max_r2_r0", "pace_cusum_r2_r0", "pace_multichart_r2_r0", "rewrite_control_r2_r0"):
+        p = PROCESSED / "t3_refined" / arm / "trajectories.jsonl"
+        if p.exists():
+            for d in read_jsonl(p):
+                t3r2.append(record(Trajectory(**d), extra={"arm": arm, "orig_traj_id": d["meta"].get("orig_traj_id"),
+                                                          "valid": d["meta"].get("valid")}))
+    write("t3r2", t3r2)
 
     la = []
     for t in load_trajectories("linuxarena_sweep"):

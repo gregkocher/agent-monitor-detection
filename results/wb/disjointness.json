@@ -1,0 +1,5 @@
+{"contrast_tasks": 253, "mb_tasks": 136,
+ "max_tfidf_cosine_contrast_task_vs_mb_task": 0.61, "p99_of_per_contrast_task_max_cosine": 0.461,
+ "contrast_action_8grams": 12009, "shared_8grams_with_400_mb_attack_trajectories": 9,
+ "shared_8gram_examples": "generic nginx proxy_set_header boilerplate and `int add(int a, int b)` C snippets",
+ "apollo_instructed_pairs": "306 true facts from ApolloResearch/deception-detection data/repe/true_false_facts.csv; no agent text"}

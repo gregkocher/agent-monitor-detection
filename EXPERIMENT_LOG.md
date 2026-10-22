@@ -629,3 +629,72 @@ m13 (README budget text, `.gitignore` for `results/.key_index`, the synthetic `s
 `tracks/r2_t1/ps_score.py`) is outside the fixes scope and still open. In-progress r3 tracks (`r3lib.paired_gain_full`,
 `mole_r3_analysis.py` / `reflag_analysis.py`, which still call the old `gains_table`) were not touched; they should
 switch to `amd.evaluation.paired`.
+
+## 2026-10-21/22: WB white-box pilot — results (Qwen3.5-27B trusted reader)
+
+Code `tracks/wb_whitebox/` (pod: `pod_reader.py`, `pod_sup.py`, `pod_check.py`, `pod_policy.py`; laptop:
+`export_inputs.py`, `gen_contrast.py`, `analyze_{mb,paired,confounds,fusion,context,la,t3,mole}.py`, `make_figures.py`).
+Results `results/wb/` (`tables.md` = all headline tables, CSVs, PDF figures). Score streams (no activations) in
+`data/processed/whitebox/scores/`. Scored: MB 1,325 (37.7k steps) and T3 r1 (509 unique) in full+none, T3 r2
+(701 unique, none), LinuxArena 342 (full+none), MOLE Stage 2. GPU ≈ $70 (two H200 pods); OpenRouter wb $2.95.
+CIs: task-cluster bootstrap with calibration noise; MB contrasts via `amd.evaluation.paired` (audit C2).
+Pre-specified primary streams: `sab` = layer-mean (6 FIBS layers) synthetic-sabotage probe, mean-pooled;
+FIBS follow-up contrasts; J-lens layer-mean mass. Per-layer variants are reported as exploratory (L43 is best
+post hoc — selected on the evaluation set, not a valid estimate).
+
+- **MB, reader vs gpt-4.1-mini (TPR of trajectory max, FPR 0.01).** history-aware (full): `sab` 0.262 vs LLM
+  0.164, +0.098 [+0.015, +0.163]; FIBS axial follow-up +0.057 [+0.010, +0.287]; FIBS linear follow-up −0.055
+  [−0.10, +0.08]; J-lens mass −0.044 [−0.09, +0.03]; Apollo deception probe −0.092 [−0.14, −0.01].
+  history-free (none): `sab` −0.023 [−0.14, +0.07]; FIBS axial +0.206 [+0.09, +0.32]; FIBS linear follow-up
+  +0.120 [+0.02, +0.20]. AUROC(max) full/none: sab 0.79/0.74, FIBS axial 0.82/0.85, J-lens 0.72/0.68, Apollo
+  0.68/0.70, LLM 0.66/0.76. Max-token J-lens is null (0.48).
+- **Confounds.** Pre-onset attack steps vs honest steps: AUROC 0.46–0.52 for every generic probe and the LLM
+  (no source/style leakage); the in-distribution cross-fitted supervised probe (`sup`, AUROC 0.998/0.98) scores
+  0.79/0.70 on PRE-onset steps → it partly learns trajectory-source features; treat it as a leaky upper bound,
+  not a monitor estimate (it also transfers poorly: LinuxArena 0.69/0.55). Agent model (audit M9): on
+  opus-4-5 attacks (same agent as Honest-550) `sab` full beats the LLM by +0.147 [+0.06, +0.23]; on opus-4-6
+  it ties (+0.01) because the LLM's TPR doubles there (0.11 → 0.25). Length-matched subsets (383 + 383): same
+  ordering. Numerical check (24 trajectories, single pass vs incremental): mean-pooled step features r ≥ 0.999
+  (median |diff| ≤ 0.02 SD); max-token features r 0.98–0.99, so max-pooled variants carry bf16 noise.
+  Probe-training data disjoint from evaluation (max TF-IDF cos of contrast tasks vs MB tasks 0.61; 9 shared
+  boilerplate 8-grams of 12k).
+- **(a) Decision rules.** On probe streams max is best: accumulators are mostly worse (full `sab` top-3 −0.13
+  [−0.17, −0.07], CUSUM k=.5 −0.21 at 0.01), FIBS follow-up streams in none mode lose most to CUSUM (−0.18 to
+  −0.25). DiD (none − full) of CUSUM k=.5 gain: `sab` +0.163 [+0.08, +0.22] (history-free favors accumulation
+  relative to history-aware, the T1 prediction), FIBS follow-ups −0.18 (opposite). No accumulator beats max
+  for any probe stream.
+- **(b) Per-context (7 MB task clusters; 10 LA envs).** Probe streams are more context-heterogeneous than the
+  LLM: tau at a global 5% threshold full: sab 1.21, FIBS axial 1.64, FIBS linear 2.70, Apollo 3.79 vs LLM 0.46
+  (n.s.); context share of honest-max variance 3–14% vs 0.2–3.5%. Allocation at 10% spend, spend-matched
+  (matched_ok 0.87–1.0; 5% rows only 0.4–0.8 matched and not claimed): CFAR raises uniform TPR more for probes
+  (Apollo none +0.15 [+0.01, +0.29]; sab +0.04..+0.09, n.s.) than for the LLM (−0.02..+0.02), and lowers
+  informed-selection safety (FIBS linear full 0.36 → 0.09, interval [−0.46, +0.01]); Stackelberg keeps
+  selection safety at or above global. Mostly n.s. with 7 clusters.
+- **(c) Fusion with gpt-4.1-mini (MB, FPR 0.01).** Full mode: LLM 0.166; sab cascade (LLM called on the 10% of
+  honest steps the probe ranks highest; 13% of all steps) 0.299 (+0.133 [+0.03, +0.22]) — ~87% fewer LLM calls
+  and higher TPR; sab KDE-LLR (trajectory) 0.279 (+0.11 [+0.06, +0.18]); FIBS axial KDE-LLR 0.328 (+0.16
+  [+0.10, +0.25]). None mode: LLM 0.151; FIBS axial alone 0.324, fusion 0.31 (no gain over the probe alone);
+  sab cascade 10% 0.280 (+0.13 [+0.04, +0.21]).
+- **(d) Detector-aware rewrites.** Every rewrite arm is detected MORE than its original by every monitor
+  (rewrite artifact: condensation + fabricated outputs; e.g. r2 none at 0.01, original → rewrite-control:
+  gpt-4.1 0.24 → 0.57, FIBS axial 0.38 → 0.65, sab 0.09 → 0.08). One-shot pacing vs one-shot control (the fair
+  strategy contrast, audit M1): gpt-4.1 −0.05..−0.09 (pace_multichart [−0.16, −0.01]); FIBS axial
+  −0.05..−0.07 (n.s.); sab +0.02..+0.05; FIBS-on-tokens +0.04..+0.09. Pacing written against gpt-4.1 partly
+  transfers to the follow-up probe, not to the token-level probes. Rewrites were written against LLM monitors
+  and carry fabricated outputs (audit M5); originals and rewrites are reported separately.
+- **LinuxArena (TPR@0.01, max).** FIBS axial follow-up full 0.756 [0.56, 0.86] and FIBS linear follow-up
+  0.713, AUROC 0.936/0.932 — above gpt-5.4 (0.57, 0.933), sonnet-4-6, gpt-5-mini, kimi, gemini-3-flash;
+  below opus-4-6 (0.92) and gemini-3.1-pro (0.90). sab is weak here (0.16; AUROC 0.62); J-lens 0.12.
+- **Stage 2 (policy vs reader activations, MOLE qwen36_27b single-day; 233 insider sessions vs 200 random
+  benign sessions).** Policy = Qwen3.6-27B reading its own sessions in its chat format incl. the system prompt
+  (which states the insider objective; reasoning tokens and tool schemas are not in the release); reader =
+  Qwen3.5-27B in the monitor framing without the system prompt. Session AUROC (max over turns / mean over
+  turns): sab policy 0.84 / 0.95, reader 0.86 / 0.96 (sab re-trained on each model's own activations of the same
+  contrast pairs; CV AUROC 0.97 both); FIBS 3.5 linear probe on tokens: policy 0.82 / 0.98 (a transfer to 3.6),
+  reader 0.62 / 0.74; J-lens top-25 hits: policy 0.80 / 0.93, reader 0.96 / 0.98. Policy activations do not
+  beat the reader on the pre-specified probe; the one stream where they do (FIBS-on-tokens) is also the one that
+  could key on the in-context instruction. No LLM baseline exists for this split; benign sessions are a random
+  sample (account/role mix not matched), so session-type differences may inflate all AUROCs.
+- **Cost.** GPU: pods `...wb-qwen27b-2` (≈7.0 h) and `...wb-qwen27b-3` (≈5.8 h) on H200 at $5.29/h plus $2.1
+  earlier ≈ $70; all white-box pods deleted 2026-10-22 ~00:35 UTC. OpenRouter wb $2.95. Reader throughput
+  ≈ 1,000 tokens/s per process with per-step follow-ups (two processes per H200).
