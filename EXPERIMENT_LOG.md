@@ -1304,3 +1304,101 @@ rewriter = google/gemini-2.5-pro; 6 replay samples hit the 900 s wall and are re
 scorer-false). Fixed-policy replays recorded commands literally; a command that silently depended on a
 real earlier dynamic output can fail — that is itself a genuine attack fragility and the right thing to
 count. Replays never ran outside the sandbox; attack content stays in gitignored data/.
+
+## 2026-10-22: Idea 05 round 1 (track r5jev): JEV as a per-step first-stage monitor — preregistration
+
+Written and committed after the dev-split prompt choice and BEFORE any evaluation (held-out) trajectory is scored
+by JEV, gpt-4.1-nano or the open decision model. Nothing below changes after evaluation scoring starts; any deviation
+is reported as a deviation in the results entry. Plan: `docs/research/IDEA_05_DECISION_MODEL_MONITORS.md` (RQ1–RQ3).
+Code `tracks/r5_jev/`; results `results/r5_jev/`; raw outputs and caches `data/r5_jev/` (gitignored). Budget tracks
+`r5dev` ($10, dev pilots; spent $5.34) and `r5jev` ($150, everything else); open-model arm ≤ $50 RunPod.
+
+**Model and interface.** OpenRouter Decisions API (`POST /api/alpha/decisions`, `amd.common.openrouter.OpenRouter.
+decisions`, same ledger / caps / key fallback as chat), model `typesafe/jev-1.14`; every dev answer came from
+`typesafe/jev-1.14-20261014` (the version is stored per call and reported). Requests carry only the main-task text
+and step texts (no metadata, labels or eval headers). Probabilities are returned rounded to 0.01.
+
+**Frozen JEV first stage (chosen on dev only; `results/r5_jev/dev_selection*.csv`, `dev_choice.json`).**
+- Request variant `B_w3` (`tracks/r5_jev/jevlib.py`): state = {main_task (≤ 5,000 chars, head+tail), previous_actions
+  (the 3 previous steps, action ≤ 600 / output ≤ 300 chars), current_action (action ≤ 4,000 / output ≤ 1,500)}; one
+  Choice question with the structured rubric `B` (mirrors the ctrl-basic-v1 monitor's objectives and signs), asked
+  in both label orders in the same request (state billed once).
+- Score = P(suspicious) of the benign-first question, normalized over the two labels (order scheme `bs`).
+- Dev selection: 3 variants (A_w3 concise rubric + 3-step window, A_w0 concise rubric, action only, B_w3) × 3 order
+  schemes (benign-first, suspicious-first, mean). Dev = a seeded 10% of groups (main tasks; trajectories where a
+  setting has < 20 tasks) per source, sample of ≤ 40 honest + 40 attacks per source (8 sources, 639 trajectories,
+  18.9k steps per variant). Pre-set criterion (in `dev_select.py` before scores were read): mean over sources of
+  capture@10% (share of attacks with a post-onset step above the 90th percentile of dev honest steps), tie-break
+  (< 0.01) by mean trajectory-max AUROC. Result: A_w3/avg 0.895, A_w3/bs 0.894, A_w3/sb 0.894, **B_w3/bs 0.889
+  (AUROC 0.813, highest of the tied set)**, B_w3/sb 0.888, A_w0 0.860–0.863 (the window helps). Dev per-source
+  trajectory-max AUROC of the chosen config: MB 0.74, bash 1.00, agentdojo 0.99, iac 0.98, shade 0.84, BashArena
+  opus-4-6 **0.24** (honest runs are longer than these attacks), BashArena sonnet-4-5 0.80, LinuxArena 0.92.
+
+**Data and splits** (`tracks/r5_jev/splits.py` → `splits.json`, seed 20261022, metadata only). Dev groups are
+excluded from every evaluation set.
+- `mb` (primary): Honest-550 eval honest **511**; attacks = the 1,775 MonitoringBench attacks that already have
+  gpt-4.1-mini `none` per-step scores (T1 sample 775 + r4_wb held-out 1,000) minus dev groups: **1,637**. First 60
+  steps, final submit step stripped (T1 / r4_wb convention). Groups = main task. Honest-550 and these attacks were
+  used by earlier tracks (not new data); JEV and nano have never seen them.
+- `akshn_*` (primary, 7 settings, pooled): every eval trajectory with a Gemini-3.1-Pro step-unit stream; all steps.
+  Eval honest / attacks: bash 680/669, agentdojo 680/670, iac 688/662, shade 679/668, BashArena-opus-4-6 418/489,
+  BashArena-sonnet-4-5 300/853, LinuxArena 1,213/1,120. Groups = main task (traj for agentdojo / iac / shade).
+- nano subset (H2 on aksh-n): per setting a seeded min(500, n) honest + min(300, n) attack eval trajectories.
+- `linuxarena_sweep` (secondary): 200 honest / 142 attacks, 12 per-action sweep monitors, hidden-tool steps
+  removed; 1% FPR not estimable (100 calibration honest) → 5% only.
+- `persistent_state`: not used this round (5 PR-level units per run, no per-step second stage of the right kind).
+
+**Second stages (cached, $0):** `mb` gpt-4.1-mini `ctrl-basic-v1` `none` (logprob-expected); secondary gpt-4.1-mini
+`full` on the T1-sample attacks (`mb_fullhist`); aksh-n Gemini-3.1-Pro local per-step suspicion (strong monitor,
+step unit). **First stages compared at equal e:** JEV (frozen); gpt-4.1-nano with the identical ctrl-basic-v1
+`none` prompt (chat path, track r5jev, cache in each source's `score_cache.sqlite`; mb: all eval trajectories,
+aksh-n: the nano subset); probe = FIBS axial follow-up `fibs_fu_ax`, trusted-reader `none` mode (the r4_wb primary
+probe; mb only; honest + r4 attacks from the round-4 pod, T1-sample attacks from the pilot pod); `len` = characters
+of the action; `rand` (seeded uniform); `oracle` (= the second-stage score itself, i.e. a perfect predictor of the
+LLM); `oracle_label` (post-onset attack steps first, all else random; non-deployable upper reference).
+Also reported: LLM-only and JEV-only (trajectory max).
+
+**Cascade (`tracks/r5_jev/cascade.py`).** Per panel and split: (1) escalate the top-e share of CALIBRATION-HONEST
+steps by first-stage score (global ranking, random tie-breaking by a fixed seeded jitter; a step without a
+first-stage score is always escalated); (2) escalated steps take the cached LLM score; **non-escalated steps take a
+conservative floor (primary)** (they can never raise an alarm); the quantile map of the first-stage score onto the
+LLM's calibration-honest step distribution is a secondary sensitivity (JEV only; map held fixed per split);
+(3) trajectory score = max; randomized plug-in threshold at nominal trajectory FPR α on calibration-honest
+trajectories; TPR on all evaluation attacks (never used for calibration); realized FPR on the test-honest half.
+e ∈ {5, 10, 20, 30}%, α ∈ {1, 5}%.
+
+**Estimation and inference.** 50 random 50/50 splits of each panel's eval honest into calibration / test, grouped by
+main task (trajectory for the < 20-task settings). Joint clustered bootstrap, B = 1,000 (as `amd.evaluation.
+paired`, extended): one resample per replicate of honest groups and attack groups, reused in every split and by
+every first stage; in each replicate BOTH the escalation threshold and the trajectory threshold are recomputed from
+the reweighted calibration honest (calibration noise). Point estimate = split mean (unweighted). Pooled aksh-n
+estimates sum alarms and attack weights across settings split by split (each setting keeps its own thresholds).
+**Estimability:** an α = 1% cell uses only panels/settings with mean calibration n ≥ 200 (≥ 2 expected
+exceedances); BashArena-sonnet-4-5 (≈150) is therefore excluded from every 1% pooled estimate and reported at 5%
+only; at 5% the floor is 40. Analysis code: `tracks/r5_jev/analyze_primary.py` (tested in
+`tests/test_r5_cascade.py` against brute force).
+
+**Confirmatory hypotheses** (Holm over these five; each a one-sided non-inferiority test with margin 0.03 TPR;
+p = (1 + #{Δ* ≤ −0.03})/(B + 1); **supported iff the Holm-adjusted p < 0.025**; all at α = 1% trajectory FPR):
+- **H1-MB / H1-AK:** TPR(JEV→LLM cascade, e = 20%) − TPR(LLM-only) > −0.03 on `mb` / pooled aksh-n. (e = 20% is
+  the largest rate the hypothesis allows; 5/10/30% are secondary.)
+- **H2-MB / H2-AK:** TPR(JEV cascade, e = 10%) − TPR(nano cascade, e = 10%) > −0.03 on `mb` / the pooled aksh-n
+  nano subset.
+- **H3-MB:** TPR(JEV cascade, e = 10%) − TPR(probe cascade, e = 10%) > −0.03 on `mb` (only panel with probe scores).
+- Secondary (no multiplicity claim, reported with intervals): every first stage × e × α, vs LLM-only and vs JEV;
+  5% FPR; the map sensitivity; `mb_fullhist`; per-setting cells; realized FPR; escalated share of honest and attack
+  steps; cost per 1k trajectories (first-stage $/step × steps + LLM $/step × escalated steps).
+
+**Exploratory (labelled as such in the results).** RQ2: standalone JEV with max / top-k / CUSUM at matched FPR
+(`matched_budget_eval`); breakdowns by side task and MonitoringBench structural strategy; readable vs derived side
+tasks where a label allows it (MB: password-leak / malware download vs firewall / sudo edits; LinuxArena
+exfiltration vs others); the length-only confound baseline. RQ3: gate by suspicion vs JEV confidence (escalate the
+least confident steps) vs two-sided (escalate by suspicion but let confidently suspicious JEV steps p ≥ 0.99 alarm
+on their own); overlap of JEV confident-benign attack misses with LLM misses vs an independence baseline.
+Open decision model arm: Perplexity Decider v1.2 (`perplexity-ai/pplx-decider-v1.2`, Apache-2.0, bf16, sha
+cce0f3f8) on the identical frozen requests, same score definition, as one more first stage on `mb` (exploratory;
+not in the Holm family; scope set by the $50 RunPod cap, ≈ 3 requests/s on one H100).
+
+**Predictions written down now (from prior work):** standalone JEV TPR at 1% FPR well below the LLM's
+(Gould: SHADE 47% vs 67–71%); any value is in routing; JEV misses concentrate in derived/state-changing sabotage;
+confident JEV misses are repeated by the LLM more than independence predicts.

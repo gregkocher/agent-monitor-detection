@@ -37,6 +37,8 @@ KEY_PATH = Path(os.environ["AMD_OPENROUTER_KEY_PATH"]) if os.environ.get("AMD_OP
 LEDGER = Path(os.environ.get("AMD_SPEND_LEDGER",
                              str(Path.home() / "Desktop" / "agent-monitor-detection_openrouter_spend_ledger.jsonl")))
 URL = "https://openrouter.ai/api/v1/chat/completions"
+# Decisions API (decision-only models such as typesafe/jev-1.14): label probabilities, no text.
+DECISIONS_URL = "https://openrouter.ai/api/alpha/decisions"
 
 # Round 1 (2026-10-20): $500 cap, spent $195.56. Round 2 (2026-10-21, overnight): +$700.
 GLOBAL_CAP_USD = 1600.0  # 2026-10-22: +$200 for idea 05 (JEV, $150 track cap) and the round-4 audit
@@ -201,6 +203,53 @@ class OpenRouter:
                     last = e
                     await asyncio.sleep(min(60, 2 ** attempt + random.random()))
             raise RuntimeError(f"OpenRouter call failed after {retries} tries: {str(last)[:300]}")
+
+
+    async def decisions(self, model: str, state, questions: dict, reserve_usd: float = 0.002,
+                        retries: int = 8, headers: dict | None = None) -> dict:
+        """One Decisions-API call (decision-only models, e.g. typesafe/jev-1.14).
+
+        Body {"model", "state", "questions"}; returns {"answers", "model" (the versioned id that answered),
+        "usage", "cost", "latency"}. Same ledger, track caps, retries and key fallback as `chat`.
+        """
+        body = {"model": model, "state": state, "questions": questions}
+        async with self.sem:
+            _check_budget(self.track, reserve_usd)
+            last = None
+            for attempt in range(retries):
+                t0 = time.time()
+                try:
+                    h = {"Authorization": f"Bearer {_key()}",
+                         "HTTP-Referer": "https://github.com/gregkocher/agent-monitor-detection",
+                         "X-Title": "agent-monitor-detection"}
+                    if headers:
+                        h.update(headers)
+                    r = await self.client.post(DECISIONS_URL, json=body, headers=h)
+                    if r.status_code in (402, 403) and any(w in r.text.lower() for w in ("credit", "limit", "insufficient", "quota")):
+                        if _advance_key(f"{r.status_code}: {r.text[:150]}"):
+                            continue
+                    if r.status_code in (429, 500, 502, 503, 504, 408, 529):
+                        raise httpx.HTTPStatusError(f"status {r.status_code}", request=r.request, response=r)
+                    if r.status_code >= 400:
+                        # client errors (400/413/422) are not retried: the request itself is invalid
+                        raise ValueError(f"status {r.status_code}: {r.text[:300]}")
+                    d = r.json()
+                    if "error" in d:
+                        raise RuntimeError(str(d["error"])[:300])
+                    usage = d.get("usage") or {}
+                    cost = float(usage.get("cost") or 0.0)
+                    _append({"t": time.time(), "track": self.track, "tag": self.tag, "model": model,
+                             "provider": d.get("provider"), "in": usage.get("input_tokens"),
+                             "out": usage.get("output_tokens"), "cost": cost,
+                             "latency": round(time.time() - t0, 2)})
+                    return {"answers": d["answers"], "model": d.get("model"), "usage": usage, "cost": cost,
+                            "provider": d.get("provider"), "latency": round(time.time() - t0, 2)}
+                except ValueError:
+                    raise
+                except (httpx.HTTPError, RuntimeError, KeyError, json.JSONDecodeError) as e:
+                    last = e
+                    await asyncio.sleep(min(60, 2 ** attempt + random.random()))
+            raise RuntimeError(f"OpenRouter decisions call failed after {retries} tries: {str(last)[:300]}")
 
 
 def spend_report() -> str:
