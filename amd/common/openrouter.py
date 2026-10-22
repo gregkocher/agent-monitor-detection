@@ -32,7 +32,10 @@ KEY_CHAIN = [Path(p) for p in os.environ.get("AMD_OPENROUTER_KEY_CHAIN", "").spl
     _KEY_DIR / "openrouter_api_key.txt",
 ]
 KEY_PATH = Path(os.environ["AMD_OPENROUTER_KEY_PATH"]) if os.environ.get("AMD_OPENROUTER_KEY_PATH") else KEY_CHAIN[0]
-LEDGER = REPO / "results" / "spend_ledger.jsonl"
+# Per-call spend ledger (every OpenRouter call: model, tokens, cost). Kept OUTSIDE the repo on purpose
+# (private, large); override with AMD_SPEND_LEDGER.
+LEDGER = Path(os.environ.get("AMD_SPEND_LEDGER",
+                             str(Path.home() / "Desktop" / "agent-monitor-detection_openrouter_spend_ledger.jsonl")))
 URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Round 1 (2026-10-20): $500 cap, spent $195.56. Round 2 (2026-10-21, overnight): +$700.
@@ -48,7 +51,7 @@ class BudgetExceeded(RuntimeError):
     pass
 
 
-_KEY_STATE = REPO / "results" / ".key_index"
+_KEY_STATE = LEDGER.with_name(".agent-monitor-detection_key_index")
 
 
 def _key_index() -> int:
