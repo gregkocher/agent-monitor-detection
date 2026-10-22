@@ -39,14 +39,16 @@ LEDGER = Path(os.environ.get("AMD_SPEND_LEDGER",
 URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Round 1 (2026-10-20): $500 cap, spent $195.56. Round 2 (2026-10-21, overnight): +$700.
-GLOBAL_CAP_USD = 1400.0  # raised 2026-10-21 again (user: OK to go a little over; prioritize validity)
+GLOBAL_CAP_USD = 1600.0  # 2026-10-22: +$200 for idea 05 (JEV, $150 track cap) and the round-4 audit
 TRACK_CAPS_USD = {"t1": 130.0, "t2": 70.0, "t3": 200.0, "dev": 15.0, "reserve": 100.0,
                   # round 2
                   "wb": 200.0, "r2t1": 200.0, "r2t2": 60.0, "r2t3": 350.0, "dev2": 20.0, "reserve2": 50.0,
                   # round 3 (2026-10-21)
                   "r3t1": 220.0, "r3t2": 70.0, "r3t3": 150.0, "dev3": 10.0, "audit": 60.0,
                   # round 4 (2026-10-22)
-                  "r4rep": 90.0, "r4wb": 60.0, "r4cs": 150.0, "r4ctx": 30.0, "audit3": 40.0}
+                  "r4rep": 90.0, "r4wb": 60.0, "r4cs": 150.0, "r4ctx": 30.0, "audit3": 40.0,
+                  # idea 05: decision-only (JEV) first-stage monitors (2026-10-22)
+                  "r5jev": 150.0, "r5dev": 10.0}
 
 
 class BudgetExceeded(RuntimeError):
