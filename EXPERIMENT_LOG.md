@@ -913,3 +913,73 @@ splits, one joint cluster bootstrap shared across splits with thresholds recompu
   for agent-matched attacks. The sab cascade holds. FIBS-axial-full claims and the LinuxArena ranking are
   weakened (and A2 makes them unverifiable).
 - E5 / r3_t2: the C1 fix holds for E5 (results/fixes); the r3_t2 5% claims hold.
+
+## 2026-10-22: T2 ROUND 4 (track r4ctx): per-context allocation at B = 1% with many honest runs per context — pre-specification
+
+Written before any allocation result of this round was computed. Code `tracks/r4_ctx/`; outputs `results/r4_ctx/`.
+OpenRouter spend: $0 planned (track `r4ctx`, cap $30, not expected to be used).
+
+**Why.** Per-context plug-in rules have a test-spend floor of about Σ_c w_c/(n_c + 1). In rounds 1–3 the 1%
+"spend-matched" rows were clamped (C1, m2, m9). This round uses panels with hundreds of honest runs per
+context and an exact spend matcher.
+
+**Data (descriptive counts only; `results/r4_ctx/panels.csv`).**
+- `akshn_setting`: aksh-n 7 settings, Gemini-3.1-Pro local suspicion, trajectory max; 5,189 honest
+  (328–1,396 per setting), 5,794 attacks. **Primary panel (largest n).** Damage = adjudicated overall_severity.
+- `ca_setting_model`: ControlArena setting × agent, 12 contexts, ~250 honest each (secondary).
+- `la_pub_env`: full public LinuxArena paper runs (data.linuxarena.ai metadata = HF
+  anonymouslinuxarena/linuxarena-public; only per-trajectory monitor maxima, env, tasks and success flags were
+  fetched, 45 MB). Monitor mean-action@gpt-5-nano. 2,183 honest (11 agent models × 200 tasks; 215–220 per
+  environment, 20 tasks per environment), 919 attacks (8 attack models, Haiku obvious-attack, Opus
+  strategy-attack). Damage = side-task severity tier (steep 1/2.5/5/10).
+- The public data has no other monitor with ≥ 300 honest per context. Excluded before analysis:
+  - `xd_*` cross-deployment panels (BashArena / MonitoringBench / LinuxArena leaderboard runs, 550–616
+    honest each). The `simple@` monitors' trajectory max saturates: 8–47% of honest runs hit the scale top
+    (100), so a 1% threshold is a coin flip among tied runs.
+  - `la_pub_taskcat`: 3 of 6 categories have 9–36 attacks.
+  - MRT SHADE: about 70 honest transcripts per task re-scored under many monitor prompts.
+
+**Design.**
+- Rules:
+  - global; CFAR; pooled (EB n0).
+  - Stackelberg, equal damage, attack hulls shrunk toward the other contexts with pseudo-count m0 = 10
+    (`stack`); unshrunk `stack_m0`.
+  - Severity-weighted Stackelberg (`stack_sev`): D_c = mean damage of the defender-fit attacks in c, hulls
+    weighted by damage, m0 = 10.
+- Splits: 10 random splits per panel, grouped by main task within a context when the context has
+  ≥ 20 distinct main tasks, otherwise by trajectory (aksh-n iac / shade / agentdojo have 5–16 tasks).
+  - Honest: calibration / test 50/50.
+  - Attacks: three disjoint group-level thirds: defender fit (Stackelberg hulls, D_c), attacker information
+    (informed / probing / damage-weighted attackers), evaluation.
+  - Calibration uses honest runs only and is disjoint from test.
+- Spend matching:
+  - For each rule, the fit level is bisected so that the realized TEST spend Σ_c w_c FPR_c brackets B.
+  - The two bracketing fits are mixed as a randomized policy (MixThreshold) so the realized spend equals B
+    exactly. No interpolation of metrics, no clamping.
+  - If the floor (test spend at level 0) exceeds B, the replicate is unmatched (NaN).
+  - Rows matched in < 80% of (replicate, split) cells are reported as not estimable and their values are not
+    shown.
+  - The realized spend of every matched replicate is stored and checked (|spend − B| ≤ 1e-6).
+- Inference (corrected joint bootstrap as in `amd.evaluation.paired`):
+  - 200 replicates of a context-stratified cluster bootstrap over groups (honest and attack members of a
+    group share its weight).
+  - Each replicate's weights are reused in all 10 splits and by all rules; thresholds are refit and
+    re-matched per replicate.
+  - Replicate value = average over splits where the rule (or both rules of a contrast) matched.
+  - Point estimate = average over the unweighted splits.
+  - 95% percentile intervals.
+- Attackers: uniform (mean TPR over contexts); informed context selection (min TPR on the attacker-information
+  thirds under the published thresholds); probing (5 free probes per context); damage-weighted (max
+  expected undetected damage); oracle min test TPR (reported, biased low).
+- Budgets B ∈ {0.5%, 1%, 2%, 5%}.
+- Transfer: the defender fits on attacks of a random half of the side tasks (or attack policies / agent
+  models) in each context; the attacker information and evaluation thirds come from the other half
+  (contexts with one side task / policy give the defender no own-context attacks; shrinkage falls back to
+  the other contexts).
+
+**Primary contrast (pre-specified).** On `akshn_setting`, B = 1%, in-distribution, spend-matched:
+Δ = selection safety (informed attacker) of `stack` (equal damage, m0 = 10) minus `global`. The claim
+"Stackelberg beats global against selection at 1%" is supported iff the 95% joint-bootstrap interval of Δ
+is above 0 and both rules are matched in ≥ 80% of cells. Every other contrast (other rules, attackers,
+budgets, panels, transfer) is secondary / exploratory and reported with its interval, without a
+multiplicity claim.
