@@ -1,0 +1,9 @@
+akshn_setting:indist S=10 R=200 rows=48240 66s
+akshn_setting:xfer_side S=10 R=200 rows=48240 63s
+akshn_setting:xfer_policy S=10 R=200 rows=48240 62s
+akshn_setting:indist_iid S=10 R=200 rows=48240 68s
+ca_setting_model:indist S=10 R=200 rows=48240 82s
+ca_setting_model:xfer_side S=10 R=200 rows=48240 84s
+la_pub_env:indist S=10 R=200 rows=48240 66s
+la_pub_env:xfer_side S=10 R=200 rows=48240 63s
+la_pub_env:xfer_policy S=10 R=200 rows=48240 71s

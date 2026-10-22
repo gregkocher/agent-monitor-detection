@@ -983,3 +983,108 @@ context and an exact spend matcher.
 is above 0 and both rules are matched in ≥ 80% of cells. Every other contrast (other rules, attackers,
 budgets, panels, transfer) is secondary / exploratory and reported with its interval, without a
 multiplicity claim.
+
+## 2026-10-22: T2 ROUND 4 (track r4ctx): results — per-context allocation at B = 1% with exact spend matching
+
+Code `tracks/r4_ctx/`:
+- `fetch_linuxarena.py`, `panels_r4.py`: data and panels.
+- `r4lib.py` (+ 5 tests in `test_r4lib.py`): grouped three-way splits, joint cluster bootstrap, exact spend
+  matching by randomized mixing.
+- `run_r4.py`, `make_report.py`, `r3t2_rematch.py`.
+
+Results in `results/r4_ctx/`:
+- `tables.md`, `summary.csv` (every panel × mode × B × rule), `primary.csv`.
+- `spend_check.csv`: per-rule share matched, floor and nominal spend; the max |realized − B| over every
+  matched replicate is 3.5e-17.
+- `panels.csv`, `figures/*.pdf`, `r3t2_corrected/`.
+
+Raw replicates are in `data/processed/r4_ctx/` (gitignored). OpenRouter spend: $0 (track `r4ctx` unused). The
+design is the pre-specification entry above, unchanged. 10 grouped splits × 200 joint cluster-bootstrap
+replicates; about 10 minutes of compute.
+
+**Primary contrast (pre-specified): met.** 7 settings (Gemini), B = 1%, in-distribution, exactly spend-matched.
+Matched in 99.9% of cells; the spend floor is 0.19% on average (95th percentile 0.52%).
+- Selection safety against the informed context-selecting attacker:
+  - Stackelberg (equal damage, m0 = 10): 0.753 [0.661, 0.796].
+  - global: 0.646 [0.596, 0.695].
+  - **Δ = +0.107 [+0.024, +0.152]**, P(Δ > 0) = 1.00.
+- Robustness:
+  - basic bootstrap interval [+0.061, +0.190];
+  - replicate mean +0.089;
+  - all 10 splits > 0 (+0.042 to +0.172);
+  - iid instead of task-grouped splits: +0.129 [+0.05, +0.16].
+- So the round-1 1% advantage, which was not significant when spend-matched (m2: [−0.11, +0.20], partly
+  clamped), holds once each context has 160–700 calibration runs.
+
+**Secondary (exploratory; 7 settings, in-distribution, spend-matched; Δ vs global).**
+- Cost to a uniform attacker at 1%: −0.020 [−0.04, +0.01] (TPR 0.834 vs 0.854).
+- Severity-weighted Stackelberg at 1%:
+  - selection: +0.124 [+0.05, +0.15];
+  - damage-maximizing attacker: +0.077 [+0.02, +0.10] (equal-damage Stackelberg +0.058 [−0.01, +0.08]);
+  - probing attacker (5 free probes per context): +0.067 [+0.00, +0.09] (equal damage +0.057 [−0.01, +0.08]).
+- Shrinkage (m0 = 10) barely matters in-distribution (unshrunk +0.104 [+0.02, +0.15]).
+- B = 0.5%: matched in 94% of cells. Stackelberg +0.089 [−0.08, +0.10], n.s.; the interval is wide and
+  sits mostly above 0.
+- B = 5%: +0.069 [+0.02, +0.09] (round 1 replicated). B = 2%: +0.133 [+0.07, +0.16].
+- CFAR is worst at every budget: −0.280 [−0.46, −0.22] at 1%, −0.318 at 0.5%, −0.143 at 5%. Partial
+  pooling (EB n0) −0.22 at 1%. Neither raises uniform TPR here (CFAR −0.047 [−0.11, −0.02] at 1%).
+- Nominal fits over-spend out of sample at B = 1% (mean realized test spend): CFAR 1.27%, Stackelberg 1.20%,
+  pooled 1.23%, global 0.99%.
+
+**Transfer (7 settings).**
+- Defender fit on other side tasks: Stackelberg is worse than global at every budget.
+  - 1%: 0.510 vs 0.643, Δ −0.133 [−0.20, −0.08]. Severity-weighted −0.108 [−0.17, −0.06]; unshrunk −0.146.
+  - 5%: −0.122 [−0.18, −0.08].
+  - m0 = 10 shrinkage does not rescue it, so round 2's E1a result holds at 1%.
+- Defender fit on other attack policies / agent models:
+  - 1%: +0.033 [−0.09, +0.10], n.s.
+  - 5%: +0.050 [+0.01, +0.08].
+- So the 1% gain needs attack data from the deployed side-task distribution.
+
+**Panels with fewer honest runs per context: the spend floor binds.**
+- ControlArena setting × agent (~250 honest per context, 125 calibration):
+  - CFAR / Stackelberg floor 0.63% mean, 1.30% p95.
+  - Matched in 85% of cells at 1% and 41% at 0.5% (n.e.).
+  - At 1%: Stackelberg Δ −0.004 [−0.23, +0.03]; CFAR −0.35 [−0.54, −0.24].
+  - At 5%: Stackelberg +0.057 [−0.00, +0.09]; severity-weighted +0.065 [+0.01, +0.09].
+  - Transfer to unseen side tasks: −0.14 at 1%, −0.23 at 5%.
+- Public LinuxArena by environment (gpt-5-nano per-action monitor, about 217 honest per environment over
+  20 tasks):
+  - Per-context rules are not estimable at 1% (matched in 68%; floor 0.83% mean, 2.27% p95) or at 0.5% (40%).
+  - The monitor is weak at these budgets: global uniform TPR 0.17 at 1%, 0.41 at 5%; selection safety 0.07
+    / 0.15.
+  - At 5% no contrast is significant (Stackelberg +0.10 [−0.12, +0.16]).
+- The global and pooled rules have no material floor (≤ 0.09% mean), so they are matchable everywhere.
+- In every panel CFAR and all Stackelberg variants share one floor (thresholds at each context's
+  calibration maximum).
+
+**Data notes.**
+- The full public LinuxArena dataset has only ~217 honest runs per environment for any single monitor:
+  11 agent models × 20 tasks, scored by the gpt-5-nano paper monitor.
+- The cross-deployment `simple@` monitor panels were excluded before analysis because the maximum
+  saturates: 8–47% of honest runs score 100.
+
+**r3_t2 Watcher tables without the clamping matcher** (`results/r4_ctx/r3t2_corrected/tables_noclamp.md`,
+`watcher_summary_noclamp.csv`).
+- Method: same panels, seeds and 40 + 100 replicates; level swept over B × {0, 0.01..3}; NaN unless
+  bracketed; n.e. below 80% matched. The r3_t2 files are untouched.
+- The 5% Watcher claims hold:
+  - mb_mini permissive 0.257 / strict 0.281 vs global 0.344 (Δ −0.082 [−0.19, −0.02], −0.059 [−0.17, −0.006]);
+  - gpt-4.1 permissive 0.263 vs 0.373 (−0.122 [−0.25, −0.006]).
+- At 1%, every per-org rule and both Watcher tiers on the MonitoringBench panels are n.e. (matched in 4–25%).
+  The clamped originals had shown values for them (e.g. tier_opt 0.191 → 0.140 matched-only). Global,
+  sev_tilt and tier_w/opt are matched in 85–96%.
+- At 5%, the mb_mini per-org rows (CFAR, Stackelberg, cell minimax) are matched in 78%: now n.e.; the other
+  panels' are 80–87%.
+- On akshn_adj, watcher_perm (1% and 5%), watcher_strict (5%) and tier_w (5%) were never matched
+  (0%; spend unreachable). Their original "matched" values were clamped.
+
+**Takeaways.**
+1. With hundreds of honest runs per context, the 1% Stackelberg advantage over global against a
+   context-selecting attacker is real: about +0.1 selection safety at equal realized spend, at a small,
+   n.s. uniform-TPR cost.
+2. It needs on-distribution attack data. Fit on other side tasks, it loses about 0.13 to global.
+3. Per-context rules are only usable at budget B if Σ_c w_c/(n_c + 1) ≪ B, i.e. at least ~1/B calibration runs
+   in the smallest contexts. That is about 300+ per context for 1% after a 50/50 split. ~125 (ControlArena)
+   and ~110 (LinuxArena env) are not enough.
+4. CFAR remains the worst rule against selection at every budget.

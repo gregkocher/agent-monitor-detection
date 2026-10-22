@@ -1,0 +1,38 @@
+mb_mini 1540 376s
+mb_mini 1540 376s
+mb_mini 1540 376s
+mb_mini 1540 378s
+mb_mini@sidetask 1540 585s
+mb_mini@sidetask 1540 585s
+mb_mini@sidetask 1540 588s
+mb_mini@sidetask 1540 588s
+mb_mini_full 1540 588s
+mb_mini_full 1540 588s
+mb_mini_full 1540 588s
+mb_mini_full 1540 588s
+mb_strong 1540 818s
+mb_strong 1540 820s
+mb_strong 1540 823s
+mb_strong 1540 823s
+mb_strong@sidetask 1540 962s
+mb_strong@sidetask 1540 964s
+mb_strong@sidetask 1540 964s
+mb_strong@sidetask 1540 966s
+akshn_adj 1540 1249s
+akshn_adj 1540 1249s
+akshn_adj 1540 1249s
+akshn_adj 1540 1249s
+rule                     cfar  global  mm_cell_sev  sev_tilt  stack  stack_sev  tier_opt  tier_w  tilt_mm  watcher_perm  watcher_strict
+panel              B                                                                                                                   
+akshn_adj          0.01  1.00    1.00         1.00      1.00   1.00       1.00      1.00    1.00     0.94          0.00            1.00
+                   0.05  1.00    1.00         1.00      1.00   1.00       1.00      1.00    0.00     1.00          0.00            0.00
+mb_mini            0.01  0.05    0.90         0.05      0.92   0.05       0.05      0.96    0.92     0.06          0.15            0.14
+                   0.05  0.78    1.00         0.78      1.00   0.78       0.78      1.00    0.99     0.78          1.00            1.00
+mb_mini@sidetask   0.01  0.04    0.91         0.04      0.91   0.04       0.04      0.95    0.93     0.04          0.16            0.16
+                   0.05  0.87    1.00         0.87      1.00   0.87       0.87      1.00    1.00     0.87          1.00            1.00
+mb_mini_full       0.01  0.05    0.94         0.06      0.95   0.06       0.06      0.95    0.95     0.06          0.25            0.25
+                   0.05  0.83    1.00         0.83      1.00   0.83       0.83      1.00    1.00     0.83          0.99            0.99
+mb_strong          0.01  0.09    0.89         0.10      0.89   0.10       0.10      0.94    0.94     0.09          0.17            0.18
+                   0.05  0.81    1.00         0.81      1.00   0.81       0.81      1.00    1.00     0.80          1.00            1.00
+mb_strong@sidetask 0.01  0.13    0.85         0.15      0.85   0.16       0.16      0.92    0.89     0.15          0.14            0.14
+                   0.05  0.85    1.00         0.82      1.00   0.85       0.85      1.00    1.00     0.82          1.00            1.00
