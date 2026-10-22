@@ -23,7 +23,7 @@ data/            raw + processed data (gitignored)
 
 ## Budget and safety rules
 
-- OpenRouter spend is capped by `amd/common/openrouter.py`: $500 global; t1 $130, t2 $70, t3 $200, dev $15, reserve $100. Every call is logged to `results/spend_ledger.jsonl` with the cost OpenRouter reports. Check with `uv run python -m amd.common.openrouter`.
+- OpenRouter spend is capped per track and globally by `amd/common/openrouter.py`. Every call is logged to a private ledger kept outside the repo (default `~/Desktop/agent-monitor-detection_openrouter_spend_ledger.jsonl`, override with `AMD_SPEND_LEDGER`). Check with `uv run python -m amd.common.openrouter`.
 - Keys are read from disk at call time and never logged or committed.
 - Experiments run locally. Monitor scoring and attack rewriting are stateless API calls over fixed trajectories. The only executed agent code (T3 replay validation) runs in per-sample Docker sandboxes via Inspect.
 - Raw third-party data stays in `data/` (gitignored). The MonitoringBench attack `.eval` headers contain a leaked third-party token, so never commit or republish raw headers.

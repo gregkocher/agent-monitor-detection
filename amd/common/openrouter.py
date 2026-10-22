@@ -1,6 +1,6 @@
 """OpenRouter client with a hard, process-safe spend ledger.
 
-Every call appends one JSON line to results/spend_ledger.jsonl with the cost OpenRouter reports
+Every call appends one JSON line to the ledger (default ~/Desktop/agent-monitor-detection_openrouter_spend_ledger.jsonl, outside the repo) with the cost OpenRouter reports
 (`usage.cost`, requested via `usage: {include: true}`). Before each call the client checks the
 cumulative cost for its track and for all tracks against the caps below and refuses to call once a
 cap would be exceeded. The ledger is shared by all processes (fcntl lock), so parallel tracks
