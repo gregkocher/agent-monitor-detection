@@ -1,0 +1,12 @@
+claim,claimed,reproduced,match,file
+"(a) WB FIBS axial follow-up (none) minus gpt-4.1-mini, TPR@FPR0.01, MB","+0.206 [+0.09, +0.32]","+0.194 [+0.104, +0.280] (40 splits); +0.185 (200 splits, equal realized FPR +0.183)",match,repro_wb_mb.csv
+"(a) WB sab (full) minus gpt-4.1-mini, TPR@FPR0.01, MB","+0.098 [+0.015, +0.163]","+0.100 [+0.025, +0.166]; 200 splits +0.095",match,repro_wb_mb.csv
+(a') WB FIBS axial (full) minus gpt-4.1-mini,"+0.057 [+0.010, +0.287]","+0.085..+0.096 nominal, but realized FPR 2.05% vs 1.42%; +0.059 at reader's FPR floor 1.58%",point differs (split noise); FPR mismatch (A1),repro_wb_mb_fpr_equalized.csv
+"(b) sab cascade 10% vs LLM alone, full, MB, FPR 0.01","0.299 vs 0.166, +0.133 [+0.03, +0.22]","0.298 vs 0.168, +0.129 [+0.067, +0.229]; realized FPR 1.43% vs 1.81%; 13.1% steps",match,repro_wb_fusion.csv
+(c) MOLE pooled single-day 3rd-max minus max (common monitor),"-0.066 [-0.156, +0.023]","-0.073 [-0.166, +0.019] (DL random effects; per corpus -0.025 / +0.011 / -0.177 / -0.173)",match,repro_mole.csv
+"(c) account centering, gpt-4.1-mini, gpt53 single-day, 3rd-max minus max",+0.131 -> +0.001,"+0.126 [-0.019, +0.259] -> -0.001 [-0.174, +0.126]",match,repro_mole.csv
+(c) activity-only 3rd-max gain; without attack days,"+0.32 [0.14, 0.49]; +0.21","+0.324 [+0.159, +0.486]; +0.237",match (log TPR 0.37 is a typo: 0.32),repro_mole.csv
+"(d) T3 r3 gemini control minus original, US @max, FPR 0.01","-0.37 [-0.55, -0.19]","-0.371 [-0.548, -0.182]",match,repro_t3r3.csv
+"(d) T3 r3 pacing minus control (gemini and gpt-4.1, max, 0.01)","all n.s.; gpt-4.1 -0.03..+0.11, gemini -0.14..-0.03",gpt-4.1 +0.114 / -0.029 / +0.086; gemini -0.143 / -0.143 / -0.029; all CIs cover 0,match,repro_t3r3.csv
+"(extra) r3_t1 PS gradual history-free top-3 minus max, FPR 0.05","0.74 vs 0.58, +0.16 [0.02, 0.23]","0.742 vs 0.581, +0.161 [+0.026, +0.233] (whitened top-3)",match,repro_ps.csv
+(extra) r3_t1 mechanism Spearman,+0.30 (p 0.017),"+0.297 (p 0.017); corpus-cluster CI [-0.04, +0.54]",match (inference weakened),mole_mechanism_check.csv

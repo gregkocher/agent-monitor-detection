@@ -856,3 +856,60 @@ submit stripped only on a real submit.
   1.6–2.6× nominal (small calibration halves).
 - Caveats: n=35 base attacks (17 tasks); one-shot only; no execution replay; agent-model confound (audit M9)
   not stratified here.
+
+## 2026-10-22: Second-pass audit (round 3 T1/T3, white-box pilot, E5 / r3_t2; $0 API)
+
+Code `tracks/audit2/` (own minimal implementation in `a2lib.py`: randomized plug-in thresholds, task-grouped
+splits, one joint cluster bootstrap shared across splits with thresholds recomputed; no reuse of
+`amd.evaluation`). Outputs `results/audit2/`: `issues.csv` (4 major, 10 minor), `corrections.csv`,
+`repro_summary.csv` and one CSV per reproduction. FINDINGS.md writes are blocked; this entry is the narrative.
+
+**Reproductions (all headline numbers match within split / bootstrap noise).**
+- WB, MB, TPR@FPR 0.01 minus gpt-4.1-mini: FIBS axial (none) +0.194 [+0.10, +0.28] (claimed +0.206); sab (full)
+  +0.100 [+0.03, +0.17] (claimed +0.098).
+- WB fusion: sab cascade 10% (full) 0.298 vs LLM 0.168, +0.129 [+0.07, +0.23] (claimed 0.299 vs 0.166);
+  realized FPR 1.43% vs 1.81%; 13% of steps sent.
+- MOLE: pooled single-day 3rd-max − max −0.073 [−0.166, +0.019] (claimed −0.066); account centering +0.126 →
+  −0.001 (claimed +0.131 → +0.001); activity-only +0.32, +0.24 without attack days.
+- T3 r3: gemini control − original −0.371 [−0.548, −0.182] (claimed −0.37); every pace − control contrast n.s.
+- r3_t1 part B: whitened top-3 0.742 vs max 0.581, +0.161 [+0.026, +0.233] (claimed 0.74, +0.16).
+
+**Major issues.**
+- A1. The full-mode FIBS-axial reader threshold does not transfer across tasks: realized FPR 2.05% at nominal
+  1% (LLM 1.42%; floor 1.58% at any nominal level). Its "+0.057" over the LLM is ≈ +0.06 at the reader's FPR
+  floor, and every FIBS-axial-full fusion rule (KDE-LLR 0.328) runs at 1.9–3.2% realized FPR. The sab cascade
+  and FIBS axial none are unaffected.
+- A2. `data/processed/whitebox/scores/{la,t3}_{full,none}.jsonl` are 0-byte files, overwritten by the last pod
+  sync (21:10, after the LA / T3-r1 analyses ran). The pods are deleted, so the LinuxArena and T3-round-1
+  reader results cannot be re-derived or re-tested.
+- A3. MOLE mechanism Spearman (+0.30, p = 0.017) treats 64 dependent cells as independent (first-audit M7,
+  unfixed). Corpus-cluster CI [−0.04, +0.54]; primary monitors only: +0.18 (p 0.36).
+- A4. T3 r3 undetected-success contrasts mix validity loss with detection. Detection-only, gemini control −
+  original is −0.14 [−0.30, −0.03] (both-valid pairs −0.19). The artifact is real and not same-model, but about
+  60% of −0.37 is broken attacks. The negative gemini pacing contrasts are validity loss (detection-only −0.06
+  to +0.09).
+
+**Minor issues.**
+- Only 10 splits in the WB MB analysis (point-estimate noise).
+- "Pre-specified primary" appears first in the results entry; with Holm over 18 stream × mode contrasts only
+  FIBS axial none survives; sab full is Holm p 0.22.
+- The LinuxArena ranking has no paired test.
+- Cascade q was chosen among 5 levels; its gain is +0.165 on opus-4-5 attacks vs +0.067 on opus-4-6.
+- MOLE "confound" claim: the raw gain was n.s. to begin with; without attack days gpt-4.1-mini barely separates
+  accounts.
+- Log typo: activity-only TPR is 0.32, not 0.37.
+- DeepSeek single-day was scored by a provider mix clustered by account (+1 point on routine days); the pooled
+  estimate is unchanged (−0.064).
+- The part-B top-3 gain depends on whitening (raw top-3 +0.03).
+- r3_t2 still uses the clamping matcher. Its 5% claims are unchanged; its 1% "matched" rows are mostly clamped
+  (only infeasibility is claimed). The E5 table and log entry lack an erratum pointer.
+- WB LinuxArena allocation rows are mostly clamped.
+
+**Verdicts.**
+- Round 3 T1: "no accumulation rule beats max on MOLE" holds; the mechanism correlation and the "account-level
+  confound" wording are weakened.
+- T3 r3: "artifact not same-model" holds with a smaller detection component; "strategy n.s." holds.
+- White-box: FIBS axial none > LLM holds. sab full > LLM holds only if sab is the declared primary, and only
+  for agent-matched attacks. The sab cascade holds. FIBS-axial-full claims and the LinuxArena ranking are
+  weakened (and A2 makes them unverifiable).
+- E5 / r3_t2: the C1 fix holds for E5 (results/fixes); the r3_t2 5% claims hold.
