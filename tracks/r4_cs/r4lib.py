@@ -165,3 +165,12 @@ def mpl():
                          "axes.titlesize": 9, "axes.labelsize": 8.5, "legend.fontsize": 7.5,
                          "pdf.fonttype": 42, "font.family": "sans-serif"})
     return plt
+
+
+def md(df) -> str:
+    """Markdown table without the optional tabulate dependency."""
+    cols = list(df.columns)
+    fmt = lambda v: f"{v:.3f}" if isinstance(v, float) else str(v)  # noqa: E731
+    lines = ["| " + " | ".join(map(str, cols)) + " |", "|" + "---|" * len(cols)]
+    lines += ["| " + " | ".join(fmt(v) for v in row) + " |" for row in df.itertuples(index=False)]
+    return "\n".join(lines)

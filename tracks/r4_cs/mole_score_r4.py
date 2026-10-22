@@ -36,12 +36,21 @@ OUT = PROCESSED / "r4_mole"
 CORPORA = ["gpt53_single_day", "deepseek_v4_flash_single_day", "qwen36_27b_single_day", "kimi_k26_single_day"]
 
 
-def score_corpus(corpus, name, concurrency, pilot=0, dry=False):
+def subset_accounts(D, n_routine, seed=4):
+    """Budget-aware subset: every solo insider + n_routine routine accounts drawn at random (fixed seed)."""
+    rout = sorted(D.account[~D.is_insider].unique())
+    keep = set(np.random.default_rng(seed).choice(rout, n_routine, replace=False)) | set(D.account[D.is_insider])
+    return D[D.account.isin(keep)]
+
+
+def score_corpus(corpus, name, concurrency, pilot=0, dry=False, subset=0):
     cfg = MONITORS[name]
     model = cfg["model"]
     d = OUT / corpus
     D = pd.read_parquet(d / "accountdays.parquet")
     D = D[~D.collusive]
+    if subset:
+        D = subset_accounts(D, subset)
     R = {}
     with open(d / "renders.jsonl") as fh:
         for line in fh:
@@ -82,7 +91,7 @@ def score_corpus(corpus, name, concurrency, pilot=0, dry=False):
                          int_score=None if rec is None else rec["int_score"],
                          lp_ok=None if rec is None else rec["lp_ok"]))
     out = pd.DataFrame(rows)
-    fn = f"llm_{slug(model)}_compact{'_pilot' if pilot else ''}.parquet"
+    fn = f"llm_{slug(model)}_compact{'_pilot' if pilot else ''}{f'_sub{subset}' if subset else ''}.parquet"
     out.to_parquet(d / fn, index=False)
     print(f"wrote {corpus}/{fn}: {out.score.notna().sum()}/{len(out)} scored", flush=True)
     return chars
@@ -95,10 +104,12 @@ def main():
     ap.add_argument("--concurrency", type=int, default=32)
     ap.add_argument("--pilot", type=int, default=0)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--subset-routine", type=int, default=0,
+                    help="budget-aware subset: all solo insiders + this many random routine accounts (seed 4)")
     a = ap.parse_args()
     tot = 0
     for c in a.corpora.split(","):
-        tot += score_corpus(c, a.monitor, a.concurrency, a.pilot, a.dry_run)
+        tot += score_corpus(c, a.monitor, a.concurrency, a.pilot, a.dry_run, a.subset_routine)
     print(f"total ~{tot / 4 / 1e6:.1f}M input tokens (chars/4)")
 
 

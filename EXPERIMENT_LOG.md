@@ -1088,3 +1088,127 @@ Matched in 99.9% of cells; the spend floor is 0.19% on average (95th percentile 
    in the smallest contexts. That is about 300+ per context for 1% after a 50/50 split. ~125 (ControlArena)
    and ~110 (LinuxArena env) are not enough.
 4. CFAR remains the worst rule against selection at every budget.
+
+## 2026-10-22: Idea 1 round 4 (track r4cs): cross-session accumulation across monitor families, MOLE with a stronger monitor, unreset streams with CIs
+
+Code `tracks/r4_cs/`; tables and vector PDFs `results/r4_cs/` (`ps_tables.md`, `ps_meta.csv`, `fig_ps_forest.pdf`,
+`arl_tables.md`, `fig_arl.pdf`, `mole_tables.md`, `fig_mole.pdf`, `mechanism.md`, `fig_mechanism.pdf`). OpenRouter
+r4cs **$143.53 / $150** (pilot $6.54): persistent-state scoring incl. pilot $82.0 (gpt-4.1 $24.8, Claude Haiku 4.5 $17.8,
+Gemini 2.5 Pro $31.4, gpt-5-mini $3.8, Claude Haiku 5.5 $2.5, GPT-6 Luna $1.6), MOLE GPT-6 Luna on 4 corpora $26.7,
+MOLE gpt-4.1 subset $34.9. This entry stands in for FINDINGS.md (blocked for subagents). The analysis scripts were
+committed (5d2d96a) before any full round-4 score was analysed; each script's docstring holds the pre-specification.
+
+**Validity rules applied.** Honest-only calibration disjoint from test (50/50 splits); gains via
+`amd.evaluation.paired` (one joint honest + attack resample per replicate, thresholds recomputed), clustered by app
+(task sequence) on persistent state and by account on MOLE; realized FPR / ARL0 reported; prompts and inputs
+identical across monitors (round-2 `build_messages`, current_only; only API-side settings differ: Gemini 2.5 Pro
+1,024-token reasoning budget, gpt-5-mini / Luna `effort: low`, higher completion caps where hidden reasoning or
+Claude verbosity truncated the `SCORE` line); monitor choice for MOLE made on persistent-state data only; length and
+activity controls. Pilot (16 runs) was used only for parse rate and cost; all 6 candidate monitors were kept.
+
+**Goal 1: more monitor families on persistent state** (`ps_multi.py`). 153 honest / 117 gradual runs with 5 scored
+PRs under every monitor; 40 splits.
+
+| monitor | run-max AUROC | max TPR @ FPR 0.05 (realized FPR) | top-3 sum − max [app CI] | 3rd-max − max [app CI] |
+|---|---|---|---|---|
+| gpt-4.1-mini (r2) | 0.894 | 0.565 (0.048) | +0.171 [−0.006, +0.275] | +0.032 [−0.230, +0.269] |
+| Gemini 2.5 Flash (r2) | 0.623 | 0.227 (0.048) | +0.022 [−0.069, +0.140] | −0.058 |
+| Qwen3-235B (r2) | 0.737 | 0.454 (0.054) | −0.063 [−0.155, +0.087] | −0.141 |
+| gpt-4.1 | 0.818 | 0.521 (0.046) | −0.132 [−0.286, +0.161] | −0.322 [−0.468, −0.096] |
+| Claude Haiku 4.5 | 0.707 | 0.251 (0.058) | +0.091 [−0.100, +0.250] | −0.005 |
+| Gemini 2.5 Pro | 0.674 | 0.147 (0.046) | +0.008 [−0.168, +0.150] | −0.038 |
+| gpt-5-mini | 0.797 | 0.463 (0.053) | −0.059 [−0.143, +0.057] | −0.345 [−0.575, −0.134] |
+| Claude Haiku 5.5 | 0.894 | 0.729 (0.054) | **−0.241 [−0.400, −0.075]** | −0.651 [−0.779, −0.563] |
+| GPT-6 Luna | 0.912 | 0.757 (0.052) | **−0.425 [−0.504, −0.261]** | −0.664 [−0.785, −0.533] |
+| GPT-4o original (reference, not pooled) | 0.634 | 0.154 (0.048) | +0.087 [−0.001, +0.226] | +0.040 |
+
+- **Pre-specified pooled estimate (9 identical-input monitors, random effects, joint app-clustered bootstrap):
+  top-3 sum − max at FPR 0.05 = −0.070 [−0.144, +0.015]** (p(≤0) 0.94; HKSJ [−0.210, +0.070]; I² 0.87,
+  τ² 0.031, 95% prediction interval [−0.51, +0.37]). No monitor has a significant gain; 2 have significant losses.
+- 3rd-max − max pooled −0.253 [−0.383, −0.139] (4 monitors significantly negative). FPR 0.01: top-3 −0.099
+  [−0.137, +0.023]. Raw top-3 −0.034 [−0.088, +0.027]; CUSUM k=1.5 −0.008 [−0.022, 0.000].
+- Robustness, pooled top-3 at FPR 0.05: leave-apps-out calibration −0.076 [−0.134, +0.012] (max's realized FPR
+  0.014–0.117 across monitors); length-residualized scores −0.031 [−0.136, +0.053]. gpt-4.1-mini keeps its gain under
+  length residualization (+0.147 [+0.052, +0.192]) and on side-task-successful attacks (+0.260 [+0.044, +0.369]).
+- On this common run set and with app clustering the GPT-4o reference gain is +0.087 [−0.001, +0.226], below the
+  corrected round-1 +0.146 [+0.025, +0.226] (different run filter, 40 vs 10 splits, app vs iid clusters).
+- **Reading:** the cross-session gain is a property of a few weak-to-mid monitors (gpt-4.1-mini, GPT-4o, maybe Haiku
+  4.5), not of history-free per-PR monitoring in general. The strongest monitors put a near-ceiling score on the
+  single payload PR, so max is already high (0.73–0.76), while their honest scores rise with diff length
+  (Spearman +0.47 to +0.67), which inflates the honest top-3 tail. Exploratory, post hoc, k = 9: the gain falls with
+  the honest score–diff-length correlation (Spearman −0.73, naive p 0.025) and with max TPR (−0.57, p 0.11).
+
+**Goal 1b: mechanism, audit2 A3 fix** (`mechanism.py`, pre-specified). Per-monitor y = top-3 − max on attacks from
+apps Q, x = repeat-spike log-LR from attacks of the other apps P, averaged over 20 app partitions, joint bootstrap
+reusing the same run weights for x, y and every monitor. **Cross-fitted Spearman across the 9 monitors +0.065
+[−0.341, +0.460]** (app), [−0.347, +0.391] (iid); not cross-fitted +0.100 [−0.417, +0.567]. Across all 42
+corpus × monitor cells (persistent state + MOLE round-3 primary monitors + MOLE round-4 Luna; derived monitors
+excluded): top-3 +0.016 with corpus-cluster CI [−0.15, +0.45], monitor-cluster [−0.43, +0.40], two-way [−0.54, +0.59];
+MOLE cells only +0.189, two-way [−0.43, +0.72]. **The repeat-spike mechanism claim is not supported.** Example:
+Claude Haiku 5.5 has the highest repeat-spike LR (2.72) and the second-largest loss.
+
+**Goal 2: longer real multi-session data.** A search of HF / GitHub found no public release with more than 5
+sessions per run and matched honest runs. Closest: the persistent-state archive `idacy/control-arena-persistent-state-eval-archive-2026-07-30`
+"dbl" batch (6 PRs; 50 honest / 60 triggered-exfil attack runs; 885 MB `.eval` tarball, not used: one extra PR does
+not change the question). `idacy/ca-pse-iclr2027` (13,311 runs, 3–4 PRs, 885k per-PR draws from 8 monitors) is
+shorter, and its per-draw `level` field (confounded with monitor model) is undocumented in the public export, so the
+history mode cannot be verified; it is a candidate for a $0 multi-monitor check once the analysis code is public.
+MOLE has no release beyond 30 workdays. So the fallback was used: MOLE's 4 single-day corpora (112 routine vs 30
+solo insiders, 3–4 attack days each, 30 workdays), renders rebuilt with the round-2 code into
+`data/processed/r4_mole/` (account-day tables verified identical to rounds 2–3), scored with GPT-6 Luna on the
+round-3 compact input (same input as the common Qwen3-235B monitor), plus gpt-4.1 on a budget-aware subset (gpt53
+single-day: all 30 solo insiders + 50 random routine accounts, seed 4).
+
+- Day-level: Luna separates attack days from routine days better than Qwen (AUROC 0.69–0.80 vs 0.57–0.69), but it
+  also flags insiders on non-attack days (AUROC 0.60–0.64; gpt53 median day score 7.5 for insiders vs 5.8 routine).
+- **Pre-specified primary, 3rd-max − max at account-level FPR 0.10, RE-pooled over the 4 corpora: Luna +0.047
+  [−0.019, +0.114]** (no corpus significant); top-3 sum +0.030 [−0.013, +0.072]. Qwen (same accounts) −0.061
+  [−0.150, +0.028]. With the attack days removed, Luna keeps +0.041 [−0.019, +0.101], so whatever gain there is is
+  not driven by repeated attack days.
+- Account centering removes Luna's detection entirely (TPR ≈ 0 for every rule): its insider signal is an
+  account-level offset that saturates near the 10-point ceiling, so attack days add almost nothing on top.
+- Activity-only control: gpt53 3rd-max − max +0.338 [+0.164, +0.514] (its max TPR is 0), +0.177 after centering;
+  no effect on the other three corpora.
+- gpt-4.1 subset (gpt53; 25 calibration accounts per split, realized FPR 0.138 at nominal 0.10, low power): max
+  0.371, 3rd-max − max +0.093 [−0.075, +0.253], top-3 +0.055 [−0.072, +0.182]; Luna on the same accounts +0.037.
+- Daily review budget (R@10/day): today's score is best or tied for every monitor and corpus (e.g. Luna gpt53 0.432
+  vs running max 0.296, CUSUM k=1.5 0.395).
+
+**Goal 3: long unreset streams** (`ps_arl.py`, pre-specified). No reset across runs; attack after U{0..4} honest
+runs; ARL0 matched on calibration runs (1e-6 jitter = randomized ties); point = 10 splits; CI = 200 iid run-bootstrap
+replicates of the whole procedure with re-calibrated thresholds; app-cluster bootstrap for ARL0 = 100.
+- **Primary P3a (round-3 claim with CIs): gpt-4.1-mini, ARL0 = 100 PRs: CUSUM k=0.5 0.718 vs max 0.586,
+  +0.132 [−0.086, +0.296]** (app {−0.09, +0.32}). The point estimate reproduces round 3 (0.71 vs 0.58), but it is
+  not significant once threshold calibration and run sampling are resampled. ARL0 = 500: +0.120 [−0.076, +0.248].
+- P3b: windowed top-3 (W = 5) − max, gpt-4.1-mini: +0.123 [−0.084, +0.266].
+- Pooled over the 9 identical-input monitors (joint bootstrap), ARL0 = 100: CUSUM k=0.5 −0.032 [−0.109, +0.049];
+  windowed top-3 **−0.116 [−0.178, −0.053]**; EWMA λ=0.2 −0.088 [−0.162, −0.009]; SR −0.061 [−0.133, +0.011];
+  CUSUM k=1.5 +0.004 [−0.019, +0.020].
+- Nested best forgetting rule (selected on attacks from one app half, evaluated on the other): +0.015 [−0.010,
+  +0.062] pooled at ARL0 = 100; +0.039 [+0.007, +0.070] at ARL0 = 500 (iid only). No single monitor significant.
+- Strong integer-score monitors (Luna, Haiku 5.5, gpt-5-mini) do best with CUSUM k = 1–2, which behaves like max.
+  Low-k CUSUM, EWMA and windowed sums lose 0.1–0.4 for them.
+- Realized ARL0 on held-out honest runs is near target at 100 (median 65–138 PRs). At 500, CUSUM over-alarms
+  out of sample (median 168–351; Gemini 2.5 Pro 620) while max is conservative (no false alarm in 47% of splits), which favours
+  CUSUM. The 500 cell is therefore not matched.
+
+**Verdict.**
+- The round-1/2 claim that cross-session accumulation helps history-free per-PR monitors does not generalize across
+  monitor families. Pooled over 9 monitors it is −0.07 [−0.14, +0.02], with strong heterogeneity. It is positive only
+  for gpt-4.1-mini (borderline) and GPT-4o (reference). The strongest monitors lose up to 0.43.
+- "Repeat-spike informativeness predicts the gain" is not supported under dependence-aware, cross-fitted tests
+  (A3 resolved: weakened to null).
+- "Unreset streams favour CUSUM" is not significant for gpt-4.1-mini (+0.13 [−0.09, +0.30]). Pooled over monitors,
+  max is as good as any forgetting rule at matched ARL0, and windowed sums are worse.
+- On MOLE, a stronger day monitor does not create an accumulation gain (+0.05 [−0.02, +0.11]). Its insider signal
+  is mostly account-level.
+
+**Not done / caveats.**
+- Only 5 apps, so the app-cluster bootstrap is coarse; iid intervals are given alongside.
+- The gpt-4.1 MOLE subset is underpowered and runs at realized FPR 0.14.
+- ca-pse-iclr2027 was not analysed (the history mode of its monitors is undocumented).
+- Raw renders (`data/processed/r4_mole/*/renders.jsonl`, 1.1 GB) were deleted after scoring. Rebuild them with
+  `tracks/r4_cs/mole_prep.py`.
+- Scores: `data/processed/persistent_state/r4_scores_*_current_only.jsonl` and
+  `data/processed/r4_mole/<corpus>/llm_*_compact*.parquet`. Caches are in `data/raw/r4_cs/`. ARL replicates are in
+  `results/r4_cs/arl_replicates.csv.gz`.

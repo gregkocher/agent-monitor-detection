@@ -272,6 +272,11 @@ def main():
     analyse(R, list(S), mons)
 
 
+def fa(x):
+    """Realized ARL0 for display; a pool with no alarm in 300 x 4*target units is shown as '> 4e4' style."""
+    return f"{x:.0f}" if x < 1e6 else "no alarm"
+
+
 def analyse(R, monitors, mons):
     rates, cons = [], []
     for (mon, al, det), g in R[R.detector != "nested_best_forgetting"].groupby(["monitor", "alpha", "detector"]):
@@ -279,7 +284,8 @@ def analyse(R, monitors, mons):
         bi = g[g.kind == "iid"]
         rates.append(dict(monitor=mon, alpha=al, detector=det, det=p.det.mean(), lo=bi.det.quantile(.025),
                           hi=bi.det.quantile(.975), uncond=p.uncond.mean(), prefix_fa=p.prefix_fa.mean(),
-                          arl0_cal=p.arl0_cal.mean(), arl0_test=p.arl0_test.mean()))
+                          arl0_cal=p.arl0_cal.median(), arl0_test=p.arl0_test.median(),
+                          arl0_test_noalarm_share=float((p.arl0_test > 1e6).mean())))
     rates = pd.DataFrame(rates)
     piv = R[R.detector != "nested_best_forgetting"].pivot_table(index=["kind", "rep", "monitor", "alpha"],
                                                                  columns="detector", values="det")
@@ -318,7 +324,8 @@ def analyse(R, monitors, mons):
     L = ["# Round 4: long unreset PR streams at matched ARL0 (persistent state, gradual attacks, history-free monitors)", "",
          "Detection = alarm inside the attack run given no alarm in the 0-4-run honest prefix. Point = mean over 10 "
          "calibration/test splits; [CI] = 200 iid run-bootstrap replicates of the whole procedure (thresholds "
-         "re-calibrated); {app} = 200 app-cluster replicates (FPR-0.05 cell only).", ""]
+         "re-calibrated); {app} = 200 app-cluster replicates (FPR-0.05 cell only). Realized ARL0 = median over splits of the mean first-passage "
+         "length on held-out honest TEST runs ('no alarm' = no false alarm in 300 simulated streams of 4 x target PRs).", ""]
     for al in sorted(C.alpha.unique()):
         tgt = int(round(5 / al))
         L += [f"## ARL0 = {tgt} PRs", "", "| monitor | max | CUSUM k=0.5 | windowed top-3 (W=5) | CUSUM 0.5 − max [CI] {app} | wtop3 − max [CI] {app} | nested best forgetting − max [CI] | realized ARL0 (test) max / CUSUM |",
@@ -335,7 +342,7 @@ def analyse(R, monitors, mons):
                 return s
             L.append(f"| {mon} | {r.loc['max'].det:.3f} | {r.loc['cusum_k0.5'].det:.3f} | {r.loc['wtop3_w5'].det:.3f} | "
                      f"{cc('cusum_k0.5')} | {cc('wtop3_w5')} | {cc('nested_best_forgetting')} | "
-                     f"{r.loc['max'].arl0_test:.0f} / {r.loc['cusum_k0.5'].arl0_test:.0f} |")
+                     f"{fa(r.loc['max'].arl0_test)} / {fa(r.loc['cusum_k0.5'].arl0_test)} |")
         L.append("")
         L += ["Full family (detection rate, point; best per monitor in bold):", "",
               "| monitor | " + " | ".join(sorted(rates.detector.unique())) + " |", "|---|" + "---|" * rates.detector.nunique()]
@@ -378,4 +385,9 @@ def fig_arl(C, monitors):
 
 
 if __name__ == "__main__":
-    main()
+    if "--reanalyse" in sys.argv:   # tables / figure from the saved replicates only
+        R = pd.read_csv(OUT / "arl_replicates.csv.gz")
+        m = ps_monitor_streams()
+        analyse(R, [x for x in m if x in set(R.monitor)], m)
+    else:
+        main()
