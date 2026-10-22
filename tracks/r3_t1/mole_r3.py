@@ -55,7 +55,11 @@ def slug(m):
 
 
 def ensure_built(corpus: str) -> bool:
+    import time
     d = PROCESSED / "r2_mole" / corpus
+    lock = PROCESSED / "r2_mole" / f".building_{corpus}"
+    while lock.exists():          # a parallel prefetch (mole_prefetch.py) is building this corpus
+        time.sleep(30)
     if (d / "accountdays.parquet").exists() and (d / "renders.jsonl").exists():
         return False
     py = [sys.executable]

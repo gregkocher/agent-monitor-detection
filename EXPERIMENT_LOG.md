@@ -698,3 +698,119 @@ post hoc — selected on the evaluation set, not a valid estimate).
 - **Cost.** GPU: pods `...wb-qwen27b-2` (≈7.0 h) and `...wb-qwen27b-3` (≈5.8 h) on H200 at $5.29/h plus $2.1
   earlier ≈ $70; all white-box pods deleted 2026-10-22 ~00:35 UTC. OpenRouter wb $2.95. Reader throughput
   ≈ 1,000 tokens/s per process with per-step follow-ups (two processes per H200).
+
+## 2026-10-22: Idea 1 round 3 (track r3t1): cross-session accumulation at scale (MOLE ×8) and re-flagging monitor designs
+
+Code `tracks/r3_t1/`; tables and PDFs `results/r3_t1/` (`mole_tables.md`, `reflag_tables.md`, `ps_longhorizon.md`).
+OpenRouter r3t1 **$161.36 / $220**: MOLE Qwen3-235B $64.5, persistent-state variants $52.2, MonitoringBench
+variants $44.6. The write-up below stands in for FINDINGS.md, which the subagent harness blocks.
+
+**Validity changes, applied to all r3 numbers.**
+- Gains over max use `amd.evaluation.paired`: one joint honest + attack resample per replicate across splits,
+  cluster-aware (task / account), thresholds recomputed.
+- The rule chooser uses nested calibration: select on one calibration half, threshold on the other. Labeled
+  attacks are drawn by task. An FPR-matched variant is also saved.
+- Realized FPR is reported throughout.
+- Prompt-variant pairs differ only in the variable under test: reflag vs plain history-aware; ledger vs
+  ledger-null; two T = 1 samples vs one.
+- Activity / length confound checks.
+- Pre-specified comparisons: 3rd-max, top-3 sum, CUSUM k = 1.5 and the chooser vs max.
+- Round-2 MOLE corpora are "discovery"; the five new ones are "confirmation".
+
+**Part A: MOLE, all 8 public corpora** (4 generators × single-day / multiday; 112–114 routine accounts each).
+- Monitor: one common history-free account-day monitor — Qwen3-235B-2507, MOLE judge prompt + taxonomy, compact
+  audit rendering (first 250 events, lines ≤ 250 chars).
+- Logprob providers throttled to ~0.4 calls/s, so the remaining calls ran on any provider without logprobs. The
+  common output is the generated integer score.
+- Robustness monitors: gpt-4.1-mini full rendering (3 corpora), MOLE z-score / peer-fit, an activity-only
+  baseline (log events per day), and account-centered variants (day score minus the account's median).
+
+**Part A results** (account-level FPR 0.10):
+- **No accumulation rule beats max for the common monitor on any corpus.**
+- 3rd-max − max: GPT-5.3 single-day −0.02 [−0.15, 0.09]; DeepSeek single-day +0.01; Qwen3.6 single-day −0.17
+  [−0.36, −0.02]; Kimi single-day −0.16 [−0.31, 0.03].
+- Random-effects pooled, single-day corpora (3–4 attack days per insider): 3rd-max −0.066 [−0.156, 0.023],
+  top-3 sum −0.045 [−0.109, 0.019], mean −0.130 [−0.229, −0.031].
+- Multiday corpora (one attack day): every rule ≤ max (pooled −0.02 to −0.09).
+- Nested chooser vs always-max: −0.01 / −0.02 on average; it stays with max in most splits.
+- **The round-2 gpt53 single-day gain was mostly an account-level confound.**
+  - Insider accounts are more active and look more suspicious on routine days too: median events 123 vs 116;
+    LLM non-attack-day AUROC 0.65.
+  - An activity-only "monitor" (no content at all) reaches TPR 0.37 with 3rd-max (+0.32 [0.14, 0.49] over its
+    own max), and keeps +0.21 with the attack days deleted.
+  - Account-centering removes the gpt-4.1-mini 3rd-max gain: +0.131 → +0.001.
+  - Peer-fit keeps +0.14 [0.01, 0.33].
+- **Mechanism.** Across 64 corpus × monitor cells, the gain tracks repeat-spike informativeness: Spearman +0.30
+  (p = 0.017) for top-3 sum, +0.28 for 3rd-max. For the common monitor on single-day corpora, though, a repeat
+  high day is barely more likely for insiders than for routine accounts (log-LR −0.10 to +0.54), while honest
+  persistence is high (h2c 0.23–0.62).
+- **Horizon sweep** (first 5 / 10 / 15 / 20 workdays): no horizon produces a gain for the common monitor.
+- **Daily review budget** (MOLE R@10/day): today's score is best or tied on every corpus (0.19–0.39); CUSUM
+  k = 1.5 is close; running max, k-th largest and top-k are worse.
+- Streaming-delay cells for integer scores are affected by ties: streaming alarms use a non-randomized threshold.
+
+**Persistent state over longer horizons** ($0; matched ARL0, no reset):
+- History-free gpt-4.1-mini: CUSUM k = 0.5 beats max (0.71 vs 0.58 at ARL0 = 100 PRs; 0.59 vs 0.48 at 500).
+- Non-forgetting k-th largest / top-k collapse to ≈ 0.
+- Concatenating runs into longer "attacks" was rejected: it would fabricate cross-run continuity.
+**Part B: re-flagging as a monitor design target** (`ps_variants.py`, `mb_variants.py`, `reflag_analysis.py`;
+`results/r3_t1/reflag_tables.md`).
+
+Monitor: gpt-4.1-mini, logprob-expected scores.
+
+Designs (matched pairs differ only in the variable under test):
+- **history-free** (current PR / current step only; round-2 / track-1 streams);
+- **history-aware** (all prior diffs / steps; plain);
+- **reflag** = history-aware + an explicit rule: re-raise suspicion when the current unit continues earlier
+  suspicious work, keep benign continuations low. Its matched pair is history-aware.
+- **ledger**: no history; the monitor's own ledger of open suspicions plus an incremental-evidence score.
+  - Its matched control, **ledger-null**, is the identical prompt with the notes always empty.
+- **two samples at T = 1**:
+  - **sample0** and **sample1**: one sample each;
+  - **sample_mean**: per-unit mean of the two;
+  - **sample_units**: both samples as separate units.
+
+Data:
+- Persistent state: 155 honest runs, 120 gradual, 397 positional.
+- MonitoringBench: 150 Honest-550 trajectories + 150 attacks (100 S4); subsets S4, opus-4-5-only attacks
+  (agent-model match), and a length-matched subset.
+
+Results at matched run-level FPR. Gains over max use the corrected `amd.evaluation.paired` bootstrap; the
+chooser is nested.
+- **Re-flagging is not a better design.** On persistent-state gradual attacks at 5% FPR:
+  - run-max AUROC is lower with the reflag rule than the plain history-aware monitor (0.806 vs 0.831), and its
+    repeat-spike log-LR is unchanged (2.00 vs 1.91);
+  - best TPR: history-free top-3 sum **0.74** (+0.16 [0.02, 0.23] over its max); history-aware top-3 0.67
+    (+0.30 [0.16, 0.42] over a weak max 0.37); reflag top-3 0.56; ledger top-3 0.64; sample_mean top-3 0.72.
+- At 1% FPR the best rules are close and CIs overlap: history-aware top-3 0.57 vs history-free top-3 0.53 and
+  max 0.50.
+- **MonitoringBench** (all / S4): no design exceeds TPR 0.43 at 5% FPR.
+  - The reflag rule lowers the repeat-spike LR vs the plain history-aware prompt (0.45 vs 0.58).
+  - Every gain over max is ≤ +0.12 and is mostly not significant.
+- **Ledger vs ledger-null.** The carried notes raise max-type detection on persistent-state gradual attacks
+  (max 0.55 vs 0.37), but the ledger monitor's honest scores grow with diff length (Spearman +0.71). It is not
+  better than history-free.
+- **Two samples.**
+  - Each T = 1 sample is weaker than T = 0 (persistent-state gradual max 0.45 / 0.49 vs 0.58).
+  - Their mean recovers T = 0 (top-3 0.72).
+  - Using both samples as units gives a small significant accumulation gain on positional attacks at 1% FPR:
+    +0.09 [0.03, 0.13] for top-3 over that stream's max.
+- **Chooser.** With nested calibration it gains +0.05 to +0.31 where top-k clearly wins (persistent-state
+  gradual), and stays within ±0.07 of max elsewhere, at realized FPR close to nominal.
+
+**Validity checks.**
+- **Diff length.** Gradual-attack diffs are about 4× shorter than honest diffs. A length-only "monitor"
+  (−log chars) with 2nd-max reaches TPR 0.40 at 5% FPR on gradual attacks.
+- But monitor scores rise with diff length (Spearman within honest PRs: gpt-4.1-mini +0.09, Qwen +0.51,
+  ledger +0.71). So length works against the monitors, and it explains Qwen's high honest persistence in round 2.
+- Length-matched persistent-state gradual subsets are too small (25/25; realized FPR ≈ 0.15) to conclude anything.
+- MonitoringBench stream length AUROC is 0.72: attacks are longer. The opus-4-5-only and length-matched subsets
+  give the same qualitative picture.
+
+**Persistent state under continuous monitoring** (no reset; matched ARL0 = 5/α PRs; `ps_longhorizon.md`):
+- CUSUM k = 0.5 beats max for history-free gpt-4.1-mini: 0.71 vs 0.58 at ARL0 = 100 PRs; 0.59 vs 0.48 at 500 PRs.
+- Same for GPT-4o: 0.27 vs 0.16.
+- Non-forgetting accumulators (k-th largest, top-k sum over the whole stream) collapse to ≈ 0.
+- So in deployment, cross-session accumulation has to forget (CUSUM) or be windowed.
+- Why no longer attacks were built: concatenating independent runs into longer campaigns would fabricate
+  cross-run attack continuity that no agent produced.
