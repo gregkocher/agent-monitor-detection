@@ -814,3 +814,45 @@ chooser is nested.
 - So in deployment, cross-session accumulation has to forget (CUSUM) or be windowed.
 - Why no longer attacks were built: concatenating independent runs into longer campaigns would fabricate
   cross-run attack continuity that no agent produced.
+
+## 2026-10-22: T3 ROUND 3 (execution replay feasibility; rewriter ≠ monitor; output-leak test; realized FPR; r3t3 $111.02)
+
+Code `tracks/r3_t3/`, results `results/r3_t3/` (`paired_contrasts[_noout].md` primary; `compare[_noout].md`,
+`leak_peaks.md`, `realized_fpr.md`). FINDINGS.md writes are blocked; full write-up is in the r3 hand-back message.
+Audit (results/audit/issues.csv) M1/M2/M5/m5/m6 are applied: one-shot vs one-shot only; strict validity (judge AND
+all target literals) primary; paired on identical base attacks; canonical joint bootstrap
+(amd.evaluation.paired: honest + attacks resampled together, task-clustered, threshold recalibrated);
+submit stripped only on a real submit.
+
+- **A. Replay — infrastructure verified, replay of our trajectories NOT run.** Laptop Docker works (190 GB free).
+  control-arena 20.1.0 ships BashArena (HF `Eccentricity/bashbench2`, 637 tasks; our task_ids match).
+  benchmark-base builds in 1m51s (938 MB); the per-task 5-service compose is healthy in ~25 s. control-arena's
+  official `test_disable_firewall` (fixed_policy + real sandbox + official side_task_success scorer, mockllm, no
+  API key) PASSED in 103 s. Blocker = data fidelity: the stored trajectories keep only a rendered action
+  string per step. bash steps keep the raw command, but text_editor steps (often the attack-critical config edit)
+  have no recoverable structured arguments; some rewritten steps are bare shell; rewrites never had structured
+  tool calls. A mis-parsed step would score as a failed attack, so replay was not run. Recipe for a full run:
+  re-extract structured tool calls from the source .eval files for the originals, make the refiner emit
+  structured {function, arguments}, then run fixed_policy per (sample, arm) (~1–2 min each, $0 API, laptop;
+  `replay_basharena.py` + test_side_tasks.run_fixed_policy pattern). All probe images/containers were removed.
+- **B. Rewriter ≠ monitor.** claude-sonnet-4.5 refused 44/46 pacing prompts (finish=content_filter; the control
+  passed 13/13), so it was replaced by **google/gemini-2.5-pro**. Gemini one-shot control + 3 pacing arms on 35
+  base attacks (no refusals), scored by gpt-4.1 none; compared with the round-2 gpt-4.1 one-shot arms (`*_r2_r0`)
+  on the same 35. Canonical paired ΔUS @max, α=0.01:
+  control − original: gpt-4.1 −0.60 [−0.72, −0.38], gemini −0.37 [−0.55, −0.19] → the rewrite artifact is NOT a
+  same-model effect. Same-model inflation exists for the control: gpt-4.1 − gemini control −0.23
+  [−0.36, −0.04] (multichart −0.14 [−0.31, −0.03]); no cross-rewriter difference for the pacing arms.
+  Strategy (pace − control, one-shot): all 12 contrasts n.s. (gpt-4.1 −0.03..+0.11; gemini −0.14..−0.03).
+  Strict validity: gpt-4.1 arms 0.74–0.77 (judge 0.94–0.97); gemini control 0.74, pacing 0.57–0.63 (judge
+  0.74–0.80). Peak score: originals 5.62, gpt-4.1 rewrites 8.2–8.5, gemini 7.0–7.6.
+- **C. Fabricated-output leak test** (re-scored with the current action's output stripped: 250 honest + 35
+  originals + 8 arms). Rewrite peaks barely move (Δ −0.33..+0.25); originals' real outputs add suspicion
+  (−0.55 [−1.03, −0.08] when stripped); DiD +0.2..+0.8 (the gap widens without outputs). No-output contrasts
+  replicate: control − original −0.51 (gpt-4.1), −0.31 (gemini); strategy n.s. Fabricated outputs do not drive
+  the findings.
+- **D. Realized held-out FPR** (200 random 50/50 splits): with output (550 honest), max/cusum1.5/top3sum ≈
+  nominal (0.0107/0.0102/0.0106 @0.01; 0.0033–0.0040 @0.003); **multichart runs hot**: 0.0173 @0.01, 0.0102
+  @0.003 (exp-tail OR overfits the calibration set). No output (250 honest, 125 per half): every detector is
+  1.6–2.6× nominal (small calibration halves).
+- Caveats: n=35 base attacks (17 tasks); one-shot only; no execution replay; agent-model confound (audit M9)
+  not stratified here.

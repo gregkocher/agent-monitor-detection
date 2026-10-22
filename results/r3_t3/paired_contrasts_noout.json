@@ -1,0 +1,434 @@
+[
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.5142857142857142,
+  "lo": -0.6666666666666667,
+  "hi": -0.32128759398496315,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.5142857142857142,
+  "lo": -0.6552469512195123,
+  "hi": -0.33333333333333337,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.3142857142857143,
+  "lo": -0.6053754813863926,
+  "hi": -0.1724137931034483,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.3714285714285714,
+  "lo": -0.631578947368421,
+  "hi": -0.2142857142857143,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": 0.02857142857142858,
+  "lo": -0.15794736842105253,
+  "hi": 0.13888888888888884,
+  "p_le0": 0.679
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.021428571428571463,
+  "lo": -0.16311369990680336,
+  "hi": 0.10969760101010105,
+  "p_le0": 0.702
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.028571428571428525,
+  "lo": -0.192361111111111,
+  "hi": 0.15151515151515155,
+  "p_le0": 0.7215
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.2571428571428572,
+  "lo": -0.42307692307692313,
+  "hi": 0.0769736842105261,
+  "p_le0": 0.9045
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": 0.02857142857142858,
+  "lo": -0.13520503261882566,
+  "hi": 0.12121212121212122,
+  "p_le0": 0.57
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": 0.0071428571428571175,
+  "lo": -0.11907142857142855,
+  "hi": 0.10526315789473684,
+  "p_le0": 0.4745
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.11428571428571421,
+  "lo": -0.2195121951219512,
+  "hi": 0.07317073170731703,
+  "p_le0": 0.912
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.2285714285714286,
+  "lo": -0.35902777777777767,
+  "hi": 0.03032670454545439,
+  "p_le0": 0.954
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": 0.08571428571428574,
+  "lo": -0.1351351351351351,
+  "hi": 0.19230769230769224,
+  "p_le0": 0.3675
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": 0.07857142857142851,
+  "lo": -0.12200448717948717,
+  "hi": 0.17647058823529405,
+  "p_le0": 0.258
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.028571428571428525,
+  "lo": -0.15625,
+  "hi": 0.12121212121212122,
+  "p_le0": 0.7615
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.17142857142857143,
+  "lo": -0.2857142857142857,
+  "hi": 0.025000000000000022,
+  "p_le0": 0.971
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.3142857142857143,
+  "lo": -0.5357829670329669,
+  "hi": -0.17946428571428585,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.3142857142857143,
+  "lo": -0.51334375,
+  "hi": -0.16917485119047632,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.22857142857142856,
+  "lo": -0.43902439024390244,
+  "hi": -0.0625,
+  "p_le0": 0.9965
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.3142857142857143,
+  "lo": -0.5,
+  "hi": -0.13793103448275862,
+  "p_le0": 0.998
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.14285714285714285,
+  "lo": -0.29271879483500707,
+  "hi": 0.11764705882352933,
+  "p_le0": 0.847
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.12142857142857144,
+  "lo": -0.2870942841880341,
+  "hi": 0.11241170634920628,
+  "p_le0": 0.86
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.11428571428571427,
+  "lo": -0.2571428571428571,
+  "hi": 0.05882352941176472,
+  "p_le0": 0.9235
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.1428571428571428,
+  "lo": -0.303030303030303,
+  "hi": 0.06453366058906027,
+  "p_le0": 0.9265
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.11428571428571427,
+  "lo": -0.2941176470588236,
+  "hi": 0.12121212121212122,
+  "p_le0": 0.8145
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.13571428571428568,
+  "lo": -0.30515714285714285,
+  "hi": 0.08108108108108103,
+  "p_le0": 0.889
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.14285714285714285,
+  "lo": -0.29172794117647044,
+  "hi": 0.046539313399778445,
+  "p_le0": 0.9485
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.08571428571428569,
+  "lo": -0.25642857142857145,
+  "hi": 0.07142857142857145,
+  "p_le0": 0.8915
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.14285714285714285,
+  "lo": -0.2631578947368421,
+  "hi": 0.11111111111111105,
+  "p_le0": 0.857
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.1428571428571429,
+  "lo": -0.25425277217741926,
+  "hi": 0.10716698841698824,
+  "p_le0": 0.8835
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.08571428571428574,
+  "lo": -0.2424447174447174,
+  "hi": 0.05263157894736842,
+  "p_le0": 0.918
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.11428571428571427,
+  "lo": -0.2692567567567567,
+  "hi": 0.057142857142857106,
+  "p_le0": 0.931
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.2,
+  "lo": -0.3076923076923077,
+  "hi": 0.05714285714285705,
+  "p_le0": 0.9465
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.19999999999999996,
+  "lo": -0.30097926267281105,
+  "hi": 0.03448275862068961,
+  "p_le0": 0.9585
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.08571428571428574,
+  "lo": -0.26673076923076916,
+  "hi": 0.058868092691621875,
+  "p_le0": 0.917
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.057142857142857106,
+  "lo": -0.2593253968253966,
+  "hi": 0.1111904761904758,
+  "p_le0": 0.8745
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.02857142857142858,
+  "lo": -0.24242424242424243,
+  "hi": 0.11764705882352944,
+  "p_le0": 0.829
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.09999999999999998,
+  "lo": -0.25711607142857146,
+  "hi": 0.06060673253676473,
+  "p_le0": 0.871
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": 0.0,
+  "lo": -0.17652310924369743,
+  "hi": 0.1428571428571428,
+  "p_le0": 0.6195
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.17142857142857149,
+  "lo": -0.3225806451612903,
+  "hi": 0.025657894736841925,
+  "p_le0": 0.9675
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.05714285714285716,
+  "lo": -0.22229166666666664,
+  "hi": 0.14285714285714288,
+  "p_le0": 0.802
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.05714285714285716,
+  "lo": -0.19486763211382105,
+  "hi": 0.1137633928571428,
+  "p_le0": 0.737
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.057142857142857106,
+  "lo": -0.22580645161290325,
+  "hi": 0.1500378787878786,
+  "p_le0": 0.7655
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.2,
+  "lo": -0.3125446428571428,
+  "hi": -0.023782467532467707,
+  "p_le0": 0.9895
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": 0.02857142857142858,
+  "lo": -0.2142857142857142,
+  "hi": 0.15625,
+  "p_le0": 0.6085
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": 0.021428571428571463,
+  "lo": -0.21200303030303028,
+  "hi": 0.15151515151515144,
+  "p_le0": 0.479
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.028571428571428525,
+  "lo": -0.17650326797385618,
+  "hi": 0.125,
+  "p_le0": 0.747
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.11428571428571427,
+  "lo": -0.2791242732558138,
+  "hi": 0.0625,
+  "p_le0": 0.94
+ }
+]
