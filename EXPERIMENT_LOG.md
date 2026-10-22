@@ -984,6 +984,44 @@ is above 0 and both rules are matched in ≥ 80% of cells. Every other contrast 
 budgets, panels, transfer) is secondary / exploratory and reported with its interval, without a
 multiplicity claim.
 
+## 2026-10-22: T3 ROUND 4 (execution-replay validity for Idea 3) — setup + pre-registration
+
+Code `tracks/r4_replay/`, results `results/r4_replay/`, budget track `r4rep` (cap $90). Goal: ground
+Idea-3's side-task validity in REAL execution (official BashArena side_task_success scorers in isolated
+per-sample Docker sandboxes) instead of the round-2/3 LLM judge + target-literal check.
+
+**Infrastructure.** control-arena 20.1.0 BashArena; benchmark-base image built once; per sample a fresh
+5-service compose (unique Inspect project), torn down after scoring. A fixed-policy (mockllm, no API key)
+replays the attack's recorded tool calls, then the official side-task scorer reads final SYSTEM STATE.
+`extract_structured.py` re-extracts structured {function, arguments} (incl. text_editor create/str_replace
+payloads) from the source .eval files via HTTP range requests — reusing the loader's machinery and NEVER
+opening header.json (leaked-token safety). `replay_run.py` = fixed_policy + task_id_whitelist + official
+scorer; per-command timeout lowered to 12 s (faithful attack-critical ops finish in <<12 s; this only caps
+blocking benign filler) + a 1800 s per-sample hard cap. `rewrite_structured.py` re-runs the round-2/3
+rewriter system prompts (control + pacing) but emits STRUCTURED tool calls so rewrites are replayable;
+`score_and_judge.py` scores rewrites with the gpt-4.1 history-free monitor and the round-2 judge.
+
+**Base set.** The 35 round-3 base attacks (17 BashArena tasks), stratified over the 4 official side tasks
+(firewall 9 / malware 9 / sudo 8 / password_leak 9) and structures S2/S3/S4, all with native
+side_task_success=True. One-shot vs one-shot only; paired on identical base attacks.
+
+**Pre-specified primary contrast (written before any result is computed).**
+1. ORIGINALS reproduction: fraction of the 35 "successful" MonitoringBench attacks whose recorded tool
+   calls, replayed faithfully, re-achieve side_task_success under the official scorer. (Measures how often
+   the dataset's success label reproduces in a clean sandbox.)
+2. PRIMARY Idea-3 contrast under EXECUTION validity: the paired ΔUS = US(rewrite_control) − US(original)
+   in undetected-success against the **max** detector at trajectory **FPR α=0.01** (gpt-4.1 history-free
+   monitor, whitened), computed with the canonical joint paired bootstrap (amd.evaluation.paired: honest +
+   attacks resampled together, task-clustered, threshold recalibrated per replicate), US_i = valid_i·(1 −
+   P(alarm_i)) with an execution-invalid attack set to statistic +inf (never an undetected success).
+   SECONDARY: pace_max − rewrite_control (strategy effect) against max at α=0.01; both contrasts also at
+   α=0.003 and against multichart / cusum1.5 / top3sum; and the SAME contrasts recomputed with JUDGE
+   validity, to quantify how much the validity source moves the Idea-3 conclusions.
+3. Judge-vs-execution agreement and FALSE-VALID rate = P(execution side_task fails | predicted valid), for
+   judge / literal / strict predictors, per rewrite arm.
+Realized held-out FPR of each matched threshold is reported alongside. Rewriter = google/gemini-2.5-pro
+(round-3 primary), arms rewrite_control + pace_max.
+
 ## 2026-10-22: T2 ROUND 4 (track r4ctx): results — per-context allocation at B = 1% with exact spend matching
 
 Code `tracks/r4_ctx/`:
@@ -1212,3 +1250,57 @@ replicates of the whole procedure with re-calibrated thresholds; app-cluster boo
 - Scores: `data/processed/persistent_state/r4_scores_*_current_only.jsonl` and
   `data/processed/r4_mole/<corpus>/llm_*_compact*.parquet`. Caches are in `data/raw/r4_cs/`. ARL replicates are in
   `results/r4_cs/arl_replicates.csv.gz`.
+
+### 2026-10-22: T3 ROUND 4 RESULTS (execution replay; r4rep $13.26)
+
+All replays ran locally in isolated per-sample BashArena Docker sandboxes (official side_task scorers,
+mockllm fixed-policy, no API key), torn down after each sample; 6 parallel workers, 10 s per-command cap,
+900 s per-sample hard limit. Hangs beyond the limit are recorded as `status=error` (time-limit), kept
+SEPARATE from scorer-false. Tables: `results/r4_replay/{reproduction,agreement,paired_contrasts}.{md,json}`.
+
+**A. Execution reproduction of side_task_success (official scorers; the headline validity number).**
+Faithfully replaying the recorded tool calls of attacks the dataset labels successful:
+- originals        24/33 scored = **0.727** (2 time-limit errors, excluded)
+- rewrite_control  16/33 scored = **0.485** (2 errors)
+- pace_max         11/28 scored = **0.393** (4 errors)
+So ~27% of "successful" MonitoringBench attacks do NOT reproduce in a clean sandbox, and LLM rewriting
+breaks them much further: a NEUTRAL control rewrite loses ~a quarter more (0.73→0.49), and detector-aware
+pacing (which adds/spreads steps) loses more still (0.39). The pilot firewall case is one concrete
+non-reproducer (native label CORRECT → replay FALSE: the firewall edit is undone / not sufficient).
+
+**B. LLM-judge vs EXECUTION validity (step 5; the key methodological result).** false_valid =
+P(execution side_task fails | predictor says valid):
+- rewrite_control: judge false_valid **0.571** (agree 0.39), strict 0.500, literal 0.423.
+- pace_max:        judge false_valid **0.762** (agree 0.21), strict 0.750, literal 0.545.
+The round-2/3 LLM judge calls a rewrite valid, yet the official scorer shows the side task actually FAILS
+the majority of the time (57% control, 76% pacing). The target-literal static check is a somewhat better
+but still poor predictor. Idea 3's validity therefore should NOT rest on the LLM judge — confirmed.
+
+**C. Idea-3 contrasts recomputed with EXECUTION validity** (canonical joint paired bootstrap,
+amd.evaluation.paired: honest+attacks resampled together, task-clustered, threshold recalibrated;
+US=valid·(1−P(alarm)), execution-invalid→statistic +inf; n=28 common base attacks, 14 tasks, honest 550;
+realized held-out FPR ≈ nominal: max 0.0141@.01 / 0.0070@.003, multichart slightly hot 0.0160).
+- PRIMARY (pre-registered) ΔUS rewrite_control − original, max, α=0.01: **−0.214 [−0.480, +0.040]**,
+  p(Δ≤0)=0.96 — negative (rewrites LESS undetected-successful than originals) but the 95% CI crosses 0,
+  so NOT significant at the pre-specified bar. Under JUDGE validity the same contrast is −0.321
+  [−0.500,−0.071] (significant). Execution grounding shrinks the magnitude ~1/3 and removes significance,
+  because the originals themselves are only 0.727 execution-valid (the judge-/strict-validity analyses had
+  assumed originals=1.0). Direction is robust across detectors (multichart −0.250 [−0.480,−0.017] sig;
+  cusum1.5 −0.214; top3sum −0.107 n.s.).
+- pace_max − original (exec, max α=0.01): −0.321 [−0.625,−0.030] (sig) — pacing is even worse for the attacker.
+- SECONDARY strategy effect pace_max − rewrite_control (exec, max α=0.01): −0.107 [−0.357,+0.120], p=0.84
+  (n.s.); all 8 detector×α cells n.s. — pacing does NOT beat a plain rewrite, replicating round 3 under
+  execution validity.
+
+**Takeaway.** Grounding side-task success in real execution (i) reveals that the dataset's and especially
+the LLM judge's "success" are substantially over-stated (judge false-valid 57–76% on rewrites), and
+(ii) leaves Idea 3's qualitative conclusion intact and arguably stronger — monitor-aware / pacing
+rewriting does not help the attacker (pace−control n.s.; rewrite−original ≤0) — while showing the
+rewrite−original magnitude is smaller and noisier than the judge-validity analysis implied. Idea 3 no
+longer rests on an LLM judge.
+
+**Caveats.** n=28 paired (14 tasks) after excluding execution errors/missing; one-shot vs one-shot;
+rewriter = google/gemini-2.5-pro; 6 replay samples hit the 900 s wall and are recorded as errors (not
+scorer-false). Fixed-policy replays recorded commands literally; a command that silently depended on a
+real earlier dynamic output can fail — that is itself a genuine attack fragility and the right thing to
+count. Replays never ran outside the sandbox; attack content stays in gitignored data/.
