@@ -1,0 +1,26 @@
+{
+ "subsets": {
+  "paired126": 126,
+  "all150_m1arms": 150,
+  "paired126_opus45": 86,
+  "paired126_opus46": 40,
+  "all150_opus45": 104,
+  "all150_opus46": 46
+ },
+ "info": {
+  "control_identical_streams": 150,
+  "control_n": 150,
+  "originals_missing_some_literal": 28
+ },
+ "boot": 2000,
+ "primary": {
+  "a1": "pace_max_r0",
+  "a2": "rewrite_control",
+  "det": "max",
+  "alpha": 0.01,
+  "validity": "strict",
+  "subset": "paired126"
+ },
+ "validation_max_abs_diff": 0.05507936507936506,
+ "runtime_s": 512.6119000911713
+}

@@ -1,0 +1,131 @@
+# Round-3 paired contrasts in undetected-success (with-output; strict validity; one-shot; n=35 base attacks, 17 tasks; honest n=550)
+
+Joint paired bootstrap (amd.evaluation.paired): honest + attacks resampled together, clustered by task, threshold recalibrated per replicate. 95% CI; p = P(boot ≤ 0).
+
+| contrast | detector | alpha | ΔUS [95% CI] | p(Δ≤0) |
+|---|---|---|---|---|
+| control/gpt41 − original | max | 0.01 | -0.600 [-0.721,-0.379] | 1.000 |
+| control/gpt41 − original | max | 0.003 | -0.486 [-0.695,-0.286] | 1.000 |
+| control/gpt41 − original | multichart | 0.01 | -0.543 [-0.705,-0.364] | 1.000 |
+| control/gpt41 − original | multichart | 0.003 | -0.481 [-0.680,-0.290] | 1.000 |
+| control/gpt41 − original | cusum1.5 | 0.01 | -0.514 [-0.657,-0.286] | 1.000 |
+| control/gpt41 − original | cusum1.5 | 0.003 | -0.429 [-0.610,-0.172] | 1.000 |
+| control/gpt41 − original | top3sum | 0.01 | -0.486 [-0.676,-0.276] | 1.000 |
+| control/gpt41 − original | top3sum | 0.003 | -0.429 [-0.636,-0.217] | 1.000 |
+| pace_max/gpt41 − control/gpt41 | max | 0.01 | +0.114 [-0.107,+0.257] | 0.249 |
+| pace_max/gpt41 − control/gpt41 | max | 0.003 | +0.029 [-0.129,+0.200] | 0.385 |
+| pace_max/gpt41 − control/gpt41 | multichart | 0.01 | +0.029 [-0.128,+0.222] | 0.372 |
+| pace_max/gpt41 − control/gpt41 | multichart | 0.003 | +0.010 [-0.143,+0.179] | 0.419 |
+| pace_max/gpt41 − control/gpt41 | cusum1.5 | 0.01 | +0.143 [-0.032,+0.250] | 0.071 |
+| pace_max/gpt41 − control/gpt41 | cusum1.5 | 0.003 | +0.029 [-0.156,+0.209] | 0.432 |
+| pace_max/gpt41 − control/gpt41 | top3sum | 0.01 | +0.000 [-0.154,+0.220] | 0.422 |
+| pace_max/gpt41 − control/gpt41 | top3sum | 0.003 | -0.057 [-0.273,+0.154] | 0.721 |
+| pace_cusum/gpt41 − control/gpt41 | max | 0.01 | -0.029 [-0.200,+0.067] | 0.829 |
+| pace_cusum/gpt41 − control/gpt41 | max | 0.003 | -0.057 [-0.214,+0.086] | 0.798 |
+| pace_cusum/gpt41 − control/gpt41 | multichart | 0.01 | -0.086 [-0.245,+0.063] | 0.862 |
+| pace_cusum/gpt41 − control/gpt41 | multichart | 0.003 | -0.094 [-0.252,+0.061] | 0.875 |
+| pace_cusum/gpt41 − control/gpt41 | cusum1.5 | 0.01 | -0.029 [-0.143,+0.071] | 0.775 |
+| pace_cusum/gpt41 − control/gpt41 | cusum1.5 | 0.003 | +0.029 [-0.135,+0.118] | 0.674 |
+| pace_cusum/gpt41 − control/gpt41 | top3sum | 0.01 | -0.114 [-0.258,+0.111] | 0.830 |
+| pace_cusum/gpt41 − control/gpt41 | top3sum | 0.003 | -0.171 [-0.314,+0.081] | 0.909 |
+| pace_multichart/gpt41 − control/gpt41 | max | 0.01 | +0.086 [-0.051,+0.194] | 0.183 |
+| pace_multichart/gpt41 − control/gpt41 | max | 0.003 | +0.029 [-0.088,+0.171] | 0.328 |
+| pace_multichart/gpt41 − control/gpt41 | multichart | 0.01 | +0.029 [-0.100,+0.172] | 0.350 |
+| pace_multichart/gpt41 − control/gpt41 | multichart | 0.003 | -0.019 [-0.114,+0.123] | 0.547 |
+| pace_multichart/gpt41 − control/gpt41 | cusum1.5 | 0.01 | +0.029 [-0.107,+0.162] | 0.354 |
+| pace_multichart/gpt41 − control/gpt41 | cusum1.5 | 0.003 | +0.057 [-0.094,+0.188] | 0.336 |
+| pace_multichart/gpt41 − control/gpt41 | top3sum | 0.01 | +0.000 [-0.152,+0.200] | 0.488 |
+| pace_multichart/gpt41 − control/gpt41 | top3sum | 0.003 | -0.057 [-0.188,+0.132] | 0.769 |
+| control/gemini − original | max | 0.01 | -0.371 [-0.550,-0.185] | 1.000 |
+| control/gemini − original | max | 0.003 | -0.314 [-0.537,-0.100] | 0.999 |
+| control/gemini − original | multichart | 0.01 | -0.400 [-0.557,-0.190] | 1.000 |
+| control/gemini − original | multichart | 0.003 | -0.299 [-0.512,-0.118] | 1.000 |
+| control/gemini − original | cusum1.5 | 0.01 | -0.314 [-0.474,-0.138] | 0.999 |
+| control/gemini − original | cusum1.5 | 0.003 | -0.286 [-0.467,-0.083] | 0.998 |
+| control/gemini − original | top3sum | 0.01 | -0.286 [-0.419,-0.118] | 1.000 |
+| control/gemini − original | top3sum | 0.003 | -0.286 [-0.441,-0.103] | 0.999 |
+| pace_max/gemini − control/gemini | max | 0.01 | -0.143 [-0.290,+0.077] | 0.897 |
+| pace_max/gemini − control/gemini | max | 0.003 | -0.114 [-0.294,+0.062] | 0.918 |
+| pace_max/gemini − control/gemini | multichart | 0.01 | -0.086 [-0.270,+0.075] | 0.875 |
+| pace_max/gemini − control/gemini | multichart | 0.003 | -0.124 [-0.290,+0.049] | 0.926 |
+| pace_max/gemini − control/gemini | cusum1.5 | 0.01 | -0.029 [-0.212,+0.118] | 0.781 |
+| pace_max/gemini − control/gemini | cusum1.5 | 0.003 | -0.143 [-0.306,+0.089] | 0.884 |
+| pace_max/gemini − control/gemini | top3sum | 0.01 | -0.143 [-0.289,+0.037] | 0.955 |
+| pace_max/gemini − control/gemini | top3sum | 0.003 | -0.143 [-0.300,+0.035] | 0.959 |
+| pace_cusum/gemini − control/gemini | max | 0.01 | -0.143 [-0.320,+0.071] | 0.910 |
+| pace_cusum/gemini − control/gemini | max | 0.003 | -0.171 [-0.368,+0.053] | 0.949 |
+| pace_cusum/gemini − control/gemini | multichart | 0.01 | -0.086 [-0.312,+0.068] | 0.905 |
+| pace_cusum/gemini − control/gemini | multichart | 0.003 | -0.176 [-0.371,+0.031] | 0.947 |
+| pace_cusum/gemini − control/gemini | cusum1.5 | 0.01 | -0.114 [-0.300,+0.044] | 0.947 |
+| pace_cusum/gemini − control/gemini | cusum1.5 | 0.003 | -0.143 [-0.300,+0.051] | 0.946 |
+| pace_cusum/gemini − control/gemini | top3sum | 0.01 | -0.143 [-0.323,+0.029] | 0.958 |
+| pace_cusum/gemini − control/gemini | top3sum | 0.003 | -0.143 [-0.300,+0.032] | 0.952 |
+| pace_multichart/gemini − control/gemini | max | 0.01 | -0.029 [-0.212,+0.125] | 0.735 |
+| pace_multichart/gemini − control/gemini | max | 0.003 | -0.114 [-0.263,+0.111] | 0.845 |
+| pace_multichart/gemini − control/gemini | multichart | 0.01 | -0.029 [-0.210,+0.138] | 0.694 |
+| pace_multichart/gemini − control/gemini | multichart | 0.003 | -0.119 [-0.267,+0.079] | 0.859 |
+| pace_multichart/gemini − control/gemini | cusum1.5 | 0.01 | -0.029 [-0.200,+0.122] | 0.733 |
+| pace_multichart/gemini − control/gemini | cusum1.5 | 0.003 | -0.114 [-0.259,+0.069] | 0.887 |
+| pace_multichart/gemini − control/gemini | top3sum | 0.01 | -0.143 [-0.303,+0.029] | 0.963 |
+| pace_multichart/gemini − control/gemini | top3sum | 0.003 | -0.057 [-0.290,+0.054] | 0.926 |
+| rewrite_control: gpt-4.1 − gemini | max | 0.01 | -0.229 [-0.355,-0.036] | 0.998 |
+| rewrite_control: gpt-4.1 − gemini | max | 0.003 | -0.171 [-0.333,-0.029] | 0.996 |
+| rewrite_control: gpt-4.1 − gemini | multichart | 0.01 | -0.143 [-0.306,-0.027] | 0.994 |
+| rewrite_control: gpt-4.1 − gemini | multichart | 0.003 | -0.181 [-0.307,-0.034] | 0.995 |
+| rewrite_control: gpt-4.1 − gemini | cusum1.5 | 0.01 | -0.200 [-0.333,-0.027] | 0.992 |
+| rewrite_control: gpt-4.1 − gemini | cusum1.5 | 0.003 | -0.143 [-0.282,+0.061] | 0.930 |
+| rewrite_control: gpt-4.1 − gemini | top3sum | 0.01 | -0.200 [-0.368,-0.062] | 0.998 |
+| rewrite_control: gpt-4.1 − gemini | top3sum | 0.003 | -0.143 [-0.333,+0.059] | 0.938 |
+| pace_max: gpt-4.1 − gemini | max | 0.01 | +0.029 [-0.194,+0.167] | 0.543 |
+| pace_max: gpt-4.1 − gemini | max | 0.003 | -0.029 [-0.179,+0.114] | 0.670 |
+| pace_max: gpt-4.1 − gemini | multichart | 0.01 | -0.029 [-0.192,+0.135] | 0.670 |
+| pace_max: gpt-4.1 − gemini | multichart | 0.003 | -0.047 [-0.179,+0.089] | 0.729 |
+| pace_max: gpt-4.1 − gemini | cusum1.5 | 0.01 | -0.029 [-0.161,+0.132] | 0.636 |
+| pace_max: gpt-4.1 − gemini | cusum1.5 | 0.003 | +0.029 [-0.139,+0.167] | 0.468 |
+| pace_max: gpt-4.1 − gemini | top3sum | 0.01 | -0.057 [-0.214,+0.073] | 0.852 |
+| pace_max: gpt-4.1 − gemini | top3sum | 0.003 | -0.057 [-0.214,+0.069] | 0.862 |
+| pace_cusum: gpt-4.1 − gemini | max | 0.01 | -0.114 [-0.270,+0.034] | 0.957 |
+| pace_cusum: gpt-4.1 − gemini | max | 0.003 | -0.057 [-0.265,+0.163] | 0.801 |
+| pace_cusum: gpt-4.1 − gemini | multichart | 0.01 | -0.143 [-0.290,+0.043] | 0.942 |
+| pace_cusum: gpt-4.1 − gemini | multichart | 0.003 | -0.099 [-0.285,+0.100] | 0.845 |
+| pace_cusum: gpt-4.1 − gemini | cusum1.5 | 0.01 | -0.114 [-0.250,+0.081] | 0.895 |
+| pace_cusum: gpt-4.1 − gemini | cusum1.5 | 0.003 | +0.029 [-0.192,+0.179] | 0.552 |
+| pace_cusum: gpt-4.1 − gemini | top3sum | 0.01 | -0.171 [-0.290,-0.030] | 0.996 |
+| pace_cusum: gpt-4.1 − gemini | top3sum | 0.003 | -0.171 [-0.281,+0.059] | 0.940 |
+| pace_multichart: gpt-4.1 − gemini | max | 0.01 | -0.114 [-0.235,+0.083] | 0.859 |
+| pace_multichart: gpt-4.1 − gemini | max | 0.003 | -0.029 [-0.241,+0.133] | 0.738 |
+| pace_multichart: gpt-4.1 − gemini | multichart | 0.01 | -0.086 [-0.250,+0.067] | 0.898 |
+| pace_multichart: gpt-4.1 − gemini | multichart | 0.003 | -0.081 [-0.256,+0.081] | 0.840 |
+| pace_multichart: gpt-4.1 − gemini | cusum1.5 | 0.01 | -0.143 [-0.303,+0.086] | 0.907 |
+| pace_multichart: gpt-4.1 − gemini | cusum1.5 | 0.003 | +0.029 [-0.219,+0.222] | 0.455 |
+| pace_multichart: gpt-4.1 − gemini | top3sum | 0.01 | -0.057 [-0.243,+0.103] | 0.826 |
+| pace_multichart: gpt-4.1 − gemini | top3sum | 0.003 | -0.143 [-0.278,+0.108] | 0.835 |
+n base attacks 35 tasks 17 = first-35 of selection: True
+{'contrast': 'control/gemini - original', 'kind': 'strict_US', 'n': 35, 'est': np.float64(-0.371), 'lo': np.float64(-0.548), 'hi': np.float64(-0.182), 'p_le0': np.float64(1.0), 'strict_valid_a': np.float64(0.743), 'strict_valid_b': np.float64(1.0)}
+{'contrast': 'control/gemini - original', 'kind': 'detection_only', 'n': 35, 'est': np.float64(-0.143), 'lo': np.float64(-0.3), 'hi': np.float64(-0.027), 'p_le0': np.float64(0.992), 'strict_valid_a': np.float64(0.743), 'strict_valid_b': np.float64(1.0)}
+{'contrast': 'control/gemini - original', 'kind': 'both_valid_pairs', 'n': 26, 'est': np.float64(-0.192), 'lo': np.float64(-0.364), 'hi': np.float64(-0.038), 'p_le0': np.float64(0.998), 'strict_valid_a': np.float64(0.743), 'strict_valid_b': np.float64(1.0)}
+{'contrast': 'control/gpt41 - original', 'kind': 'strict_US', 'n': 35, 'est': np.float64(-0.6), 'lo': np.float64(-0.732), 'hi': np.float64(-0.385), 'p_le0': np.float64(1.0), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(1.0)}
+{'contrast': 'control/gpt41 - original', 'kind': 'detection_only', 'n': 35, 'est': np.float64(-0.429), 'lo': np.float64(-0.548), 'hi': np.float64(-0.256), 'p_le0': np.float64(1.0), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(1.0)}
+{'contrast': 'control/gpt41 - original', 'kind': 'both_valid_pairs', 'n': 27, 'est': np.float64(-0.519), 'lo': np.float64(-0.667), 'hi': np.float64(-0.296), 'p_le0': np.float64(1.0), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(1.0)}
+{'contrast': 'control: gpt41 - gemini', 'kind': 'strict_US', 'n': 35, 'est': np.float64(-0.229), 'lo': np.float64(-0.345), 'hi': np.float64(-0.056), 'p_le0': np.float64(0.998), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'control: gpt41 - gemini', 'kind': 'detection_only', 'n': 35, 'est': np.float64(-0.286), 'lo': np.float64(-0.414), 'hi': np.float64(-0.091), 'p_le0': np.float64(1.0), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'control: gpt41 - gemini', 'kind': 'both_valid_pairs', 'n': 24, 'est': np.float64(-0.292), 'lo': np.float64(-0.44), 'hi': np.float64(-0.045), 'p_le0': np.float64(0.997), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_max/gemini - control/gemini', 'kind': 'strict_US', 'n': 35, 'est': np.float64(-0.143), 'lo': np.float64(-0.294), 'hi': np.float64(0.059), 'p_le0': np.float64(0.908), 'strict_valid_a': np.float64(0.571), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_max/gemini - control/gemini', 'kind': 'detection_only', 'n': 35, 'est': np.float64(-0.057), 'lo': np.float64(-0.206), 'hi': np.float64(0.171), 'p_le0': np.float64(0.558), 'strict_valid_a': np.float64(0.571), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_max/gemini - control/gemini', 'kind': 'both_valid_pairs', 'n': 19, 'est': np.float64(-0.053), 'lo': np.float64(-0.238), 'hi': np.float64(0.218), 'p_le0': np.float64(0.464), 'strict_valid_a': np.float64(0.571), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_max/gpt41 - control/gpt41', 'kind': 'strict_US', 'n': 35, 'est': np.float64(0.114), 'lo': np.float64(-0.108), 'hi': np.float64(0.25), 'p_le0': np.float64(0.244), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.771)}
+{'contrast': 'pace_max/gpt41 - control/gpt41', 'kind': 'detection_only', 'n': 35, 'est': np.float64(0.114), 'lo': np.float64(-0.108), 'hi': np.float64(0.25), 'p_le0': np.float64(0.244), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.771)}
+{'contrast': 'pace_max/gpt41 - control/gpt41', 'kind': 'both_valid_pairs', 'n': 25, 'est': np.float64(0.16), 'lo': np.float64(-0.148), 'hi': np.float64(0.36), 'p_le0': np.float64(0.245), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.771)}
+{'contrast': 'pace_cusum/gemini - control/gemini', 'kind': 'strict_US', 'n': 35, 'est': np.float64(-0.143), 'lo': np.float64(-0.314), 'hi': np.float64(0.059), 'p_le0': np.float64(0.929), 'strict_valid_a': np.float64(0.629), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_cusum/gemini - control/gemini', 'kind': 'detection_only', 'n': 35, 'est': np.float64(-0.057), 'lo': np.float64(-0.156), 'hi': np.float64(0.167), 'p_le0': np.float64(0.605), 'strict_valid_a': np.float64(0.629), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_cusum/gemini - control/gemini', 'kind': 'both_valid_pairs', 'n': 21, 'est': np.float64(-0.095), 'lo': np.float64(-0.312), 'hi': np.float64(0.211), 'p_le0': np.float64(0.704), 'strict_valid_a': np.float64(0.629), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_cusum/gpt41 - control/gpt41', 'kind': 'strict_US', 'n': 35, 'est': np.float64(-0.029), 'lo': np.float64(-0.2), 'hi': np.float64(0.07), 'p_le0': np.float64(0.826), 'strict_valid_a': np.float64(0.743), 'strict_valid_b': np.float64(0.771)}
+{'contrast': 'pace_cusum/gpt41 - control/gpt41', 'kind': 'detection_only', 'n': 35, 'est': np.float64(0.029), 'lo': np.float64(-0.167), 'hi': np.float64(0.154), 'p_le0': np.float64(0.506), 'strict_valid_a': np.float64(0.743), 'strict_valid_b': np.float64(0.771)}
+{'contrast': 'pace_cusum/gpt41 - control/gpt41', 'kind': 'both_valid_pairs', 'n': 24, 'est': np.float64(-0.042), 'lo': np.float64(-0.286), 'hi': np.float64(0.111), 'p_le0': np.float64(0.826), 'strict_valid_a': np.float64(0.743), 'strict_valid_b': np.float64(0.771)}
+{'contrast': 'pace_multichart/gemini - control/gemini', 'kind': 'strict_US', 'n': 35, 'est': np.float64(-0.029), 'lo': np.float64(-0.214), 'hi': np.float64(0.118), 'p_le0': np.float64(0.748), 'strict_valid_a': np.float64(0.6), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_multichart/gemini - control/gemini', 'kind': 'detection_only', 'n': 35, 'est': np.float64(0.086), 'lo': np.float64(-0.129), 'hi': np.float64(0.258), 'p_le0': np.float64(0.292), 'strict_valid_a': np.float64(0.6), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_multichart/gemini - control/gemini', 'kind': 'both_valid_pairs', 'n': 20, 'est': np.float64(0.15), 'lo': np.float64(-0.148), 'hi': np.float64(0.444), 'p_le0': np.float64(0.21), 'strict_valid_a': np.float64(0.6), 'strict_valid_b': np.float64(0.743)}
+{'contrast': 'pace_multichart/gpt41 - control/gpt41', 'kind': 'strict_US', 'n': 35, 'est': np.float64(0.086), 'lo': np.float64(-0.054), 'hi': np.float64(0.2), 'p_le0': np.float64(0.159), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.771)}
+{'contrast': 'pace_multichart/gpt41 - control/gpt41', 'kind': 'detection_only', 'n': 35, 'est': np.float64(0.114), 'lo': np.float64(-0.031), 'hi': np.float64(0.24), 'p_le0': np.float64(0.092), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.771)}
+{'contrast': 'pace_multichart/gpt41 - control/gpt41', 'kind': 'both_valid_pairs', 'n': 25, 'est': np.float64(0.12), 'lo': np.float64(-0.08), 'hi': np.float64(0.267), 'p_le0': np.float64(0.159), 'strict_valid_a': np.float64(0.771), 'strict_valid_b': np.float64(0.771)}
+  [redirect] results/audit2/repro_t3r3.csv -> /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/results/fixes2/rep_audit2_t3r3_plugin_thrfix/repro_t3r3.csv

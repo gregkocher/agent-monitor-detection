@@ -1,0 +1,28 @@
+{
+ "n_honest": 550,
+ "n_attack_scored": 1000,
+ "n_attack_planned": 1000,
+ "n_attack_excluded": 0,
+ "n_ext": 200,
+ "length_mismatches": {
+  "fibs_fu_ax": [
+   0,
+   0
+  ],
+  "old": 0,
+  "sab": [
+   0,
+   0
+  ],
+  "fibs_fu": [
+   0,
+   0
+  ]
+ },
+ "fpr_gap_pp": 0.11196578289280629,
+ "n_attack_llm_incomplete": 28,
+ "auroc_reader": 0.8170427272727272,
+ "auroc_llm": 0.7152145454545454,
+ "H1_supported": true,
+ "H1_in_pilot_interval": true
+}

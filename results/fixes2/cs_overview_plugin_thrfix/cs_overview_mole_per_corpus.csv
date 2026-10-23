@@ -1,0 +1,5 @@
+set,alpha,detector,gain_vs_max,lo,hi,p_le0,corpus
+mole:gpt53_single_day:qwen_int,0.1,kth3,-0.021399931551805373,-0.15109941914470745,0.08797190507221102,0.6535,gpt53_single_day
+mole:deepseek_v4_flash_single_day:qwen_int,0.1,kth3,0.01403595241130846,-0.10712724029731305,0.13025159269003328,0.4045,deepseek_v4_flash_single_day
+mole:qwen36_27b_single_day:qwen_int,0.1,kth3,-0.1738663472823473,-0.35598290218462436,-0.016475877368002392,0.984,qwen36_27b_single_day
+mole:kimi_k26_single_day:qwen_int,0.1,kth3,-0.1565832899241568,-0.31380778959774314,0.032180595120823205,0.952,kimi_k26_single_day

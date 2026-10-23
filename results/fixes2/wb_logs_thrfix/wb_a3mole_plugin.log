@@ -1,0 +1,70 @@
+{
+ "n_sel": 466,
+ "labels": {
+  "attack": 233,
+  "honest": 233
+ },
+ "n_pairs": 233,
+ "pairs_not_size2": 0,
+ "pairs_same_account": 233,
+ "pairs_same_day": 233,
+ "n_accounts": 38,
+ "benign_reused": 0,
+ "sel_keys": [
+  "account",
+  "day",
+  "label",
+  "messages",
+  "neutral_system",
+  "outcome",
+  "pair",
+  "task_id"
+ ],
+ "n_used": 466
+}
+                            contrast family metric                        a                            b     est      lo      hi  p_two  p_holm
+0                 M1 policy - reader   holm  auroc           policy/sab/max               reader/sab/max -0.0350 -0.0760  0.0103  0.121   0.297
+1         M2 policy_neutral - reader   holm  auroc   policy_neutral/sab/max               reader/sab/max -0.0328 -0.0701  0.0066  0.099   0.297
+2         M3 policy - policy_neutral   holm  auroc           policy/sab/max       policy_neutral/sab/max -0.0021 -0.0164  0.0144  0.839   0.839
+3           M4 reader - LLM(insider)   holm  auroc           reader/sab/max    llm_insider/score/session -0.0532 -0.1044 -0.0054  0.034   0.136
+4   M5 policy_neutral - LLM(insider)   holm  auroc   policy_neutral/sab/max    llm_insider/score/session -0.0860 -0.1383 -0.0368  0.003   0.015
+5                            M1 tpr5   tpr5   tpr5           policy/sab/max               reader/sab/max -0.2414 -0.3378 -0.1008  0.000   0.000
+6                            M2 tpr5   tpr5   tpr5   policy_neutral/sab/max               reader/sab/max -0.1831 -0.2821 -0.0368  0.004   0.008
+7                            M3 tpr5   tpr5   tpr5           policy/sab/max       policy_neutral/sab/max -0.0583 -0.1058 -0.0246  0.004   0.008
+8                            M4 tpr5   tpr5   tpr5           reader/sab/max    llm_insider/score/session -0.2942 -0.4489 -0.1664  0.000   0.000
+9                            M5 tpr5   tpr5   tpr5   policy_neutral/sab/max    llm_insider/score/session -0.4773 -0.6073 -0.3024  0.000   0.000
+10                       sec M1 mean    sec  auroc          policy/sab/mean              reader/sab/mean  0.0039 -0.0129  0.0213  0.681     NaN
+11                       sec M2 mean    sec  auroc  policy_neutral/sab/mean              reader/sab/mean -0.0098 -0.0337  0.0100  0.320     NaN
+12                       sec M3 mean    sec  auroc          policy/sab/mean      policy_neutral/sab/mean  0.0137  0.0061  0.0239  0.000     NaN
+13                       sec M4 mean    sec  auroc          reader/sab/mean    llm_insider/score/session  0.0500  0.0078  0.0982  0.017     NaN
+14                       sec M5 mean    sec  auroc  policy_neutral/sab/mean    llm_insider/score/session  0.0402  0.0012  0.0813  0.046     NaN
+15               sec M3 fibs_tok max    sec  auroc      policy/fibs_tok/max  policy_neutral/fibs_tok/max -0.0848 -0.1087 -0.0645  0.000     NaN
+16                  sec M3 jl_lm max    sec  auroc         policy/jl_lm/max     policy_neutral/jl_lm/max -0.0597 -0.0779 -0.0399  0.000     NaN
+17                sec M3 jl_hits max    sec  auroc       policy/jl_hits/max   policy_neutral/jl_hits/max -0.0231 -0.0718  0.0332  0.399     NaN
+policy/sab/max {'auroc': 0.8146, 'lo': 0.7721, 'hi': 0.86, 'tpr5': 0.2436}
+policy/sab/mean {'auroc': 0.9567, 'lo': 0.9325, 'hi': 0.9777, 'tpr5': 0.82}
+policy/fibs_tok/max {'auroc': 0.818, 'lo': 0.7684, 'hi': 0.8591, 'tpr5': 0.2601}
+policy/fibs_tok/mean {'auroc': 0.9807, 'lo': 0.9679, 'hi': 0.9903, 'tpr5': 0.9037}
+policy/jl_lm/max {'auroc': 0.6338, 'lo': 0.5459, 'hi': 0.7262, 'tpr5': 0.0913}
+policy/jl_lm/mean {'auroc': 0.7725, 'lo': 0.7018, 'hi': 0.8386, 'tpr5': 0.3649}
+policy/jl_hits/max {'auroc': 0.7517, 'lo': 0.6708, 'hi': 0.8286, 'tpr5': 0.087}
+policy/jl_hits/mean {'auroc': 0.8921, 'lo': 0.8286, 'hi': 0.9403, 'tpr5': 0.4648}
+policy_neutral/sab/max {'auroc': 0.8167, 'lo': 0.7675, 'hi': 0.867, 'tpr5': 0.3019}
+policy_neutral/sab/mean {'auroc': 0.943, 'lo': 0.9114, 'hi': 0.9697, 'tpr5': 0.787}
+policy_neutral/fibs_tok/max {'auroc': 0.9028, 'lo': 0.8648, 'hi': 0.9349, 'tpr5': 0.4878}
+policy_neutral/fibs_tok/mean {'auroc': 0.991, 'lo': 0.9845, 'hi': 0.9963, 'tpr5': 0.9614}
+policy_neutral/jl_lm/max {'auroc': 0.6935, 'lo': 0.6085, 'hi': 0.7773, 'tpr5': 0.1423}
+policy_neutral/jl_lm/mean {'auroc': 0.8411, 'lo': 0.7807, 'hi': 0.8962, 'tpr5': 0.4922}
+policy_neutral/jl_hits/max {'auroc': 0.7748, 'lo': 0.6953, 'hi': 0.8523, 'tpr5': 0.1972}
+policy_neutral/jl_hits/mean {'auroc': 0.8446, 'lo': 0.7768, 'hi': 0.9126, 'tpr5': 0.5013}
+reader/sab/max {'auroc': 0.8495, 'lo': 0.7995, 'hi': 0.897, 'tpr5': 0.485}
+reader/sab/mean {'auroc': 0.9527, 'lo': 0.9317, 'hi': 0.9738, 'tpr5': 0.7927}
+reader/fibs_tok/max {'auroc': 0.5724, 'lo': 0.4996, 'hi': 0.6445, 'tpr5': 0.1361}
+reader/fibs_tok/mean {'auroc': 0.6849, 'lo': 0.5942, 'hi': 0.7732, 'tpr5': 0.2603}
+reader/jl_lm/max {'auroc': 0.7124, 'lo': 0.6304, 'hi': 0.792, 'tpr5': 0.2152}
+reader/jl_lm/mean {'auroc': 0.8331, 'lo': 0.7532, 'hi': 0.903, 'tpr5': 0.5568}
+reader/jl_hits/max {'auroc': 0.9349, 'lo': 0.8994, 'hi': 0.9669, 'tpr5': 0.6614}
+reader/jl_hits/mean {'auroc': 0.9736, 'lo': 0.9518, 'hi': 0.993, 'tpr5': 0.8953}
+llm_insider/score/session {'auroc': 0.9028, 'lo': 0.8492, 'hi': 0.9497, 'tpr5': 0.7792}
+llm_generic/score/session {'auroc': 0.9155, 'lo': 0.8697, 'hi': 0.9587, 'tpr5': 0.759}
+[a3mole plugin] done in 30s -> /Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/results/fixes2/wb_a3mole_plugin_thrfix

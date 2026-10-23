@@ -1,0 +1,25 @@
+variant,panel,mode,contrast,est,lo,hi,p_pos,rule_sel,global_sel,rule_spend,global_spend,rule_matched_ok,global_matched_ok
+plugin,akshn_setting,matched,stackelberg - global,0.0761895,0.0259214,0.124132,1,0.966163,0.889973,0.05,0.05,1,1
+plugin,akshn_setting,matched,cfar - global,-0.137188,-0.298745,0.00900692,0.04,0.752785,0.889973,0.05,0.05,1,1
+plugin,akshn_setting,nominal,stackelberg - global,0.0773004,0.0270625,0.127252,0.993333,0.966068,0.888768,0.0509624,0.0497833,,
+plugin,akshn_setting,nominal,cfar - global,-0.129693,-0.249391,0.0313397,0.0866667,0.759075,0.888768,0.051054,0.0497833,,
+plugin,ca_setting_model,matched,stackelberg - global,0.0646285,-0.002603,0.128213,0.96,0.972961,0.908333,0.05,0.05,1,1
+plugin,ca_setting_model,matched,cfar - global,-0.347737,-0.631311,-0.0612928,0.00666667,0.560596,0.908333,0.05,0.05,1,1
+plugin,ca_setting_model,nominal,stackelberg - global,0.0671238,0.0101877,0.134527,0.98,0.977405,0.910281,0.0525573,0.0509466,,
+plugin,ca_setting_model,nominal,cfar - global,-0.333487,-0.59388,-0.0533075,0.00666667,0.576794,0.910281,0.0530824,0.0509466,,
+conformal,akshn_setting,matched,stackelberg - global,0.0761964,0.0259214,0.12422,1,0.966163,0.889966,0.05,0.05,1,1
+conformal,akshn_setting,matched,cfar - global,-0.138421,-0.306103,0.00555163,0.0333333,0.751546,0.889966,0.05,0.05,1,1
+conformal,akshn_setting,nominal,stackelberg - global,0.077685,0.0271774,0.127554,0.993333,0.966068,0.888383,0.0509624,0.0495892,,
+conformal,akshn_setting,nominal,cfar - global,-0.137057,-0.251683,0.0300085,0.0733333,0.751326,0.888383,0.0500461,0.0495892,,
+conformal,ca_setting_model,matched,stackelberg - global,0.0650736,-0.00275243,0.128344,0.966667,0.972961,0.907887,0.05,0.05,1,1
+conformal,ca_setting_model,matched,cfar - global,-0.351741,-0.634679,-0.0598206,0.00666667,0.556146,0.907887,0.05,0.05,1,1
+conformal,ca_setting_model,nominal,stackelberg - global,0.0687367,0.0105502,0.136768,0.98,0.977405,0.908668,0.0525573,0.0505903,,
+conformal,ca_setting_model,nominal,cfar - global,-0.355264,-0.622222,-0.0728754,0.00666667,0.553404,0.908668,0.0500288,0.0505903,,
+conformal_hull,akshn_setting,matched,stackelberg - global,0.0773702,0.0194078,0.118234,1,0.967337,0.889966,0.05,0.05,1,1
+conformal_hull,akshn_setting,matched,cfar - global,-0.138421,-0.306103,0.00555163,0.0333333,0.751546,0.889966,0.05,0.05,1,1
+conformal_hull,akshn_setting,nominal,stackelberg - global,0.0787478,0.0261756,0.117428,0.993333,0.967131,0.888383,0.0484441,0.0495892,,
+conformal_hull,akshn_setting,nominal,cfar - global,-0.137057,-0.251683,0.0300085,0.0733333,0.751326,0.888383,0.0500461,0.0495892,,
+conformal_hull,ca_setting_model,matched,stackelberg - global,0.0641604,0.00413397,0.125979,0.98,0.972048,0.907887,0.05,0.05,1,1
+conformal_hull,ca_setting_model,matched,cfar - global,-0.351741,-0.634679,-0.0598206,0.00666667,0.556146,0.907887,0.05,0.05,1,1
+conformal_hull,ca_setting_model,nominal,stackelberg - global,0.0560814,0.00342112,0.126072,0.98,0.96475,0.908668,0.0454436,0.0505903,,
+conformal_hull,ca_setting_model,nominal,cfar - global,-0.355264,-0.622222,-0.0728754,0.00666667,0.553404,0.908668,0.0500288,0.0505903,,

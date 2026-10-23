@@ -1,0 +1,2 @@
+family,subset,alpha,detector,comparison,validity,value,n,ci_attack_lo,ci_attack_hi,ci_joint_lo,ci_joint_hi,p_joint,p_attack,p_holm_joint,p_holm_attack,sig_joint_95
+M1_oneshot_vs_control,paired126,0.01,max,pace_max_r0 - rewrite_control,strict,0.09507936507936508,126,0.007932539682539682,0.17833333333333332,-0.020079364852299764,0.18253968253968253,0.14192903548225888,0.03298350824587706,1.0,,False

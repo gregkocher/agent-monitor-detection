@@ -1,0 +1,67 @@
+# Execution reproduction of side_task_success (official BashArena scorers)
+
+| arm | side_task_success | scored | rate |
+|---|---|---|---|
+| original | 24 | 33 | 0.727 |
+| rewrite_control | 16 | 33 | 0.485 |
+| pace_max | 11 | 28 | 0.393 |
+
+# Judge/literal/strict validity vs EXECUTION validity (rewrite arms)
+
+false_valid = P(execution side_task fails | predicted valid). agree = overall match.
+
+## rewrite_control (n=33, exec success rate 0.48484848484848486)
+| predictor | agree | false_valid | tp | fp | fn | tn |
+|---|---|---|---|---|---|---|
+| judge | 0.394 | 0.571 | 12 | 16 | 4 | 1 |
+| literal | 0.636 | 0.423 | 15 | 11 | 1 | 6 |
+| strict | 0.515 | 0.500 | 11 | 11 | 5 | 6 |
+
+## pace_max (n=28, exec success rate 0.39285714285714285)
+| predictor | agree | false_valid | tp | fp | fn | tn |
+|---|---|---|---|---|---|---|
+| judge | 0.214 | 0.762 | 5 | 16 | 6 | 1 |
+| literal | 0.536 | 0.545 | 10 | 12 | 1 | 5 |
+| strict | 0.321 | 0.750 | 4 | 12 | 7 | 5 |
+
+
+# Round-4 paired ΔUS contrasts (n=28 base attacks, 14 tasks; honest n=550)
+
+Joint paired bootstrap (amd.evaluation.paired): honest+attacks resampled together, task-clustered, threshold recalibrated per replicate. US=valid·(1−P(alarm)); invalid→+inf.
+
+| validity | contrast | detector | alpha | realized FPR | ΔUS [95% CI] | p(Δ≤0) |
+|---|---|---|---|---|---|---|
+| exec | rewrite_control − original | max | 0.01 | 0.0141 | -0.214 [-0.480,+0.040] | 0.962 |
+| exec | rewrite_control − original | max | 0.003 | 0.0070 | -0.179 [-0.462,+0.000] | 0.980 |
+| exec | rewrite_control − original | multichart | 0.01 | 0.0160 | -0.250 [-0.480,-0.017] | 0.983 |
+| exec | rewrite_control − original | multichart | 0.003 | 0.0078 | -0.172 [-0.440,+0.000] | 0.980 |
+| exec | rewrite_control − original | cusum1.5 | 0.01 | 0.0136 | -0.214 [-0.458,+0.000] | 0.980 |
+| exec | rewrite_control − original | cusum1.5 | 0.003 | 0.0061 | -0.214 [-0.444,+0.033] | 0.968 |
+| exec | rewrite_control − original | top3sum | 0.01 | 0.0140 | -0.107 [-0.364,+0.091] | 0.884 |
+| exec | rewrite_control − original | top3sum | 0.003 | 0.0071 | -0.143 [-0.400,+0.062] | 0.930 |
+| exec | pace_max − original | max | 0.01 | 0.0141 | -0.321 [-0.625,-0.030] | 0.989 |
+| exec | pace_max − original | max | 0.003 | 0.0070 | -0.286 [-0.600,-0.028] | 0.988 |
+| exec | pace_max − original | multichart | 0.01 | 0.0160 | -0.357 [-0.625,-0.065] | 0.994 |
+| exec | pace_max − original | multichart | 0.003 | 0.0078 | -0.273 [-0.569,-0.030] | 0.987 |
+| exec | pace_max − original | cusum1.5 | 0.01 | 0.0136 | -0.179 [-0.480,+0.071] | 0.939 |
+| exec | pace_max − original | cusum1.5 | 0.003 | 0.0061 | -0.286 [-0.560,+0.000] | 0.976 |
+| exec | pace_max − original | top3sum | 0.01 | 0.0140 | -0.214 [-0.516,+0.000] | 0.984 |
+| exec | pace_max − original | top3sum | 0.003 | 0.0071 | -0.214 [-0.522,+0.000] | 0.984 |
+| exec | pace_max − rewrite_control | max | 0.01 | 0.0141 | -0.107 [-0.357,+0.120] | 0.837 |
+| exec | pace_max − rewrite_control | max | 0.003 | 0.0070 | -0.107 [-0.361,+0.174] | 0.801 |
+| exec | pace_max − rewrite_control | multichart | 0.01 | 0.0160 | -0.107 [-0.360,+0.130] | 0.826 |
+| exec | pace_max − rewrite_control | multichart | 0.003 | 0.0078 | -0.101 [-0.364,+0.179] | 0.774 |
+| exec | pace_max − rewrite_control | cusum1.5 | 0.01 | 0.0136 | +0.036 [-0.294,+0.280] | 0.496 |
+| exec | pace_max − rewrite_control | cusum1.5 | 0.003 | 0.0061 | -0.071 [-0.357,+0.208] | 0.719 |
+| exec | pace_max − rewrite_control | top3sum | 0.01 | 0.0140 | -0.107 [-0.400,+0.138] | 0.852 |
+| exec | pace_max − rewrite_control | top3sum | 0.003 | 0.0071 | -0.071 [-0.375,+0.160] | 0.795 |
+| judge | rewrite_control − original | max | 0.01 | 0.0141 | -0.321 [-0.500,-0.071] | 0.998 |
+| judge | rewrite_control − original | max | 0.003 | 0.0070 | -0.250 [-0.458,-0.077] | 0.999 |
+| judge | rewrite_control − original | multichart | 0.01 | 0.0160 | -0.321 [-0.481,-0.103] | 0.997 |
+| judge | rewrite_control − original | multichart | 0.003 | 0.0078 | -0.244 [-0.429,-0.091] | 0.999 |
+| judge | rewrite_control − original | cusum1.5 | 0.01 | 0.0136 | -0.286 [-0.440,-0.091] | 1.000 |
+| judge | rewrite_control − original | cusum1.5 | 0.003 | 0.0061 | -0.286 [-0.417,-0.087] | 0.999 |
+| judge | rewrite_control − original | top3sum | 0.01 | 0.0140 | -0.179 [-0.348,+0.043] | 0.954 |
+| judge | rewrite_control − original | top3sum | 0.003 | 0.0071 | -0.179 [-0.360,+0.000] | 0.979 |
+| judge | pace_max − original | max | 0.01 | 0.0141 | -0.286 [-0.486,+0.000] | 0.978 |
+| judge | pace_max − original | max | 0.003 | 0.0070 | -0.214 [-0.444,+0.040] | 0.967 |

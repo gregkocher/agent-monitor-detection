@@ -1,0 +1,866 @@
+[
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.5720000000000001,
+  "lo": -0.717948717948718,
+  "hi": -0.37830127186009577,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.47579999999999995,
+  "lo": -0.6842105263157895,
+  "hi": -0.27999758064516134,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.5428571428571429,
+  "lo": -0.7027027027027026,
+  "hi": -0.3583674193548388,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.4728857142857143,
+  "lo": -0.6666666666666667,
+  "hi": -0.2812282614942529,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.5142857142857142,
+  "lo": -0.6526578947368421,
+  "hi": -0.2857142857142857,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": -0.379,
+  "lo": -0.5913987573099414,
+  "hi": -0.1724137931034483,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.4857142857142857,
+  "lo": -0.6750037878787879,
+  "hi": -0.27578448275862105,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gpt41 \u2212 original",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.40874285714285724,
+  "lo": -0.6154853907416624,
+  "hi": -0.21875,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": 0.07228571428571429,
+  "lo": -0.1071428571428572,
+  "hi": 0.25007317073170693,
+  "p_le0": 0.258
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": 0.038485714285714234,
+  "lo": -0.11217448275862076,
+  "hi": 0.1891938344594594,
+  "p_le0": 0.331
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": 0.02857142857142858,
+  "lo": -0.13160428849902525,
+  "hi": 0.21523848467369783,
+  "p_le0": 0.3765
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": 0.025657142857142934,
+  "lo": -0.11635142857142852,
+  "hi": 0.17004732142857126,
+  "p_le0": 0.385
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": 0.1428571428571429,
+  "lo": -0.03448787715517242,
+  "hi": 0.24390243902439024,
+  "p_le0": 0.071
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": -0.001171428571428601,
+  "lo": -0.15629111842105256,
+  "hi": 0.1875,
+  "p_le0": 0.477
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": 0.014000000000000012,
+  "lo": -0.14788552188552181,
+  "hi": 0.20734090909090883,
+  "p_le0": 0.431
+ },
+ {
+  "contrast": "pace_max/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.08688571428571412,
+  "lo": -0.27586206896551724,
+  "hi": 0.13157894736842102,
+  "p_le0": 0.766
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.04257142857142859,
+  "lo": -0.2013558467741934,
+  "hi": 0.06060606060606055,
+  "p_le0": 0.8285
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.037314285714285855,
+  "lo": -0.1971504464285715,
+  "hi": 0.08333333333333337,
+  "p_le0": 0.7615
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.08571428571428574,
+  "lo": -0.24724338054187198,
+  "hi": 0.06079332430340553,
+  "p_le0": 0.867
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.06297142857142868,
+  "lo": -0.21254721813725486,
+  "hi": 0.0623767718715391,
+  "p_le0": 0.8305
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.02857142857142858,
+  "lo": -0.1428571428571428,
+  "hi": 0.0727383592017738,
+  "p_le0": 0.7595
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": 0.008742857142857108,
+  "lo": -0.125,
+  "hi": 0.10083836726998467,
+  "p_le0": 0.6425
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.1002857142857142,
+  "lo": -0.2564285714285715,
+  "hi": 0.09391008771929804,
+  "p_le0": 0.851
+ },
+ {
+  "contrast": "pace_cusum/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.13177142857142854,
+  "lo": -0.28368071428571423,
+  "hi": 0.07317073170731703,
+  "p_le0": 0.9055
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": 0.08571428571428574,
+  "lo": -0.04700618921308551,
+  "hi": 0.19444444444444442,
+  "p_le0": 0.1735
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": 0.02857142857142858,
+  "lo": -0.09095198863636358,
+  "hi": 0.16116865808823527,
+  "p_le0": 0.316
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": 0.02857142857142858,
+  "lo": -0.10004296875000002,
+  "hi": 0.1666999999999999,
+  "p_le0": 0.3595
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.002914285714285647,
+  "lo": -0.11111183333333338,
+  "hi": 0.1208648268398266,
+  "p_le0": 0.5035
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": 0.02857142857142858,
+  "lo": -0.10716698841698843,
+  "hi": 0.17034919354838696,
+  "p_le0": 0.339
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": 0.04722857142857145,
+  "lo": -0.08571428571428574,
+  "hi": 0.1794871794871795,
+  "p_le0": 0.3
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": 0.0,
+  "lo": -0.1530506993006992,
+  "hi": 0.1875,
+  "p_le0": 0.5015
+ },
+ {
+  "contrast": "pace_multichart/gpt41 \u2212 control/gpt41",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.06705714285714282,
+  "lo": -0.1875,
+  "hi": 0.09761654581410646,
+  "p_le0": 0.7925
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.3854285714285714,
+  "lo": -0.5555555555555556,
+  "hi": -0.1946590221774195,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.28454285714285715,
+  "lo": -0.5128315217391305,
+  "hi": -0.08935830170778009,
+  "p_le0": 0.999
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.39999999999999997,
+  "lo": -0.5542676847766134,
+  "hi": -0.1929469572368423,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.27580000000000005,
+  "lo": -0.48542994047619054,
+  "hi": -0.10191832386363645,
+  "p_le0": 1.0
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.3142857142857142,
+  "lo": -0.47423026315789474,
+  "hi": -0.14285023041474657,
+  "p_le0": 0.9985
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": -0.2658857142857143,
+  "lo": -0.4417776340768865,
+  "hi": -0.08102773826458066,
+  "p_le0": 0.9975
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.2717142857142857,
+  "lo": -0.41463414634146345,
+  "hi": -0.1111111111111111,
+  "p_le0": 0.9995
+ },
+ {
+  "contrast": "control/gemini \u2212 original",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.29562857142857146,
+  "lo": -0.4390781922525107,
+  "hi": -0.11428571428571428,
+  "p_le0": 0.999
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.10085714285714287,
+  "lo": -0.2876232057416268,
+  "hi": 0.06931952169076734,
+  "p_le0": 0.8875
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.13411428571428563,
+  "lo": -0.29417211328976034,
+  "hi": 0.04878048780487798,
+  "p_le0": 0.9255
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.08571428571428574,
+  "lo": -0.26934642857142854,
+  "hi": 0.07236684842934836,
+  "p_le0": 0.871
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.1399428571428572,
+  "lo": -0.2943301435877262,
+  "hi": 0.03548008003048768,
+  "p_le0": 0.9395
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.02857142857142858,
+  "lo": -0.207923872180451,
+  "hi": 0.12,
+  "p_le0": 0.7755
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": -0.15277142857142856,
+  "lo": -0.30769230769230765,
+  "hi": 0.06251067073170725,
+  "p_le0": 0.911
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.15685714285714286,
+  "lo": -0.29276240538267434,
+  "hi": 0.03448275862068967,
+  "p_le0": 0.957
+ },
+ {
+  "contrast": "pace_max/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.1329428571428572,
+  "lo": -0.3,
+  "hi": 0.040041666666666476,
+  "p_le0": 0.948
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.12885714285714278,
+  "lo": -0.3168548387096774,
+  "hi": 0.06345576036866352,
+  "p_le0": 0.913
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.18134285714285714,
+  "lo": -0.3631731671554252,
+  "hi": 0.024259537815126044,
+  "p_le0": 0.959
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.08571428571428574,
+  "lo": -0.3178809523809523,
+  "hi": 0.06616666666666657,
+  "p_le0": 0.9015
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.18425714285714284,
+  "lo": -0.3659448529411765,
+  "hi": 0.006991061776061614,
+  "p_le0": 0.9695
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.11428571428571432,
+  "lo": -0.2988030303030304,
+  "hi": 0.04350241545893704,
+  "p_le0": 0.945
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": -0.1428571428571429,
+  "lo": -0.2972972972972973,
+  "hi": 0.03559138655462183,
+  "p_le0": 0.9495
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.14285714285714285,
+  "lo": -0.3214573732718894,
+  "hi": 0.02941176470588236,
+  "p_le0": 0.9585
+ },
+ {
+  "contrast": "pace_cusum/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.11311428571428578,
+  "lo": -0.2889748663101605,
+  "hi": 0.03125,
+  "p_le0": 0.9435
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.014571428571428569,
+  "lo": -0.20883549931600548,
+  "hi": 0.12822580645161277,
+  "p_le0": 0.7215
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.12419999999999998,
+  "lo": -0.25710107142857147,
+  "hi": 0.08830213903743281,
+  "p_le0": 0.879
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.02857142857142858,
+  "lo": -0.2164257142857142,
+  "hi": 0.13259340175953072,
+  "p_le0": 0.6995
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.12711428571428568,
+  "lo": -0.2647058823529411,
+  "hi": 0.055384496753246706,
+  "p_le0": 0.9065
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.02857142857142858,
+  "lo": -0.19999999999999996,
+  "hi": 0.11772016806722652,
+  "p_le0": 0.7355
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": -0.12420000000000003,
+  "lo": -0.2655409174876846,
+  "hi": 0.04999999999999999,
+  "p_le0": 0.9125
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.15685714285714286,
+  "lo": -0.3041548531289911,
+  "hi": 0.026333570412517653,
+  "p_le0": 0.9605
+ },
+ {
+  "contrast": "pace_multichart/gemini \u2212 control/gemini",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.06705714285714282,
+  "lo": -0.26825106707317076,
+  "hi": 0.05211328947368412,
+  "p_le0": 0.9195
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.1865714285714286,
+  "lo": -0.339407553107789,
+  "hi": -0.039972972972973156,
+  "p_le0": 0.9975
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.1912571428571428,
+  "lo": -0.33333333333333337,
+  "hi": -0.03448275862068961,
+  "p_le0": 0.995
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.1428571428571429,
+  "lo": -0.30169736842105255,
+  "hi": -0.029390756302521023,
+  "p_le0": 0.9935
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.19708571428571425,
+  "lo": -0.31951964285714285,
+  "hi": -0.03571428571428581,
+  "p_le0": 0.9945
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.20000000000000007,
+  "lo": -0.3214285714285714,
+  "hi": -0.025555555555556043,
+  "p_le0": 0.9905
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": -0.11311428571428572,
+  "lo": -0.26244700000000004,
+  "hi": 0.0625,
+  "p_le0": 0.9145
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.21400000000000002,
+  "lo": -0.3611111111111111,
+  "hi": -0.0625,
+  "p_le0": 0.9975
+ },
+ {
+  "contrast": "rewrite_control: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.11311428571428578,
+  "lo": -0.3030457219251337,
+  "hi": 0.05907160312805452,
+  "p_le0": 0.9235
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.013428571428571456,
+  "lo": -0.19162818336162982,
+  "hi": 0.16216216216216217,
+  "p_le0": 0.56
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.018657142857142928,
+  "lo": -0.16613137254901952,
+  "hi": 0.09965306372549017,
+  "p_le0": 0.647
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.02857142857142858,
+  "lo": -0.19132857889237198,
+  "hi": 0.125,
+  "p_le0": 0.6815
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.03148571428571412,
+  "lo": -0.16240509259259236,
+  "hi": 0.08788203124999999,
+  "p_le0": 0.7045
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.02857142857142858,
+  "lo": -0.15625,
+  "hi": 0.12835080645161284,
+  "p_le0": 0.621
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": 0.038485714285714234,
+  "lo": -0.12348748206599709,
+  "hi": 0.17142857142857137,
+  "p_le0": 0.3855
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.04314285714285715,
+  "lo": -0.20588235294117652,
+  "hi": 0.07278760162601615,
+  "p_le0": 0.838
+ },
+ {
+  "contrast": "pace_max: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.0670571428571427,
+  "lo": -0.21528374999999997,
+  "hi": 0.06250249999999999,
+  "p_le0": 0.8625
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.10028571428571442,
+  "lo": -0.27033169533169527,
+  "hi": 0.03448275862068961,
+  "p_le0": 0.95
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.04722857142857151,
+  "lo": -0.25006184210526305,
+  "hi": 0.16862738095238047,
+  "p_le0": 0.7665
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.1428571428571429,
+  "lo": -0.28682572751322744,
+  "hi": 0.04213961038961028,
+  "p_le0": 0.937
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.07580000000000009,
+  "lo": -0.27161459719142644,
+  "hi": 0.12626628151260466,
+  "p_le0": 0.7995
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.11428571428571432,
+  "lo": -0.24325972313777194,
+  "hi": 0.08339285714285685,
+  "p_le0": 0.8825
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": 0.03848571428571429,
+  "lo": -0.16097132352941174,
+  "hi": 0.17588176470588227,
+  "p_le0": 0.462
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.17142857142857137,
+  "lo": -0.2903225806451613,
+  "hi": -0.032258064516129004,
+  "p_le0": 0.9955
+ },
+ {
+  "contrast": "pace_cusum: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.13177142857142854,
+  "lo": -0.2666999999999999,
+  "hi": 0.05882352941176472,
+  "p_le0": 0.9355
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.01,
+  "est": -0.0862857142857143,
+  "lo": -0.23334375000000004,
+  "hi": 0.09096194503171211,
+  "p_le0": 0.8465
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "max",
+  "alpha": 0.003,
+  "est": -0.038485714285714234,
+  "lo": -0.25,
+  "hi": 0.12903225806451613,
+  "p_le0": 0.7155
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.01,
+  "est": -0.08571428571428574,
+  "lo": -0.25000000000000006,
+  "hi": 0.0657944240196077,
+  "p_le0": 0.8945
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "multichart",
+  "alpha": 0.003,
+  "est": -0.07288571428571422,
+  "lo": -0.2571119047619047,
+  "hi": 0.09187534722222236,
+  "p_le0": 0.805
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.01,
+  "est": -0.1428571428571429,
+  "lo": -0.29999999999999993,
+  "hi": 0.09098011363636317,
+  "p_le0": 0.8825
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "cusum1.5",
+  "alpha": 0.003,
+  "est": 0.05831428571428576,
+  "lo": -0.17954545454545448,
+  "hi": 0.22580645161290322,
+  "p_le0": 0.3395
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.01,
+  "est": -0.05714285714285716,
+  "lo": -0.2424447174447174,
+  "hi": 0.10530899830220687,
+  "p_le0": 0.8225
+ },
+ {
+  "contrast": "pace_multichart: gpt-4.1 \u2212 gemini",
+  "detector": "top3sum",
+  "alpha": 0.003,
+  "est": -0.11311428571428578,
+  "lo": -0.2585659523809524,
+  "hi": 0.10715746753246747,
+  "p_le0": 0.814
+ }
+]

@@ -1,0 +1,14 @@
+contrast,family,a,b,est,lo,hi,p_two,p_holm
+M1 policy - reader,holm,policy/sab/max,reader/sab/max,-0.034961041831678585,-0.07492090289729877,0.008483630551346174,0.101,0.29400000000000004
+M2 policy_neutral - reader,holm,policy_neutral/sab/max,reader/sab/max,-0.03282432905376764,-0.07060446678740492,0.005002197693481818,0.098,0.29400000000000004
+M3 policy - policy_neutral (instruction effect),holm,policy/sab/max,policy_neutral/sab/max,-0.002136712777910943,-0.016636813382085832,0.01361959111583165,0.802,0.802
+M4 reader - LLM(insider),holm,reader/sab/max,llm_insider/score/session,-0.0532152001326236,-0.10388035955752206,-0.003302462753697748,0.036,0.144
+M5 policy_neutral - LLM(insider),holm,policy_neutral/sab/max,llm_insider/score/session,-0.08603952918639124,-0.14007721013592828,-0.03212520006536915,0.001,0.005
+sec: policy - reader (sab mean),secondary,policy/sab/mean,reader/sab/mean,0.003941866676490546,-0.013022033425410546,0.019847014544191903,0.72,
+sec: policy_neutral - reader (sab mean),secondary,policy_neutral/sab/mean,reader/sab/mean,-0.009780986940264191,-0.03208698858662467,0.008869336461205541,0.31,
+sec: policy - policy_neutral (sab mean),secondary,policy/sab/mean,policy_neutral/sab/mean,0.013722853616754738,0.006369263393394655,0.023896114512854488,0.0,
+sec: policy - policy_neutral (fibs_tok max),secondary,policy/fibs_tok/max,policy_neutral/fibs_tok/max,-0.08478697342002983,-0.10853844874226609,-0.06470256554288126,0.0,
+sec: policy - policy_neutral (jl_hits max),secondary,policy/jl_hits/max,policy_neutral/jl_hits/max,-0.023126231833336397,-0.07232383702288361,0.028782868186042164,0.362,
+sec: policy - policy_neutral (jl_lm max),secondary,policy/jl_lm/max,policy_neutral/jl_lm/max,-0.05971743815505881,-0.07979475174719679,-0.040363694050658774,0.0,
+sec: reader - LLM(generic),secondary,reader/sab/max,llm_generic/score/session,-0.06592495717364477,-0.11366674290909393,-0.021327715872208615,0.001,
+sec: LLM(insider) - LLM(generic),secondary,llm_insider/score/session,llm_generic/score/session,-0.012709757041021175,-0.030864568017923432,0.005332494897297205,0.158,

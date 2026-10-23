@@ -1,0 +1,10 @@
+honest n=550, distinct raw max 550; Spearman(raw max, track whitened max)=1.000000, discordant pairs 0
+r2_t3 honest n=550; Spearman(raw max, r2 deployed max)=1.000000
+{'statistic': 'raw_max_550 (r4_replay, r3_t3, audit2)', 'alpha': 0.01, 'convention': 'plugin', 'n': 550, 'loo_fpr': 0.01091, 'split_iid_fpr': 0.01043, 'split_task_fpr': 0.01221, 'loo_ratio': 1.09091, 'split_iid_ratio': 1.04291, 'split_task_ratio': 1.22127}
+{'statistic': 'raw_max_550 (r4_replay, r3_t3, audit2)', 'alpha': 0.01, 'convention': 'conformal', 'n': 550, 'loo_fpr': 0.01, 'split_iid_fpr': 0.00959, 'split_task_fpr': 0.01093, 'loo_ratio': 1.0, 'split_iid_ratio': 0.95878, 'split_task_ratio': 1.09271}
+{'statistic': 'raw_max_550 (r4_replay, r3_t3, audit2)', 'alpha': 0.003, 'convention': 'plugin', 'n': 550, 'loo_fpr': 0.00364, 'split_iid_fpr': 0.00358, 'split_task_fpr': 0.00444, 'loo_ratio': 1.21212, 'split_iid_ratio': 1.19273, 'split_task_ratio': 1.47849}
+{'statistic': 'raw_max_550 (r4_replay, r3_t3, audit2)', 'alpha': 0.003, 'convention': 'conformal', 'n': 550, 'loo_fpr': 0.003, 'split_iid_fpr': 0.00296, 'split_task_fpr': 0.00358, 'loo_ratio': 1.0, 'split_iid_ratio': 0.98758, 'split_task_ratio': 1.19371}
+{'statistic': 'r2_t3_deployed_max_550', 'alpha': 0.01, 'convention': 'plugin', 'n': 550, 'loo_fpr': 0.01091, 'split_iid_fpr': 0.01043, 'split_task_fpr': 0.01221, 'loo_ratio': 1.09091, 'split_iid_ratio': 1.04291, 'split_task_ratio': 1.22127}
+{'statistic': 'r2_t3_deployed_max_550', 'alpha': 0.01, 'convention': 'conformal', 'n': 550, 'loo_fpr': 0.01, 'split_iid_fpr': 0.00959, 'split_task_fpr': 0.01093, 'loo_ratio': 1.0, 'split_iid_ratio': 0.95878, 'split_task_ratio': 1.09271}
+{'statistic': 'r2_t3_deployed_max_550', 'alpha': 0.003, 'convention': 'plugin', 'n': 550, 'loo_fpr': 0.00364, 'split_iid_fpr': 0.00358, 'split_task_fpr': 0.00444, 'loo_ratio': 1.21212, 'split_iid_ratio': 1.19273, 'split_task_ratio': 1.47849}
+{'statistic': 'r2_t3_deployed_max_550', 'alpha': 0.003, 'convention': 'conformal', 'n': 550, 'loo_fpr': 0.003, 'split_iid_fpr': 0.00296, 'split_task_fpr': 0.00358, 'loo_ratio': 1.0, 'split_iid_ratio': 0.98758, 'split_task_ratio': 1.19371}

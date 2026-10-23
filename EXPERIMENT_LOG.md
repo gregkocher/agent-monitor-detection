@@ -1990,3 +1990,64 @@ reimplementations agree within split noise:
 - *r4wb:* "H1 +0.20 [+0.10, +0.30] (+0.17 at exactly 1.00% FPR for both). LinuxArena: 7/12 at equal 1.0% FPR, 6/12 at
   2.0%. MOLE: no AUROC difference, but at 5% session FPR the reader beats the policy (−0.24) and the instruction
   lowers the policy's TPR (−0.06)."
+
+## 2026-10-23: Threshold-convention fix (conformal randomized rule) and headline rerun ($0 API)
+
+Fixes the cross-cutting issue from the third-pass audit: the plug-in randomized threshold has out-of-sample FPR
+(⌊αn⌋+1)/(n+1) for continuous scores (n = 100 at 1%: 1.98%).
+
+**Code.**
+- New opt-in rule in `amd/evaluation/calibration.py`: `conformal_randomized_threshold` / `calibrate(..., "conformal_randomized")`.
+  It is the smoothed conformal p-value test: a new score s alarms with probability
+  clip((α(n+1) − #{S_i > s}) / (#{S_i = s} + 1), 0, 1). Expected out-of-sample FPR is exactly α for exchangeable
+  scores, tied or continuous.
+- The convention switch (`threshold_convention("conformal")`, env `AMD_THRESHOLD_CONVENTION`) redirects
+  method="randomized". Per-replicate `row_thresholds` is used by `matched_budget_eval` and the paired bootstraps.
+- The default stays plug-in, and plug-in outputs are bit-identical (commit e447edc).
+- `tests/test_threshold_convention.py` checks realized FPR by simulation for both rules: continuous, integer αn, and
+  JEV-like probabilities rounded to 0.01. It also tests exact leave-one-out exactness with ties.
+- Track-local plug-in copies (r5_jev cascade, r4_wb r4lib, audit wb_lib / a2lib, t2lib) are switched by
+  monkeypatching in `tracks/fixes2/`; no committed track code or result was edited.
+
+**Rerun.**
+- 57 headline rows are in `results/fixes2/headline_threshold_rerun.csv`. Per-track scripts are
+  `tracks/fixes2/{ctx,cs,wb,jev,rep}_*.py`, with outputs `results/fixes2/*_thrfix*`.
+- Each track's own code was run with only the convention switched.
+- Every plug-in rerun reproduces the committed numbers exactly. Bootstrap sizes are the originals.
+
+**Conclusions that change** (7 rows; all others keep their verdict):
+- *r4_wb A1 FIBS-axial-full at equal FPR*: +0.061 [+0.021, +0.219] → −0.015 [−0.055, +0.097]. The audit's both-at-1.00%
+  version gives +0.066 → −0.019. The "gain" was the plug-in FPR floor (1.6–1.7%). It is dropped.
+- *LinuxArena equal 1.00% FPR (audit)*: 7/12 reader wins + 1 loss → 10/12 + 0 losses.
+  - The count is rule-sensitive: at n_cal = 100, 8 of 12 LLM levels sit below 1/(n+1), where the conformal rule
+    never alarms with certainty.
+  - Do not headline it. The equal-2.0% count (6/12 + 1) is unchanged.
+- *LinuxArena nominal 1% (audit split code)*: 7 → 6 Holm-significant (gpt-5.4 Holm 0.035 → 0.055).
+  - The committed nominal-1% table keeps 7 + 1.
+  - The reader's realized FPR falls from 1.8–2.1% to 0.84–1.09%, and its TPR from 0.76–0.81 to 0.66–0.72. Report
+    the latter.
+- *Persistent-state gpt-4.1-mini top-3 − max (5%)*: +0.145 [−0.001, +0.228] → +0.145 [+0.007, +0.230]. It is now
+  barely significant under the iid bootstrap.
+  - The app-cluster CI still covers 0, and the gain needs the logprob read-out (audit 3).
+  - r4_cs Holm is unchanged (only Luna's loss).
+- *r4_replay all 33 pairs*: −0.242 [−0.500, 0.000] → −0.257 [−0.500, −0.026]. This is a knife-edge flip from one attack
+  in the rank-5/6 gap. The n = 28 primary is unchanged (−0.214 [−0.480, +0.032]).
+- *r4_replay realized FPR at α = 0.003*: 1.2–1.5× nominal → 0.99–1.00× under exchangeable splits. The 1.19× that
+  remains under task-grouped splits is out-of-task shift.
+
+**Unchanged.**
+- r4_ctx primary +0.107 [+0.024, +0.152] and the main-task variant [−0.003, +0.251]. These are spend-matched on
+  test-honest data, so the rule only moves bounds by ≤ 0.004. A Stackelberg conformal-hull sensitivity is also
+  unchanged.
+- Idea 2 overview rows (the figure's 0.075 is 0.076).
+- r4_cs pooled −0.066 [−0.147, +0.015].
+- GPT-4o +0.134 [+0.024, +0.217]; MOLE 3rd-max, chooser.
+- r4_wb H1 +0.194 [+0.089, +0.288] (exactly 1.00%: +0.164), S1–S3, MOLE M1 / M3, panel (d) white-box effects.
+- r5_jev H1-MB/H1-AK (incl. leave-SHADE-out −0.023 [−0.037, +0.009], equal-weight −0.004), H2-AK +0.170, H2-MB, H3-MB,
+  the AK and MB 5% cells. Realized FPR moves toward nominal (e.g. MB 1.5% → 1.3%).
+- Idea 3 overview rows (rewrite − original −0.385 [−0.556, −0.195]).
+
+**Notes.**
+- With α(n+1) < 1 the new rule never alarms with certainty. Equal-FPR matching at small n_cal is therefore
+  resolution-limited under any rule.
+- `SmoothedRows` defines `__len__`/`__getitem__`, so do not pass it through `np.asarray`.

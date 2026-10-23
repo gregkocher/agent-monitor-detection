@@ -1,0 +1,65 @@
+set,n,contrast,validity_a,validity_b,kind,alpha,valid_a,valid_b,note,est,lo,hi,p_le0,p_ge0
+n28_track,28,rewrite_control - original,exec,exec,US,0.01,0.5714285714285714,0.7142857142857143,PRIMARY (exec validity both arms),-0.21428571428571427,-0.48,0.038461538461538464,0.95975,0.0545
+n28_track,28,rewrite_control - original,judge,one,US,0.01,0.8214285714285714,1.0,track's judge-validity version (originals assumed valid),-0.30392857142857144,-0.5,-0.07692307692307693,0.9975,0.00425
+n28_track,28,rewrite_control - original,judge,exec,US,0.01,0.8214285714285714,0.7142857142857143,"judge for rewrite, exec for original",-0.018214285714285707,-0.3333333333333333,0.2962962962962963,0.57925,0.47625
+n28_track,28,rewrite_control - original,exec,one,US,0.01,0.5714285714285714,1.0,"exec for rewrite, originals assumed valid",-0.5,-0.747375,-0.23076923076923078,1.0,0.0
+n28_track,28,rewrite_control - original,one,one,detection_only,0.01,1.0,1.0,validity ignored,-0.16107142857142856,-0.37037037037037035,0.048750000000000134,0.9465,0.079
+n28_track,28,rewrite_control - original,exec,exec,detection_part,0.01,0.5714285714285714,0.7142857142857143,"symmetric decomposition, detection part",-0.15196428571428572,-0.3333333333333333,0.03705694444444452,0.95375,0.06
+n28_track,28,rewrite_control - original,exec,exec,validity_part,0.01,0.5714285714285714,0.7142857142857143,"symmetric decomposition, validity part",-0.062321428571428576,-0.23076923076923078,0.06451612903225806,0.8295,0.23575
+n28_track,15,rewrite_control - original,one,one,detection_only,0.01,1.0,1.0,both-execution-valid pairs,-0.26666666666666666,-0.5454545454545454,0.06666666666666667,0.96425,0.063
+n28_track,28,pace_max - original,exec,exec,US,0.01,0.39285714285714285,0.7142857142857143,exec validity,-0.32142857142857145,-0.6141068376068375,-0.03571428571428571,0.9875,0.01825
+n28_track,28,pace_max - original,one,one,detection_only,0.01,1.0,1.0,validity ignored,-0.08964285714285714,-0.3181818181818182,0.13333333333333333,0.81825,0.2405
+n28_track,28,pace_max - original,exec,exec,detection_part,0.01,0.39285714285714285,0.7142857142857143,decomposition,-0.08053571428571428,-0.2608695652173913,0.08986693548387108,0.8475,0.1865
+n28_track,28,pace_max - original,exec,exec,validity_part,0.01,0.39285714285714285,0.7142857142857143,decomposition,-0.24089285714285716,-0.46,-0.034482758620689655,0.9935,0.0115
+n28_track,10,pace_max - original,one,one,detection_only,0.01,1.0,1.0,both-execution-valid pairs,-0.2,-0.625,0.2222222222222222,0.8845,0.199
+n28_track,28,pace_max - rewrite_control,exec,exec,US,0.01,0.39285714285714285,0.5714285714285714,exec validity,-0.10714285714285714,-0.37037037037037035,0.125,0.84525,0.24025
+n28_track,28,pace_max - rewrite_control,one,one,detection_only,0.01,1.0,1.0,validity ignored,0.07142857142857142,-0.12163692307692303,0.25,0.26675,0.82625
+n28_track,28,pace_max - rewrite_control,exec,exec,detection_part,0.01,0.39285714285714285,0.5714285714285714,decomposition,0.04446428571428572,-0.11538461538461539,0.2,0.326,0.74325
+n28_track,28,pace_max - rewrite_control,exec,exec,validity_part,0.01,0.39285714285714285,0.5714285714285714,decomposition,-0.15160714285714286,-0.3392857142857143,0.019230769230769232,0.9715,0.05175
+n28_track,10,pace_max - rewrite_control,one,one,detection_only,0.01,1.0,1.0,both-execution-valid pairs,0.2,-0.2222222222222222,0.5,0.1975,0.90725
+n28_track,28,rewrite_control - original,exec,exec,US,0.003,0.5714285714285714,0.7142857142857143,PRIMARY (exec validity both arms),-0.16617857142857145,-0.4444444444444444,0.0,0.9795,0.04
+n28_track,28,rewrite_control - original,judge,one,US,0.003,0.8214285714285714,1.0,track's judge-validity version (originals assumed valid),-0.23760714285714288,-0.43810583333333336,-0.08,0.99825,0.00525
+n28_track,28,rewrite_control - original,judge,exec,US,0.003,0.8214285714285714,0.7142857142857143,"judge for rewrite, exec for original",0.048107142857142855,-0.2666759259259259,0.3103987068965519,0.46525,0.584
+n28_track,28,rewrite_control - original,exec,one,US,0.003,0.5714285714285714,1.0,"exec for rewrite, originals assumed valid",-0.45189285714285715,-0.7103614906832296,-0.2616171936758893,1.0,0.0
+n28_track,28,rewrite_control - original,one,one,detection_only,0.003,1.0,1.0,validity ignored,-0.09475,-0.2997214285714286,0.0370726495726497,0.947,0.101
+n28_track,28,rewrite_control - original,exec,exec,detection_part,0.003,0.5714285714285714,0.7142857142857143,"symmetric decomposition, detection part",-0.09475,-0.275,0.0,0.97575,0.0455
+n28_track,28,rewrite_control - original,exec,exec,validity_part,0.003,0.5714285714285714,0.7142857142857143,"symmetric decomposition, validity part",-0.07142857142857142,-0.25,0.058823529411764705,0.86725,0.19825
+n28_track,15,rewrite_control - original,one,one,detection_only,0.003,1.0,1.0,both-execution-valid pairs,-0.17686666666666667,-0.4840538461538461,0.0,0.99725,0.04325
+n28_track,28,pace_max - original,exec,exec,US,0.003,0.39285714285714285,0.7142857142857143,exec validity,-0.26092857142857145,-0.5624097222222223,-0.014733035714285662,0.98775,0.022
+n28_track,28,pace_max - original,one,one,detection_only,0.003,1.0,1.0,validity ignored,0.0014642857142857116,-0.24002717391304346,0.18515462962962964,0.56775,0.486
+n28_track,28,pace_max - original,exec,exec,detection_part,0.003,0.39285714285714285,0.7142857142857143,decomposition,-0.004732142857142859,-0.19764928571428575,0.12520150862068974,0.59775,0.43725
+n28_track,28,pace_max - original,exec,exec,validity_part,0.003,0.39285714285714285,0.7142857142857143,decomposition,-0.25619642857142855,-0.4838709677419355,-0.04838709677419355,0.99625,0.00625
+n28_track,10,pace_max - original,one,one,detection_only,0.003,1.0,1.0,both-execution-valid pairs,-0.030600000000000006,-0.5077805555555556,0.2,0.6915,0.43425
+n28_track,28,pace_max - rewrite_control,exec,exec,US,0.003,0.39285714285714285,0.5714285714285714,exec validity,-0.09475,-0.3640278571428571,0.17395760869565233,0.77425,0.2765
+n28_track,28,pace_max - rewrite_control,one,one,detection_only,0.003,1.0,1.0,validity ignored,0.09621428571428571,-0.10248888546798028,0.32507508361204024,0.18375,0.85775
+n28_track,28,pace_max - rewrite_control,exec,exec,detection_part,0.003,0.39285714285714285,0.5714285714285714,decomposition,0.048107142857142855,-0.08337916666666664,0.2278268633540373,0.2655,0.78975
+n28_track,28,pace_max - rewrite_control,exec,exec,validity_part,0.003,0.39285714285714285,0.5714285714285714,decomposition,-0.14285714285714285,-0.34375,0.03336206896551735,0.95325,0.0675
+n28_track,10,pace_max - rewrite_control,one,one,detection_only,0.003,1.0,1.0,both-execution-valid pairs,0.1347,-0.2,0.5,0.287,0.868
+n33_orig_ctrl,33,rewrite_control - original,exec,exec,US,0.01,0.48484848484848486,0.7272727272727273,PRIMARY (exec validity both arms),-0.25727272727272726,-0.5,-0.02564102564102564,0.98825,0.01875
+n33_orig_ctrl,33,rewrite_control - original,judge,one,US,0.01,0.8484848484848485,1.0,track's judge-validity version (originals assumed valid),-0.2727272727272727,-0.45161290322580644,-0.06514516129032251,0.99525,0.00875
+n33_orig_ctrl,33,rewrite_control - original,judge,exec,US,0.01,0.8484848484848485,0.7272727272727273,"judge for rewrite, exec for original",0.0,-0.3,0.2700067567567568,0.55,0.5065
+n33_orig_ctrl,33,rewrite_control - original,exec,one,US,0.01,0.48484848484848486,1.0,"exec for rewrite, originals assumed valid",-0.53,-0.75,-0.25925191570881223,0.99975,0.00025
+n33_orig_ctrl,33,rewrite_control - original,one,one,detection_only,0.01,1.0,1.0,validity ignored,-0.15151515151515152,-0.34285714285714286,0.05105756578947369,0.94225,0.078
+n33_orig_ctrl,33,rewrite_control - original,exec,exec,detection_part,0.01,0.48484848484848486,0.7272727272727273,"symmetric decomposition, detection part",-0.13636363636363635,-0.2993035714285714,0.027777777777777776,0.95575,0.05625
+n33_orig_ctrl,33,rewrite_control - original,exec,exec,validity_part,0.01,0.48484848484848486,0.7272727272727273,"symmetric decomposition, validity part",-0.12090909090909091,-0.29310344827586204,0.013513513513513514,0.9665,0.04725
+n33_orig_ctrl,15,rewrite_control - original,one,one,detection_only,0.01,1.0,1.0,both-execution-valid pairs,-0.26666666666666666,-0.5454545454545454,0.06666666666666667,0.96425,0.063
+n33_orig_ctrl,33,rewrite_control - original,exec,exec,US,0.003,0.48484848484848486,0.7272727272727273,PRIMARY (exec validity both arms),-0.23190909090909093,-0.48148148148148145,-0.06060606060606061,0.998,0.00375
+n33_orig_ctrl,33,rewrite_control - original,judge,one,US,0.003,0.8484848484848485,1.0,track's judge-validity version (originals assumed valid),-0.23190909090909093,-0.40257386853448274,-0.08999599999999999,0.99825,0.00325
+n33_orig_ctrl,33,rewrite_control - original,judge,exec,US,0.003,0.8484848484848485,0.7272727272727273,"judge for rewrite, exec for original",0.040818181818181816,-0.25050865384615384,0.2564175,0.472,0.57875
+n33_orig_ctrl,33,rewrite_control - original,exec,one,US,0.003,0.48484848484848486,1.0,"exec for rewrite, originals assumed valid",-0.5046363636363635,-0.7290651115618662,-0.3,1.0,0.0
+n33_orig_ctrl,33,rewrite_control - original,one,one,detection_only,0.003,1.0,1.0,validity ignored,-0.1106969696969697,-0.2903225806451613,0.015695800889877667,0.96925,0.059
+n33_orig_ctrl,33,rewrite_control - original,exec,exec,detection_part,0.003,0.48484848484848486,0.7272727272727273,"symmetric decomposition, detection part",-0.09554545454545454,-0.25,0.0,0.9835,0.027
+n33_orig_ctrl,33,rewrite_control - original,exec,exec,validity_part,0.003,0.48484848484848486,0.7272727272727273,"symmetric decomposition, validity part",-0.13636363636363635,-0.32139223602484474,0.0,0.97975,0.031
+n33_orig_ctrl,15,rewrite_control - original,one,one,detection_only,0.003,1.0,1.0,both-execution-valid pairs,-0.17686666666666667,-0.4840538461538461,0.0,0.99725,0.04325
+n35_imputed,35,rewrite_control - original,exec,exec,US,0.01,0.45714285714285713,0.6857142857142857,"errors imputed: orig=invalid, control=invalid",-0.24257142857142858,-0.4696897058823529,-0.02498475609756092,0.987,0.019
+n35_imputed,35,rewrite_control - original,exec,exec,US,0.01,0.5142857142857142,0.6857142857142857,"errors imputed: orig=invalid, control=valid",-0.18542857142857144,-0.4482758620689655,0.07144588744588751,0.93325,0.0885
+n35_imputed,35,rewrite_control - original,exec,exec,US,0.01,0.45714285714285713,0.7428571428571429,"errors imputed: orig=valid, control=invalid",-0.2997142857142857,-0.5483870967741935,-0.058823529411764705,0.99425,0.01
+n35_imputed,35,rewrite_control - original,exec,exec,US,0.01,0.5142857142857142,0.7428571428571429,"errors imputed: orig=valid, control=valid",-0.24257142857142858,-0.4696897058823529,-0.02498475609756092,0.987,0.019
+n28_track_nofirewall,20,rewrite_control - original,exec,exec,US,0.01,0.75,0.95,PRIMARY without firewall (BashArena 1.1 firewall change),-0.35,-0.6462702205882352,0.0,0.983,0.02725
+n28_track_nofirewall,20,rewrite_control - original,judge,one,US,0.01,0.8,1.0,judge version without firewall,-0.4255,-0.6470588235294118,-0.15,0.99875,0.0025
+n28_track_nofirewall,20,rewrite_control - original,one,one,detection_only,0.01,1.0,1.0,"validity ignored, without firewall",-0.27549999999999997,-0.5263157894736842,0.0,0.98025,0.034
+n28_track_nofirewall,20,pace_max - original,exec,exec,US,0.01,0.5,0.95,,-0.5,-0.782608695652174,-0.11758823529411744,0.995,0.00825
+n28_track_nofirewall,20,pace_max - rewrite_control,exec,exec,US,0.01,0.5,0.75,,-0.15,-0.47368421052631576,0.16666666666666666,0.8475,0.2395
+n33_orig_ctrl_nofirewall,24,rewrite_control - original,exec,exec,US,0.01,0.625,0.9583333333333334,PRIMARY without firewall (BashArena 1.1 firewall change),-0.3954166666666667,-0.6666666666666666,-0.08333333333333333,0.9945,0.00825
+n33_orig_ctrl_nofirewall,24,rewrite_control - original,judge,one,US,0.01,0.8333333333333334,1.0,judge version without firewall,-0.375,-0.5789473684210527,-0.10714285714285714,0.9985,0.0025
+n33_orig_ctrl_nofirewall,24,rewrite_control - original,one,one,detection_only,0.01,1.0,1.0,"validity ignored, without firewall",-0.25,-0.47619047619047616,0.019231481481481485,0.9705,0.04225

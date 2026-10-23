@@ -1,0 +1,13 @@
+{'paired126': 126, 'all150_m1arms': 150, 'paired126_opus45': 86, 'paired126_opus46': 40, 'all150_opus45': 104, 'all150_opus46': 46} {'control_identical_streams': 150, 'control_n': 150, 'originals_missing_some_literal': 28}
+2038 streams; running joint bootstrap B=2000
+  joint bootstrap replicate 250/2000
+  joint bootstrap replicate 500/2000
+  joint bootstrap replicate 750/2000
+  joint bootstrap replicate 1000/2000
+  joint bootstrap replicate 1250/2000
+  joint bootstrap replicate 1500/2000
+  joint bootstrap replicate 1750/2000
+  joint bootstrap replicate 2000/2000
+engine done 496s
+validation max |diff| vs project: 0.05507936507936506  max |m6 effect|: 0.0
+done 513s

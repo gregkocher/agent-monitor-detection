@@ -1,0 +1,2 @@
+claim,est,lo,hi,set_lo,set_hi,fpr_det,fpr_max,win,loss
+chooser_emp_vs_always_max_nested_fpr01,0.0012,-0.0061,0.009,-0.0042,0.0085,0.0101,0.0102,11,24
