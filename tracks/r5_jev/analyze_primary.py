@@ -138,6 +138,17 @@ def main():
     cells("akshn_pooled", Rs_ak, Ps_ak, rows)
     cells("akshn_nano_pooled", Rs_nano, Ps_nano, rows)
 
+    # ---------------- secondary: LinuxArena sweep, one cascade per sweep monitor as the second stage (5% only)
+    sw = PN.load_la_sweep(variant, scheme)
+    for m in sw.meta["monitors"]:
+        sw.second = f"la:{m}"
+        for k in ("rand", "oracle", "oracle_label"):
+            sw.streams.pop(k, None)
+        PN._refs(sw, sw.attack_onset)
+        Rw = run_panel(sw, ["jev", "len", "rand", "oracle"], S, B, 50, mapped_first=())
+        cells(f"lasweep:{m}", [Rw], [sw], rows)
+    print("done lasweep", flush=True)
+
     # ---------------- preregistered hypotheses (Holm over the five, one-sided level 0.025 each after adjustment)
     H = [("H1-MB", contrast([R_mb], [mb], ("jev", H1_E), "llm_only", 0.01)),
          ("H1-AK", contrast(Rs_ak, Ps_ak, ("jev", H1_E), "llm_only", 0.01)),

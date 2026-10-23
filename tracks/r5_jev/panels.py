@@ -225,4 +225,5 @@ def load_la_sweep(variant, scheme, monitors=None):
     P = Panel("linuxarena_sweep", hid, aid, np.array([f"task:{T[t].context.get('main_task')}" for t in hid]),
               np.array([f"task:{T[t].context.get('main_task')}" for t in aid]), streams, f"la:{monitors[0]}",
               attack_onset=[None for _ in aid], meta=dict(monitors=monitors, jev_cost_step=cj))
+    _refs(P, P.attack_onset)
     return P

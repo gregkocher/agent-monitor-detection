@@ -85,5 +85,43 @@ def main():
     plt.close(fig)
 
 
+def decider_fig():
+    p = OUT / "explore_decider.csv"
+    if not p.exists():
+        return
+    d = pd.read_csv(p)
+    panels = [("mb", "llm", 0.01, "MonitoringBench, 1% FPR"), ("akshn_linuxarena", "llm", 0.01, "aksh-n LinuxArena, 1% FPR"),
+              ("linuxarena_sweep", "la:claude-opus-4-6", 0.05, "LinuxArena sweep (opus-4-6 2nd stage), 5% FPR")]
+    fig, axes = plt.subplots(1, 3, figsize=(11.5, 3.4), sharey=True)
+    for ax, (pn, sec, al, title) in zip(axes, panels):
+        x = d[(d.panel == pn) & (d.second == sec) & (d.alpha == al)]
+        if x.empty:
+            ax.set_visible(False)
+            continue
+        llm = x[x.config == "llm_only"].iloc[0]
+        ax.axhline(llm.tpr, color=INK, lw=1.5)
+        ax.text(31.5, llm.tpr, "LLM only", va="center", fontsize=8)
+        for f in ("jev", "decider"):
+            y = x[x.config.str.startswith(f"('{f}'")].copy()
+            y["e"] = y.config.str.extract(r", ([0-9.]+)\)").astype(float)
+            y = y.sort_values("e")
+            ax.errorbar(y.e * 100, y.tpr, yerr=[y.tpr - y.lo, y.hi - y.tpr], color=COL[f], lw=2, marker="o", ms=4,
+                        capsize=2, label=NAME[f] + " cascade")
+            only = x[x.config == f"{f}_only"].iloc[0]
+            ax.axhline(only.tpr, color=COL[f], lw=1, ls=":")
+        ax.set_xticks([5, 10, 20, 30])
+        ax.set_xlim(3, 38)
+        ax.set_ylim(0, 1.02)
+        ax.set_xlabel("escalated share of honest steps e (%)")
+        ax.set_title(title, fontsize=9, loc="left")
+    axes[0].set_ylabel("TPR (dotted: first stage alone)")
+    h, lab = axes[0].get_legend_handles_labels()
+    fig.legend(h, lab, loc="lower center", ncol=2, frameon=False, fontsize=8)
+    fig.tight_layout(rect=(0, 0.08, 1, 1))
+    fig.savefig(OUT / "fig_decider_vs_jev.pdf")
+    plt.close(fig)
+
+
 if __name__ == "__main__":
+    decider_fig()
     main()

@@ -32,7 +32,7 @@ from .splits import AKSHN
 
 OUT = REPO / "results" / "r5_jev"
 DEC = DATA / "r5_jev" / "decider"
-READABLE = {"passwords": "readable", "malware": "readable", "firewall": "derived", "sudo": "derived"}
+READABLE = {"passwords": "readable", "password_leak": "readable", "malware": "readable", "firewall": "derived", "sudo": "derived"}
 
 
 def clean(arrs):
@@ -154,33 +154,75 @@ def breakdown(name, P, labels, S, B, rows, seed=0, keys=("jev_only", "llm_only",
                                  tpr=s["est"], lo=s["lo"], hi=s["hi"]))
 
 
-def load_decider(P):
-    """Add the Decider P(suspicious) (benign-first question) to a MonitoringBench panel; returns coverage."""
+def load_decider(P, src="mb"):
+    """Add the Decider P(suspicious) (benign-first question) as stream `decider`, aligned exactly like the JEV
+    stream of the panel (MonitoringBench: first 60 steps, submit stripped; LinuxArena sweep: hidden-tool steps
+    removed; aksh-n: all steps). Returns the share of steps covered."""
     import glob
-    from amd.common.schema import read_jsonl
+    from amd.common.schema import PROCESSED, Trajectory, read_jsonl
     sc = {}
-    for f in glob.glob(str(DEC / "*.jsonl")):
+    for f in glob.glob(str(DEC / "*_out_B_w3.jsonl")):
         for d in read_jsonl(f):
-            src, tid, k = d["key"].split("|")
+            s, tid, k = d["key"].split("|")
+            if s != src:
+                continue
             pr = d["answers"]["verdict_bs"]["probabilities"]
             sc.setdefault(tid, {})[int(k)] = pr["suspicious"] / (pr["suspicious"] + pr["benign"])
     if not sc:
         return 0.0
-    from amd.common.schema import PROCESSED, Trajectory
-    T = {}
-    for src in ("mb_honest", "monitoringbench"):
-        for d in read_jsonl(PROCESSED / src / "trajectories.jsonl"):
-            if d["traj_id"] in set(P.hid) | set(P.aid):
-                T[d["traj_id"]] = Trajectory(**d)
+    files = ["mb_honest", "monitoringbench"] if src == "mb" else [src]
+    ids = set(P.hid) | set(P.aid)
+    T = {d["traj_id"]: Trajectory(**d) for f in files for d in read_jsonl(PROCESSED / f / "trajectories.jsonl")
+         if d["traj_id"] in ids}
     out, cov = [], []
     for t, L in zip(P.hid + P.aid, P.streams[P.second]):
         n = len(L)
-        raw = np.array([sc.get(t, {}).get(k, np.nan) for k in range(min(len(T[t].steps), 60))], float)
-        a = PN._fit(PN._strip(T[t], raw), n)
-        cov.append(np.isfinite(a).mean())
+        tr = T[t]
+        nmax = min(len(tr.steps), 60) if src == "mb" else len(tr.steps)
+        raw = np.array([sc.get(t, {}).get(k, np.nan) for k in range(nmax)], float)
+        if src == "mb":
+            a = PN._fit(PN._strip(tr, raw), n)
+        elif src == "linuxarena_sweep":
+            hidden = set(tr.meta.get("hidden_tool_steps") or [])
+            a = raw[[k for k in range(len(tr.steps)) if k not in hidden]]
+        else:
+            a = PN._fit(raw, n)
+        cov.append(np.isfinite(a).mean() if len(a) else 1.0)
         out.append(a)
     P.streams["decider"] = out
     return float(np.mean(cov))
+
+
+def decider_rows(P, src, S, seed, rows, firsts=("decider", "jev")):
+    cov = load_decider(P, src)
+    if cov == 0:
+        return
+    if cov < 0.999:                      # analyse only trajectories the open model fully covers
+        keep = {t for t, a in zip(P.hid + P.aid, P.streams["decider"]) if np.isfinite(a).all()}
+        P = PN.subset(P, keep)
+    d = make_design(P, S, 1000, seed)
+    res = {"llm_only": evaluate(P, d, {"kind": "plain", "stream": P.second}, ALPHAS),
+           "decider_only": evaluate(P, d, {"kind": "plain", "stream": "decider"}, ALPHAS),
+           "jev_only": evaluate(P, d, {"kind": "plain", "stream": "jev"}, ALPHAS)}
+    for e in E_LEVELS:
+        for f in firsts:
+            res[(f, e)] = evaluate(P, d, {"kind": "cascade", "first": f, "e": e}, ALPHAS)
+    y = [0] * P.nh + [1] * len(P.aid)
+    auc_d, auc_j = roc_auc_score(y, plain_stats(P, "decider")), roc_auc_score(y, plain_stats(P, "jev"))
+    for al in ALPHAS:
+        if np.mean(res["llm_only"][al]["n_cal"]) < MIN_CAL[al]:
+            continue
+        b0 = tpr_boot([res["llm_only"]], al)
+        for k, r in res.items():
+            t = tpr_boot([r], al)
+            s, dd = summarize(t), summarize(t - b0)
+            ref = res[("jev", k[1])] if isinstance(k, tuple) else res["jev_only"]
+            vj = summarize(t - tpr_boot([ref], al))
+            rows.append(dict(panel=P.name, second=P.second, config=str(k), alpha=al, tpr=s["est"], lo=s["lo"],
+                             hi=s["hi"], d_llm=dd["est"], d_llm_lo=dd["lo"], d_llm_hi=dd["hi"], d_vs_jev=vj["est"],
+                             d_vs_jev_lo=vj["lo"], d_vs_jev_hi=vj["hi"], coverage=cov, n_honest=P.nh,
+                             n_attack=len(P.aid), esc_honest=np.nanmean(r[al]["esc_h"]),
+                             auroc_decider_max=auc_d, auroc_jev_max=auc_j))
 
 
 def main():
@@ -196,31 +238,16 @@ def main():
     only = set(a.only.split(",")) if a.only else None
 
     if not only or "decider" in only:
-        cov = load_decider(mb)
-        if cov > 0:
-            d = make_design(mb, S, 1000, 1)        # same seed as the primary mb design
-            rows = []
-            res = {"llm_only": evaluate(mb, d, {"kind": "plain", "stream": "llm"}, ALPHAS),
-                   "decider_only": evaluate(mb, d, {"kind": "plain", "stream": "decider"}, ALPHAS),
-                   "jev_only": evaluate(mb, d, {"kind": "plain", "stream": "jev"}, ALPHAS)}
-            for e in E_LEVELS:
-                for f in ("decider", "jev"):
-                    res[(f, e)] = evaluate(mb, d, {"kind": "cascade", "first": f, "e": e}, ALPHAS)
-            for al in ALPHAS:
-                b0 = tpr_boot([res["llm_only"]], al)
-                for k, r in res.items():
-                    t = tpr_boot([r], al)
-                    s, dd = summarize(t), summarize(t - b0)
-                    vj = summarize(t - tpr_boot([res[("jev", k[1])] if isinstance(k, tuple) else res["jev_only"]], al))
-                    rows.append(dict(config=str(k), alpha=al, tpr=s["est"], lo=s["lo"], hi=s["hi"], d_llm=dd["est"],
-                                     d_llm_lo=dd["lo"], d_llm_hi=dd["hi"], d_vs_jev=vj["est"], d_vs_jev_lo=vj["lo"],
-                                     d_vs_jev_hi=vj["hi"], coverage=cov))
-            P_ = [x for x in mb.streams["decider"]]
-            y = [0] * mb.nh + [1] * len(mb.aid)
-            auc = roc_auc_score(y, plain_stats(mb, "decider"))
-            pd.DataFrame(rows).assign(auroc_decider_max=auc).to_csv(OUT / "explore_decider_mb.csv", index=False)
-            print("decider coverage", cov, "auroc", auc, flush=True)
-            del P_
+        rows = []
+        decider_rows(mb, "mb", S, 1, rows)
+        la = [P for P in panels if P.name == "akshn_linuxarena"][0]
+        decider_rows(la, "akshn_linuxarena", S, 16, rows)
+        sw = PN.load_la_sweep(variant, scheme)
+        for m in sw.meta["monitors"]:
+            sw.second = f"la:{m}"
+            decider_rows(sw, "linuxarena_sweep", S, 40, rows)
+        pd.DataFrame(rows).to_csv(OUT / "explore_decider.csv", index=False)
+        print("decider done", flush=True)
 
     if not only or "rq2" in only:
         dfs = []

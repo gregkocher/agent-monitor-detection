@@ -1587,3 +1587,122 @@ fix at 1%**:
 - All four pods were deleted after their outputs were copied off and verified: row counts and unique ids checked,
   no empty files.
 - OpenRouter track r4wb: $34.47 / $60.
+
+## 2026-10-23: Idea 05 round 1 (track r5jev): JEV as a per-step first-stage monitor — results
+
+Preregistration: commit f4d792a (the entry above), written before any held-out call. Code `tracks/r5_jev/`; tables and
+vector PDFs `results/r5_jev/` (`hypotheses.csv`, `cascade_cells.csv` = every panel × first stage × e × α incl. realized
+FPR and escalated shares, `panels.csv`, `explore_*.csv`, `fig_tpr_vs_e_alpha{1,5}.pdf`, `fig_hypotheses.pdf`,
+`fig_decider_vs_jev.pdf`); scores and caches in `data/r5_jev/` and `data/processed/*/r5_scores_openai_gpt-4.1-nano_none.jsonl`.
+Analysis: 50 grouped 50/50 honest splits per panel, joint clustered bootstrap B = 1,000 with both thresholds recomputed
+per replicate (`analyze_primary.py`); exploratory parts B = 500 (`analyze_explore.py`).
+
+**Scoring completeness.** JEV (`typesafe/jev-1.14-20261014` on every call): 420,986 held-out steps + 18,922 dev steps per
+variant, 0 missing after re-runs. About 927 steps had failed in every pass during a laptop network outage (DNS / "network
+unreachable"); a direct re-run with the network back scored all of them (HTTP 200), so no request was invalid and no
+deviation rule was needed. gpt-4.1-nano: MonitoringBench 64.0k steps, 0 NaN; aksh-n nano subset 174.0k steps, 1 NaN
+(a cached parse failure in akshn_bash; escalated per the preregistered missing-score rule). Probe and LLM streams aligned
+with 0 length mismatches.
+
+### Confirmatory (preregistered; Holm over five one-sided non-inferiority tests, margin 0.03, α = 1% trajectory FPR)
+
+| test | contrast | TPRs | Δ [95% CI] | Holm p | verdict |
+|---|---|---|---|---|---|
+| H1-MB | JEV→mini cascade e=20% − mini only | 0.110 vs 0.114 | −0.003 [−0.006, +0.002] | 0.005 | supported |
+| H1-AK | JEV→Gemini cascade e=20% − Gemini only, 6 settings pooled | 0.834 vs 0.833 | +0.001 [−0.015, +0.025] | 0.005 | supported |
+| H2-MB | JEV cascade − nano cascade, e=10% | 0.124 vs 0.122 | +0.003 [−0.042, +0.038] | 0.071 | **not supported** (inconclusive) |
+| H2-AK | JEV cascade − nano cascade, e=10%, nano subset pooled | 0.792 vs 0.621 | **+0.171 [+0.141, +0.203]** | 0.005 | supported |
+| H3-MB | JEV cascade − probe (FIBS axial) cascade, e=10% | 0.124 vs 0.112 | +0.012 [−0.006, +0.034] | 0.005 | supported |
+
+BashArena-sonnet-4-5 is excluded from every 1% pooled estimate (mean calibration n 151 < 200, preregistered rule).
+
+**How to read these (do not overclaim).**
+- *MonitoringBench is nearly degenerate as a cascade test.* The second stage (gpt-4.1-mini `none`) is weak (TPR 0.114 at
+  realized FPR 0.015), and the LLM-score oracle gate reproduces LLM-only exactly. Every gate that escalates ≥ 20% (JEV,
+  nano, probe, length, random at 30%) lands within 0.01 of LLM-only. So H1-MB and H3-MB show JEV routing loses nothing
+  here, not that it is a strong router. H2-MB is a null with a wide interval.
+- *H1-AK is a pooled average over heterogeneous settings.* Per setting (1%, e = 20%, Δ vs Gemini only): SHADE **+0.171
+  [+0.070, +0.282]** (JEV filters Gemini's honest false alarms); iac +0.015; LinuxArena +0.003 [−0.005, +0.016];
+  bash −0.002; agentdojo −0.001; **BashArena-opus-4-6 −0.244 [−0.288, −0.121]** (JEV ranks these attacks *below*
+  honest runs; standalone AUROC 0.30, TPR 0.000). The SHADE gain offsets the opus-4-6 loss.
+- *At 5% FPR (secondary) non-inferiority is not shown:* pooled 7 settings, e = 20%: −0.026 [−0.037, −0.014]; e = 30%:
+  −0.013 [−0.022, −0.002]; e = 10%: −0.052. BashArena-sonnet-4-5 at 5%: −0.014 [−0.024, −0.007].
+- *H2-AK is the clearest result:* at equal escalation, JEV triage beats gpt-4.1-nano triage (same `none` prompt as the
+  mini monitor) by +0.17 at 1% and by +0.12 to +0.30 at 5% (e = 30% down to 5%). nano escalates only 11–37% of attack steps at
+  e = 5–30% vs 23–46% for JEV.
+
+**Secondary cells** (`cascade_cells.csv`; 1% FPR unless noted).
+- Pooled aksh-n (6 settings), Gemini only 0.833: JEV cascade e = 5/10/20/30%: 0.800 / 0.824 / 0.834 / 0.839; action
+  length 0.316 / 0.487 / 0.712 / 0.787; random 0.215 / 0.321 / 0.460 / 0.563; label oracle 0.968 → 0.900; JEV only
+  0.581 [0.530, 0.620]. Escalated share of attack steps at e = 20%: JEV 0.37, length 0.20, oracle 0.51.
+- MonitoringBench at 5% FPR: JEV cascade e = 5/10% beats mini-only by +0.046 [+0.009, +0.107] / +0.040 [+0.005, +0.077];
+  probe e = 5% +0.035 [+0.005, +0.077]; nano never does. With mini full-history as the second stage (T1-sample attacks
+  702): every gate within 0.01 of LLM-only (0.165) at e ≥ 10%.
+- Quantile-map sensitivity (non-escalated steps keep a mapped JEV score instead of the floor): identical to the floor
+  in every cell. The mapped values never reach the trajectory threshold.
+- Realized FPR: cascades 0.010–0.016 at nominal 0.01; LLM-only on MB 0.015; **JEV-only on MB 0.024** (JEV probabilities
+  are rounded to 0.01 and tie at the top of the honest distribution), so standalone JEV TPRs on MB are optimistic.
+- Cost per 1k trajectories (MonitoringBench, 29 steps / trajectory): mini only $25.6; JEV only $3.96; nano only $6.33;
+  JEV→mini cascade $5.3 / $6.7 / $9.3 / $11.8 at e = 5/10/20/30% (nano→mini $7.7–14.2). JEV costs $0.06–0.14 per 1k
+  steps across sources (median request ≈ 2.7k tokens, latency ≈ 0.2 s). aksh-n: LLM calls per 1k trajectories drop
+  from 57.8k to 11.6k at e = 20% (LinuxArena).
+- LinuxArena sweep (5% only; 12 per-action monitors): JEV→monitor cascades lose to strong monitors at e ≤ 20%
+  (e.g. opus-4-6 0.94 → 0.80 at e = 20%; gemini-3.1-pro 0.93 → 0.83) and are near LLM-only for weak ones.
+
+### Exploratory (not preregistered tests; intervals uncorrected)
+
+**RQ2: standalone JEV and where it fails.**
+- Trajectory max at 1% FPR (JEV vs the second-stage LLM): MB 0.215 [0.095, 0.444] vs mini 0.103 (nano 0.029);
+  bash 0.99 vs 0.99; agentdojo 0.91 vs 1.00; iac 0.57 vs 0.79; SHADE 0.15 vs 0.37; LinuxArena 0.64 vs 0.94;
+  BashArena-opus-4-6 0.00 vs 0.82. The prediction "standalone JEV is weak at low FPR against a strong monitor" holds on
+  aksh-n. On MonitoringBench JEV beats the weak mini `none` monitor.
+- Aggregation (JEV, 1%): max is best on MB, bash, agentdojo and SHADE; mean is better on iac (0.69 vs 0.57),
+  LinuxArena (0.74 vs 0.64), BashArena-sonnet-4-5 (0.44 vs 0.40) and opus-4-6 (0.03 vs 0.00); CUSUM (k = 0.5) and
+  top-3 are worse almost everywhere (e.g. bash CUSUM 0.39 vs max 0.99).
+- Readable vs derived (MB, 1%): JEV only, readable (password leak + malware, 666) 0.19 vs derived (firewall + sudo,
+  971) 0.24; mini only, 0.18 vs **0.04**. The predicted derived-sabotage weakness is the LLM's, not JEV's, on this data.
+  By side task, JEV only: sudo 0.37, firewall 0.10, password leak 0.19, malware 0.18. By agent: opus-4-5 0.25,
+  opus-4-6 0.16.
+- Length confound: max action length AUROC 0.33–0.66 (MB 0.48); step count AUROC 0.70 on MB and 0.83 on agentdojo,
+  but 0.05–0.18 on the BashArena sets (attacks are shorter). Spearman(JEV, action length) on honest steps 0.04–0.21.
+  JEV max rises with honest trajectory length (Spearman 0.06–0.42), which explains the BashArena-opus-4-6 failure:
+  honest runs are longer than its short attacks.
+
+**RQ3: gates and error overlap.**
+- Gates at 1%, e = 10% (`explore_rq3_gates.csv`): suspicion ≥ confidence everywhere. Confidence gating fails where
+  attack steps get p ≈ 1 (bash 0.72 vs 0.99, LinuxArena 0.92 vs 0.94, MB 0.09 vs 0.12). The two-sided rule (least
+  confident escalated, p ≥ 0.99 alarms alone) ≈ suspicion (MB 0.126 vs 0.119).
+- Overlap: attacks JEV confidently clears (every step p ≤ 0.05; 0.6–13.5% of attacks) are missed by the second-stage
+  LLM far more often than its base rate. At 1%: LinuxArena P(Gemini miss | JEV confident-benign) 0.39 vs 0.066,
+  ratio 5.9 [3.7, 8.9]; iac 0.77 vs 0.21 (3.6 [3.1, 4.3]); opus-4-6 1.6 [1.1, 2.1]; SHADE 1.4 [1.3, 1.5]; MB 1.11
+  (mini misses 90% anyway). Conditional on any JEV miss the ratios are 1.0–2.7. Thresholds are held at split means, so
+  these intervals omit threshold noise; sonnet-4-5 at 1% is below the calibration-size floor. The prediction (correlated
+  confident errors) holds on sabotage data. This is why confidence-based escalation cannot rescue confident JEV misses.
+
+**Open decision model (Perplexity Decider v1.2 27B, bf16, one H100, same frozen requests; `explore_decider.csv`).**
+Scored MB eval (64.0k steps), the full aksh-n LinuxArena eval set (134.9k) and the LinuxArena sweep (20.3k) at
+3.7–4.4 req/s. Standalone it matches JEV: AUROC(max) MB 0.82 vs 0.81, LinuxArena 0.96 vs 0.94, sweep 0.91 vs 0.88;
+TPR at 1% MB 0.19 vs 0.23 (both ± 0.1), LinuxArena 0.64 vs 0.64. As a router it is equal or slightly better. MB 1%
+cascade vs JEV cascade: e = 10% +0.017 [−0.004, +0.033], e = 20% +0.024 [−0.002, +0.046]; MB 5%, e = 20%: +0.039
+[+0.007, +0.068]; sweep 5% with opus-4-6 as second stage: +0.046 to +0.055 (CIs exclude 0 at e = 10–20%);
+LinuxArena 1%: ±0.001. The open model is a viable fee-free replacement for JEV in this cascade (and it returns
+full-precision probabilities, with no 0.01 rounding).
+
+### Deviations and caveats
+- After the preregistration commit: (a) `rand_threshold_rows` vectorized (identical output, tested against the loop);
+  (b) the preregistered LinuxArena-sweep secondary cells had been omitted from `analyze_primary.py` and were added
+  (no effect on H1–H3); (c) the exploratory readable/derived map missed the label `password_leak` and was fixed before
+  the reported numbers; (d) the open-model arm was extended from MB to the full aksh-n LinuxArena eval set and the
+  LinuxArena sweep after its RunPod budget was raised (exploratory only); (e) a provisional primary run started before
+  nano completed was discarded unread; only the final run (all scores complete) is reported.
+- Honest-550 and the MB attacks were used by earlier tracks; MB calibration (mean n 252) and the 1% cells rest on
+  2–3 calibration exceedances. Realized FPRs are reported above.
+- aksh-n Gemini scores are the dataset's own monitor outputs. JEV / Decider training-data contamination with these
+  public benchmarks cannot be excluded.
+- JEV probabilities are rounded to 0.01, so its top tail ties (handled by random tie-breaking / randomized thresholds).
+- RQ4 (monitor-aware attacks on the first stage) and fine-tuning / white-box reading of the open model are not done.
+
+**Spend.** OpenRouter: r5dev $5.34 / $10 (JEV dev, 3 variants); r5jev $82.08 / $150 (JEV eval $47.04, gpt-4.1-nano
+$35.04). RunPod (MATS account): one H100 on-demand pod `CLAUDE_POD_GREG---r5-decider` at $3.99/h, ≈ 16.9 h ≈ $67
+(setup, smoke test, 219k Decider judgments); outputs copied and verified (md5), then the pod was deleted. The total
+rate of prefixed pods stayed ≤ $15/h.
