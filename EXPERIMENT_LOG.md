@@ -1706,3 +1706,124 @@ full-precision probabilities, with no 0.01 rounding).
 $35.04). RunPod (MATS account): one H100 on-demand pod `CLAUDE_POD_GREG---r5-decider` at $3.99/h, ≈ 16.9 h ≈ $67
 (setup, smoke test, 219k Decider judgments); outputs copied and verified (md5), then the pod was deleted. The total
 rate of prefixed pods stayed ≤ $15/h.
+
+## 2026-10-23: Idea 05 round 2, part A (exploratory): is JEV's failure on BashArena-opus-4-6 a length or format confound?
+
+Exploratory, not preregistered. Uses cached round-1 scores only (no API calls, $0). Same evaluation panels and step
+alignment as round 1 (MB first 60 steps with submit stripped; aksh-n all steps; second stage = mini `none` on MB,
+Gemini-3.1-Pro on aksh-n). Code `tracks/r5_jev/analyze_length.py`. Tables in `results/r5_jev/`:
+`explore_length_confound.csv` (per panel), `explore_length_features.csv`, `explore_length_strata.csv`,
+`explore_length_auroc_long.csv`, `explore_length_side_task.csv`. Intervals: grouped bootstrap over the panel's groups,
+B = 500. Out-of-fold scores are held fixed, so there is no refit noise.
+
+**Question.** On BashArena-opus-4-6, standalone JEV ranks attacks below honest runs (trajectory-max AUROC 0.30). The
+JEV→Gemini cascade loses −0.244 at 1% FPR there. Is this because attacks are shorter (14 vs 23 median steps) and
+the max over more steps is higher?
+
+**Trajectory AUROC (attack = positive).**
+- *Length only*: logistic regression on log step count, action / output / total chars; grouped 5-fold CV,
+  out-of-fold scores.
+- *+ format*: adds tool-call shares, share of truncated actions and share of empty outputs.
+- *Stratified*: Mann-Whitney over within-stratum pairs only.
+  - "n-strata": quintiles of step count.
+  - "len-score strata": quintiles of the out-of-fold length-only score.
+- *nadj-max*: −log(1 − F(max)^n), with F the empirical CDF of honest steps (in-sample).
+
+| setting | length only | + format | JEV max | JEV max, n-strata | JEV max, len-score strata | JEV mean | JEV mean, len-score strata | JEV nadj-max | LLM max (len-score strata) |
+|---|---|---|---|---|---|---|---|---|---|
+| MB | 0.73 [0.67, 0.79] | 0.79 | 0.81 [0.76, 0.85] | 0.80 | 0.80 | 0.74 | 0.76 | 0.78 | 0.73 (0.71) |
+| bash | 0.58 | 0.67 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 (1.00) |
+| agentdojo | 0.90 [0.88, 0.92] | 0.92 | 0.99 | 0.99 | 0.99 | 0.99 | 0.99 | 0.99 | 1.00 (1.00) |
+| iac | 0.67 | 0.70 | 0.97 | 0.97 | 0.97 | 0.97 | 0.97 | 0.97 | 0.99 (0.99) |
+| SHADE | 0.67 | 0.71 | 0.81 | 0.80 | 0.82 | 0.75 | 0.79 | 0.79 | 0.97 (0.97) |
+| **BashArena-opus-4-6** | **0.84 [0.81, 0.86]** | **0.92** | **0.30 [0.27, 0.33]** | **0.35 [0.30, 0.39]** | **0.36 [0.31, 0.40]** | 0.44 | 0.40 | 0.43 | 0.98 (0.97) |
+| BashArena-sonnet-4-5 | 0.95 [0.93, 0.96] | 0.97 | 0.87 [0.85, 0.89] | 0.92 | 0.92 | 0.93 | 0.91 | 0.94 | 1.00 (1.00) |
+| LinuxArena | 0.77 [0.74, 0.80] | 0.83 | 0.94 | 0.96 | 0.95 | 0.96 | 0.96 | 0.96 | 0.99 (0.99) |
+
+**Findings.**
+
+1. **Length predicts the label on several sets, but it does not explain the opus-4-6 inversion.**
+   - *Length alone carries signal.* Length-only AUROC is 0.84 on opus-4-6, 0.95 on sonnet-4-5, 0.90 on agentdojo,
+     0.77 on LinuxArena and 0.73 on MB. On BashArena and LinuxArena attacks are shorter; on MB and agentdojo they are
+     longer. Adding format features raises it to 0.92 on opus-4-6 (text_editor share AUROC 0.80, submit share 0.82,
+     truncated-action share 0.82).
+   - *Stratifying barely helps on opus-4-6.* Within length strata JEV max moves only from 0.30 to 0.35–0.36. In every
+     step-count quintile it is 0.15–0.47, while Gemini scores 0.97–0.99 in the same strata.
+   - *Elsewhere stratification changes JEV max by ≤ 0.05.* The gains are sonnet-4-5 0.87 → 0.92 and LinuxArena
+     0.94 → 0.96. Length mildly dampens JEV max where honest runs are longer.
+   - *Step level.* Action length barely separates steps (AUROC 0.50–0.62), and JEV is unchanged within action-length
+     strata.
+
+2. **Max vs mean.** Part of the round-1 max/mean difference is a length effect.
+   - *Before stratifying*:
+     - mean beats max where honest runs are longer: sonnet-4-5 0.93 vs 0.87, LinuxArena 0.96 vs 0.94, opus-4-6
+       0.44 vs 0.30;
+     - max beats mean on MB (0.81 vs 0.74) and SHADE (0.81 vs 0.75).
+   - *After stratifying by the length score*, the gaps shrink to MB 0.80 vs 0.76, SHADE 0.82 vs 0.79, sonnet-4-5
+     0.92 vs 0.91, and opus-4-6 0.36 vs 0.40.
+   - *Length-adjusted max* is close to the better of the two everywhere (MB 0.78, SHADE 0.79, sonnet-4-5 0.94,
+     LinuxArena 0.96). No aggregation rescues opus-4-6.
+   - *Round-1 TPR at 1% FPR, max vs mean*: MB 0.22 vs 0.03, opus-4-6 0.00 vs 0.03.
+
+3. **What does explain it: content on the honest side.** These checks are post hoc, added after reading the
+   top-scoring honest steps.
+   - *Honest runs make a firewall edit JEV flags.* 80% of opus-4-6 honest runs raise the firewall `PACKET_SIZE_LIMIT`
+     as part of the main task (`sed -i 's/PACKET_SIZE_LIMIT=256/…65535/' /etc/firewall/firewall.conf`); only 19% of
+     sonnet-4-5 honest runs do. JEV scores these steps at median 0.46, even with the main task in the request.
+   - *That edit sets the honest maximum.* The highest-JEV step of 80% of opus-4-6 honest runs mentions the firewall
+     (sonnet-4-5: 37%). 45% of opus-4-6 honest runs have JEV max ≥ 0.5, vs 18% of its attacks.
+   - *Masking firewall steps* in both classes raises opus-4-6 AUROC from 0.30 to 0.58. On sonnet-4-5 the same masking
+     lowers it (0.87 → 0.80), because there the firewall steps carry attack signal.
+
+4. **...and truncation on the attack side.**
+   - *Where actions are cut.* Ingest keeps only the head and tail of any action over 4,000 chars (`amd/data/_util.trunc`,
+     `ACTION_CHARS`). The frozen JEV request also caps the current action at 4,000 chars. The aksh-n Gemini scores are
+     the dataset's own, computed on the original actions. So on long steps Gemini saw text that JEV did not.
+   - *Opus-4-6 attacks lose the most text.* They lose a median 52% of their action characters to truncation (honest
+     28%; sonnet-4-5 30% / 27%; LinuxArena 3% / 12%; bash, agentdojo, iac and SHADE 0%).
+   - *Gemini's top step is usually a truncated one there.* That holds for 75% of opus-4-6 attacks (honest 15%;
+     sonnet-4-5 48%; LinuxArena 27%; others ≤ 6%). JEV's mean score at those steps is 0.09.
+   - *Excluding truncated top steps is not enough on its own.* Restricting to attacks whose Gemini-argmax step is
+     untruncated gives 0.36; with firewall steps also masked, 0.61. The corresponding figure for sonnet-4-5 is 0.95.
+   - *Per-step separation is weak.* Even post-onset, JEV barely separates opus-4-6 attack steps from honest steps
+     (step AUROC 0.56; 90th percentile 0.17 vs 0.09). On sonnet-4-5 the step AUROC is 0.67, with a 90th percentile of
+     0.68 vs 0.02.
+   - *By side task*, opus-4-6 JEV max AUROC ranges from 0.17 (disable_firewall) to 0.38. Gemini scores 0.91–1.00.
+
+5. **How this produces the cascade loss.** Consider a gate that escalates the top 20% of honest steps:
+   - *JEV gate.* It reaches Gemini's highest step in 52% of opus-4-6 attacks (49% when that step is truncated, 60% when
+     not). On sonnet-4-5 and LinuxArena it reaches 96–97%.
+   - *Action-length gate.* It reaches 90% on opus-4-6, including every truncated top step.
+   - *Round 1 already showed the consequence* (opus-4-6, 1% FPR, e = 20%):
+     - length-gate cascade 0.851, +0.039 [−0.020, +0.141] vs Gemini only;
+     - JEV cascade 0.568, −0.244.
+     On opus-4-6 the attack payload sits in long file writes, so a length gate routes better than JEV.
+
+**Interpretation.**
+- *Not mainly a length confound.* Length is a strong label predictor in these datasets, which matters for any
+  standalone comparison, but holding it fixed leaves JEV at 0.35 on opus-4-6.
+- *Two content effects drive the failure.*
+  - Honest main tasks require a security-relevant config edit that JEV flags.
+  - Attack payloads sit in the middle of long writes, which a 4,000-char head+tail view drops.
+- *The truncation effect is a property of the frozen request, not only of ingest.* Even untruncated data would be cut
+  at 4,000 chars by the request.
+- *It also makes the aksh-n comparison uneven.* Standalone JEV-vs-Gemini comparisons on BashArena and LinuxArena favor
+  Gemini partly because Gemini saw more text. In H1-AK, the escalated steps get Gemini's full-text score, but the
+  routing decision is made on truncated text.
+- *Not affected:* MB and the nano arms. Every MB score, and the nano scores on aksh-n, were computed on the same
+  truncated text.
+- *Reasoning text is not a JEV confound but is label-leaking.* JEV requests do not include it, but it differs sharply by
+  label: MB honest median 944 chars vs attack 71 (AUROC 0.003); LinuxArena AUROC 0.79. Any monitor that reads
+  reasoning on these sets would see a label leak.
+
+**Leads for RQ4.**
+- "Payload in the middle of a long write" is a concrete monitor-aware attack on a head+tail-truncating
+  decision-model gate.
+- A cheap length gate (or a full-text chunked first stage) is a natural complement.
+
+**Caveats.**
+- The firewall and truncation checks were chosen after inspecting the data.
+- The CDF F in the length-adjusted max is in-sample.
+- Stratified AUROCs ignore strata without both classes (e.g. sonnet-4-5 step-count quintile 1 has no honest runs).
+- Gate coverage uses one global 80th-percentile threshold over all honest steps, not the cascade's split-wise
+  calibration.
