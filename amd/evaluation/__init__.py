@@ -1,6 +1,9 @@
 """Matched-budget calibration, streaming metrics, Logit-ROC extrapolation, per-context
 threshold allocation, and synthetic streams. See docs/detectors.md."""
-from .calibration import Threshold, calibrate, conformal_threshold, randomized_threshold
+from .calibration import (ConformalRandomizedThreshold, RowThresholds, Threshold, calibrate,
+                          conformal_randomized_threshold, conformal_threshold, get_threshold_convention,
+                          randomized_threshold, randomized_threshold_plugin, row_thresholds,
+                          set_threshold_convention, threshold_convention)
 from .contexts import (context_curve, cfar_thresholds, evaluate_thresholds, global_threshold,
                        max_detection_allocation, partially_pooled_thresholds,
                        stackelberg_thresholds)
@@ -13,6 +16,9 @@ from .streaming import (alarm_times, arl0_simulation, delay_summary, delay_table
 
 __all__ = [
     "Threshold", "calibrate", "conformal_threshold", "randomized_threshold",
+    "randomized_threshold_plugin", "conformal_randomized_threshold", "ConformalRandomizedThreshold",
+    "RowThresholds", "row_thresholds", "threshold_convention", "set_threshold_convention",
+    "get_threshold_convention",
     "matched_budget_eval", "simple_matched", "crossfit_stats", "crossfit_models",
     "score_with_models", "bootstrap_weights",
     "paired_contrast_bootstrap", "paired_gain_bootstrap", "paired_did_bootstrap",

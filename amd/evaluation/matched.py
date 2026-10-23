@@ -29,7 +29,7 @@ import numpy as np
 import pandas as pd
 
 from ..detectors.base import Detector, Packed, pack
-from .calibration import Threshold, calibrate
+from .calibration import RowThresholds, Threshold, calibrate, get_threshold_convention, row_thresholds
 
 
 # ------------------------------------------------------------------------------------------
@@ -102,7 +102,14 @@ def bootstrap_weights(n: int, B: int, rng, groups=None) -> np.ndarray:
 
 
 def _boot_threshold(sorted_cal: np.ndarray, Wc: np.ndarray, alpha: float, method: str):
-    """Per-replicate threshold (h, gamma) from weighted calibration statistics."""
+    """Per-replicate threshold (h, gamma) from weighted calibration statistics (plug-in randomized or
+    conformal rule). The conformal randomized rule is not an (h, gamma) pair: use
+    calibration.row_thresholds, which covers every rule."""
+    if method == "randomized" and get_threshold_convention() != "plugin":
+        raise ValueError("_boot_threshold implements only the plug-in randomized rule; under the "
+                         "'conformal' convention use amd.evaluation.calibration.row_thresholds")
+    if method == "randomized_plugin":
+        method = "randomized"
     vals, inv = np.unique(sorted_cal, return_inverse=True)
     Wu = np.zeros((Wc.shape[0], len(vals)))
     np.add.at(Wu.T, inv, Wc.T)
@@ -124,8 +131,12 @@ def _boot_threshold(sorted_cal: np.ndarray, Wc: np.ndarray, alpha: float, method
     return h, gamma
 
 
-def _boot_rate(stats, W, h, gamma):
-    A = (stats[None, :] > h[:, None]) + gamma[:, None] * (stats[None, :] == h[:, None])
+def _boot_rate(stats, W, h, gamma=None):
+    """Weighted alarm rate per replicate; h is an (h, gamma) pair's h array or a RowThresholds."""
+    if isinstance(h, RowThresholds):
+        A = h.alarm(stats)
+    else:
+        A = (stats[None, :] > h[:, None]) + gamma[:, None] * (stats[None, :] == h[:, None])
     return (A * W).sum(axis=1) / np.maximum(W.sum(axis=1), 1)
 
 
@@ -226,7 +237,7 @@ def matched_budget_eval(
                 for kind, dd in kinds:
                     if kind == "calibrated":
                         thr = calibrate(cal_s, alpha, method)
-                        hb, gb = _boot_threshold(sc, Wc_sorted, alpha, method)
+                        hb, gb = row_thresholds(sc, Wc_sorted, alpha, method), None
                     else:
                         thr = Threshold(h=dd.analytic_threshold(alpha), alpha=alpha, method="analytic")
                         hb, gb = np.full(n_boot, thr.h), np.zeros(n_boot)

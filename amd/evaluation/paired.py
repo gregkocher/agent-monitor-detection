@@ -9,7 +9,8 @@ iid (no task clustering).
 This module draws ONE joint resample per replicate and reuses it in every split:
   * honest trajectories (the whole honest universe the splits were cut from; optionally a cluster bootstrap by
     task / app / account) -> each split's calibration weights are the replicate weights restricted to that
-    split's calibration indices, and the randomized (or conformal) threshold is recomputed from them;
+    split's calibration indices, and the threshold is recomputed from them under the chosen rule
+    (amd.evaluation.calibration.row_thresholds);
   * attack trajectories (optionally clustered) -> the same weights for every split and every detector.
 The replicate contrast is the split-average of the weighted contrast; the point estimate is the split-average
 of the unweighted contrast (identical to the old point estimate). Cross-fitted per-unit transforms are held
@@ -23,8 +24,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from .calibration import calibrate
-from .matched import _boot_threshold, bootstrap_weights
+from .calibration import calibrate, row_thresholds
+from .matched import bootstrap_weights
 
 
 def _index(raws):
@@ -91,10 +92,9 @@ def paired_contrast_bootstrap(terms, n_honest: int, n_attack: int, alpha: float,
                 cal = np.asarray(r["cal"], float)
                 order = np.argsort(cal, kind="stable")
                 wc = Wh[:, np.asarray(r["cal_idx"])][:, order]
-                h, g = _boot_threshold(cal[order], wc, alpha, method)
+                A = row_thresholds(cal[order], wc, alpha, method).alarm(s_att)
             else:
-                h, g = np.full(n_boot, thr.h), np.full(n_boot, thr.gamma)
-            A = (s_att[None, :] > h[:, None]) + g[:, None] * (s_att[None, :] == h[:, None])
+                A = np.broadcast_to(thr.alarm_prob(s_att)[None, :], (n_boot, len(s_att)))
             bt += coef * (A * wa).sum(axis=1) / den
         est_s.append(pt)
         boot_s.append(bt)
