@@ -41,7 +41,7 @@ URL = "https://openrouter.ai/api/v1/chat/completions"
 DECISIONS_URL = "https://openrouter.ai/api/alpha/decisions"
 
 # Round 1 (2026-10-20): $500 cap, spent $195.56. Round 2 (2026-10-21, overnight): +$700.
-GLOBAL_CAP_USD = 1600.0  # 2026-10-22: +$200 for idea 05 (JEV, $150 track cap) and the round-4 audit
+GLOBAL_CAP_USD = 1800.0  # 2026-10-22: +$200 for idea 05 (JEV, $150 track cap) and the round-4 audit
 TRACK_CAPS_USD = {"t1": 130.0, "t2": 70.0, "t3": 200.0, "dev": 15.0, "reserve": 100.0,
                   # round 2
                   "wb": 200.0, "r2t1": 200.0, "r2t2": 60.0, "r2t3": 350.0, "dev2": 20.0, "reserve2": 50.0,
@@ -52,7 +52,9 @@ TRACK_CAPS_USD = {"t1": 130.0, "t2": 70.0, "t3": 200.0, "dev": 15.0, "reserve": 
                   # idea 05: decision-only (JEV) first-stage monitors (2026-10-22)
                   "r5jev": 150.0, "r5dev": 10.0,
                   # idea 05 round 2: decision-model-aware attacks + length check (2026-10-23)
-                  "r5atk": 120.0}
+                  "r5atk": 120.0,
+                  # idea 05: GPT-6 Luna Decisions + hosted Decider check (2026-10-23)
+                  "r5luna": 200.0}
 
 
 class BudgetExceeded(RuntimeError):
