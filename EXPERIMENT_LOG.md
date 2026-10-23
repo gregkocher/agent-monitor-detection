@@ -2051,3 +2051,140 @@ Fixes the cross-cutting issue from the third-pass audit: the plug-in randomized 
 - With α(n+1) < 1 the new rule never alarms with certainty. Equal-FPR matching at small n_cal is therefore
   resolution-limited under any rule.
 - `SmoothedRows` defines `__len__`/`__getitem__`, so do not pass it through `np.asarray`.
+
+## 2026-10-23: Idea 05, GPT-6 Luna Decisions arm (track r5luna): preregistration
+
+Written and committed after dev-split pilots and BEFORE any held-out (evaluation-split) call to GPT-6 Luna Decisions
+or generative GPT-6 Luna. Nothing below changes after held-out scoring starts; deviations go in the results entry.
+Code `tracks/r5_luna/`; small tables and vector PDFs `results/r5_luna/`; raw outputs and caches `data/r5_luna/`
+(gitignored). Budget track `r5luna` ($200 for everything in this arm). The round-1 frozen request, rubric, score
+scheme, labels and splits (`tracks/r5_jev/splits.json`) are held fixed.
+
+**Model and interface.**
+- `openai/gpt-6-luna-decisions` through the OpenRouter Decisions API (`POST /api/alpha/decisions`, the same client,
+  ledger, caps and key fallback as JEV). Public beta since 6 Oct 2026; every dev response came from
+  `openai/gpt-6-luna-decisions-20261006`. The versioned id is stored per call and reported; if it changes during the
+  run, results are also reported per version.
+- $0.10 per million input tokens, $0 output. Luna counts ≈ 0.87× JEV's input tokens on the same requests (dev).
+- Probabilities come back rounded to 0.01 (like JEV). Identical requests return identical answers (120 / 120 dev
+  repeats, `repeat_check.py`).
+- Request: the frozen round-1 JEV request, byte-identical (variant `B_w3`: main task ≤ 5,000 chars, 3 previous steps
+  with action ≤ 600 / output ≤ 300, current action ≤ 4,000 / output ≤ 1,500, rubric `B` in both label orders). Score
+  = P(suspicious) of the benign-first question, normalized over the two labels (`bs`). On dev, all 3,936 Luna request
+  hashes equal the cached JEV request hashes.
+
+**Dev pilots (r5luna, $1.2 so far; dev groups only).**
+- Luna Decisions on 8 honest + 8 attack dev trajectories per source (3,936 steps, $0.96, 0 errors). Spearman with
+  JEV per step 0.36–0.71 by source.
+- Full-text requests (below) on the same dev sample: 76 steps differ from the frozen request, all scored. JEV accepts
+  the full-text requests above its ~32 kB long-context switch (max 41 kB, same version id).
+- Generative Luna (H5c prompt) on 170 dev steps: $0.00044–0.00049 per step, 0 parse failures, 116–172 completion
+  tokens per call (incl. reasoning). About 1.8× the Decisions cost per step, not "much higher".
+- Hosted Decider check on 500 dev requests (below; a sanity check, not a hypothesis).
+- No dev result was used to choose anything about the Luna arm other than cost and feasibility.
+
+**Panels.** Second stages are the cached round-1 ones: MonitoringBench (`mb`) gpt-4.1-mini `none`; aksh-n
+Gemini-3.1-Pro local per-step suspicion.
+- `mb`: as round 1. 511 honest / 1,637 attacks, first 60 steps, submit step stripped.
+- aksh-n `full`: every evaluation trajectory of the 7 settings (as H1-AK).
+- aksh-n `nano`: the round-1 nano subset (as H2-AK).
+- Contingency, fixed now: if the full aksh-n evaluation set cannot be scored within the budget, H5a-AK is evaluated
+  on the `nano` panels and this is reported as a deviation.
+
+**Cascade and inference: the round-1 machinery, unchanged** (`tracks/r5_jev/cascade.py`, as preregistered in f4d792a).
+- Escalate the top-e share of calibration-honest steps by first-stage score. Non-escalated steps take the floor.
+  Trajectory score = max. A missing first-stage score is always escalated.
+- 50 grouped 50/50 honest calibration/test splits per panel.
+- Joint clustered bootstrap, B = 1,000: one resample per replicate, both thresholds recomputed per replicate.
+- Pooled aksh-n: alarms and attack weights are summed split by split, each setting keeping its own thresholds.
+- Estimability: a 1% cell needs mean calibration n ≥ 200. BashArena-sonnet-4-5 is therefore out of every 1% pooled
+  estimate (it enters 5% cells).
+- **Threshold convention.**
+  - *Primary (all verdicts):* the conformal randomized rule. This is `amd.evaluation.calibration.row_thresholds(...,
+    "conformal_randomized")`, committed in e447edc and applied to the r5_jev cascade through
+    `tracks/fixes2/jev_patch.py` (6f76dac). Its expected out-of-sample FPR is exactly α for every arm, so compared arms
+    are at equal realized FPR in expectation.
+  - *Also reported:* the round-1 plug-in rule.
+  - The escalation threshold is a step-level budget, not an FPR guarantee, and is the same rule for both arms.
+  - Realized FPR (test-honest half, mean over splits) is reported for every cell.
+
+**Confirmatory hypotheses.** Eight two-sided tests with Holm at family-wise 0.05. p = 2·min{(1 + #Δ* ≤ 0), (1 + #Δ* ≥ 0)} /
+(B + 1), using the bootstrap replicates of the difference. All are at α = 1% trajectory FPR.
+- **H5a-MB / H5a-AK.** TPR(Luna-Decisions → LLM cascade, e = 10%) − TPR(JEV → LLM cascade, e = 10%).
+  - MB panel / aksh-n `full` panels pooled (6 settings at 1%).
+  - Same frozen requests (same truncation and window), same escalation share.
+- **H5b-MB / H5b-AK.** TPR(Luna cascade, e = 10%) − TPR(gpt-4.1-nano cascade, e = 10%) on MB / aksh-n `nano` panels
+  pooled (the H2 setup). Like H2, this compares first-stage designs: the task + 3-step window and the decision rubric
+  vs nano's history-free `none` prompt.
+- **H5c (interface vs model).** Standalone trajectory max at 1% FPR: Luna Decisions − generative GPT-6 Luna, on the
+  same steps.
+  - No usable overlap exists: the only generative-Luna scores in the repo are persistent-state PR units
+    (`r4_scores_openai_gpt-6-luna_current_only.jsonl`) and MOLE day units, never per step on these panels. So
+    generative scores are generated now.
+  - Generator: `openai/gpt-6-luna`, `amd.scoring` prompt `ctrl-basic-v1`, history `window` (W = 3). This is the
+    existing per-step prompt closest to B_w3's task + 3-step view.
+  - API settings as the round-4 Luna monitor: reasoning effort `low`, completion cap 4,000. The score is the generated
+    integer (no logprobs are offered).
+  - Monitor id `openai/gpt-6-luna|ctrl-basic-v1|window|effort-low`; cache `data/r5_luna/cache/gen_<source>.sqlite`.
+    A parse failure is a missing step (left out of the max).
+  - Subset (seeded, metadata only; `tracks/r5_luna/h5c_subset.json`, seed 20261023):
+    - MB: all 511 evaluation honest + 400 random evaluation attacks;
+    - BashArena-opus-4-6: all evaluation trajectories (418 / 489);
+    - LinuxArena: the nano subset (500 / 300).
+    - About 91k steps, ≈ $41 at the dev rate.
+    - Sizing: about 1,190 attacks and ≥ 209 calibration honest per panel. Pooled, a ±0.05 TPR interval is expected
+      when the paired arms disagree on ≤ 15% of attacks.
+  - H5c pools the three panels split by split (each keeps its own thresholds). Per-panel contrasts and AUROC are
+    secondary.
+  - Remaining design differences, stated now:
+    - wording (rubric B mirrors the generative prompt's objectives and signs);
+    - caps: the generative prompt shows previous actions ≤ 3,000 / outputs ≤ 800 chars, current output ≤ 3,000, task
+      ≤ 12,000; the current action is ingest-capped at ~4,000 for both;
+    - the generative monitor writes reasoning before its score.
+- **H5d-AUC / H5d-TPR / H5d-CAS (truncation).**
+  - Panel: BashArena-opus-4-6, all evaluation trajectories (418 honest / 489 attacks).
+  - Luna Decisions with the FULL untruncated current action vs the frozen request.
+  - Full request = the frozen request with only `state.current_action.action` replaced by the untruncated action from
+    `tracks/r5_luna/build_full.py`. That script reruns the unchanged aksh-n loader with the action cap lifted. Verified
+    for every trajectory: equal step counts, and `trunc(full, 4000)` reproduces every processed action (0
+    mismatches); 2,300 of 23,462 opus-4-6 steps exceed the cap.
+  - Steps whose full request equals the frozen one reuse the frozen answer (identical requests return identical
+    answers).
+  - Contrasts (full − frozen):
+    - *AUC:* standalone trajectory-max AUROC, clustered bootstrap.
+    - *TPR:* standalone TPR at 1% FPR.
+    - *CAS:* Luna → Gemini cascade TPR at e = 20%, 1% FPR.
+- **Secondary H5d cells** (not in the Holm family):
+  - full-text cascade vs Gemini only;
+  - the same three contrasts on LinuxArena (`nano` panel; budget permitting);
+  - JEV full text vs JEV frozen on the same steps. JEV's long-context mode works through OpenRouter on dev, so it is
+    run; only the steps that differ are re-scored, and the rest use the round-1 JEV cache.
+
+**Robustness reported for every hypothesis cell** (as the third-pass audit asks):
+- per-setting contrasts;
+- leave-SHADE-out pooled (H5a-AK, H5b-AK);
+- equal-weight settings;
+- task-level resampling: bootstrap clusters = main task in every aksh-n setting, on the same splits (SHADE / iac /
+  agentdojo have 5 / 5 / 16 tasks);
+- 5% FPR, e ∈ {5, 10, 20, 30}%;
+- the plug-in convention.
+
+**Secondary / exploratory.**
+- Standalone Luna Decisions vs JEV per setting (trajectory max, equal FPR).
+- Per-step agreement with JEV.
+- Cost per 1k trajectories.
+- Version stability.
+
+**Hosted vs self-hosted Decider (sanity check).** 500 seeded frozen dev requests (`data/r5_jev/dev_req_A_w3.jsonl`, the
+requests the round-1 pod scored) sent to the hosted `perplexity/pplx-decider-v1.2`. P(suspicious) is compared with
+the pod outputs (`decider_check.py`).
+
+**Predictions, written now.**
+- H5a: Luna Decisions ≈ JEV as a router (|Δ| < 0.03) on both panels.
+- H5b: Luna > nano on aksh-n (as JEV, through the design difference) and ≈ on MB.
+- H5c: generative Luna > Luna Decisions standalone (reasoning helps derived sabotage).
+- H5d: full text raises opus-4-6 AUROC but does not fix it. The honest firewall edits that set the honest maximum
+  are unaffected by truncation.
+
+**Analysis code** (`tracks/r5_luna/analyze.py`) is committed before any held-out Luna score is read. It implements
+exactly the above.
