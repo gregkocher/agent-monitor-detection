@@ -48,9 +48,11 @@ TRACK_CAPS_USD = {"t1": 130.0, "t2": 70.0, "t3": 200.0, "dev": 15.0, "reserve": 
                   # round 3 (2026-10-21)
                   "r3t1": 220.0, "r3t2": 70.0, "r3t3": 150.0, "dev3": 10.0, "audit": 60.0,
                   # round 4 (2026-10-22)
-                  "r4rep": 90.0, "r4wb": 60.0, "r4cs": 150.0, "r4ctx": 30.0, "audit3": 40.0,
+                  "r4rep": 90.0, "r4wb": 60.0, "r4cs": 150.0, "r4ctx": 30.0, "audit3": 60.0,
                   # idea 05: decision-only (JEV) first-stage monitors (2026-10-22)
-                  "r5jev": 150.0, "r5dev": 10.0}
+                  "r5jev": 150.0, "r5dev": 10.0,
+                  # idea 05 round 2: decision-model-aware attacks + length check (2026-10-23)
+                  "r5atk": 120.0}
 
 
 class BudgetExceeded(RuntimeError):
