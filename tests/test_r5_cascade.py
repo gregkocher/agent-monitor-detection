@@ -67,3 +67,15 @@ def test_evaluate_end_to_end_synthetic():
     assert good[0] > rnd[0]
     s = summarize(good - base, 0.03)
     assert s["lo"] <= s["est"] <= s["hi"]
+
+
+def test_rand_threshold_rows_vectorized_matches_loop():
+    from tracks.r5_jev.cascade import rand_threshold_rows_loop
+    rng = np.random.default_rng(5)
+    for alpha in (0.01, 0.05, 0.3):
+        S = rng.integers(0, 8, (40, 120)).astype(float)
+        S[:, :5] = -1e6                                    # floor ties
+        W = rng.integers(0, 3, (40, 120)).astype(float)
+        h1, g1 = rand_threshold_rows(S, W, alpha)
+        h2, g2 = rand_threshold_rows_loop(S, W, alpha)
+        assert np.array_equal(h1, h2) and np.allclose(g1, g2)

@@ -149,8 +149,8 @@ def plain_stats(panel: Panel, stream: str, agg: str = "max") -> np.ndarray:
     return out
 
 
-def rand_threshold_rows(S: np.ndarray, W: np.ndarray, alpha: float):
-    """Weighted randomized plug-in threshold for every row (statistics may differ per row)."""
+def rand_threshold_rows_loop(S: np.ndarray, W: np.ndarray, alpha: float):
+    """Reference implementation (row loop) of rand_threshold_rows."""
     B = S.shape[0]
     h, gam = np.empty(B), np.empty(B)
     for b in range(B):
@@ -164,6 +164,37 @@ def rand_threshold_rows(S: np.ndarray, W: np.ndarray, alpha: float):
         j = int(np.argmax(gt <= alpha * m + 1e-9))
         h[b] = vals[j]
         gam[b] = np.clip((alpha * m - gt[j]) / max(wu[j], 1e-12), 0, 1)
+    return h, gam
+
+
+def rand_threshold_rows(S: np.ndarray, W: np.ndarray, alpha: float):
+    """Weighted randomized plug-in threshold for every row (statistics may differ per row), vectorized.
+    Smallest observed value h (among positive-weight entries) with weight(S > h) <= alpha * m; ties at h alarm
+    with probability gamma = (alpha m - weight(S > h)) / weight(S == h)."""
+    S = np.asarray(S, float)
+    W = np.asarray(W, float)
+    S = np.where(W > 0, S, -np.inf)                      # zero-weight entries never become the threshold
+    o = np.argsort(-S, axis=1, kind="stable")
+    s = np.take_along_axis(S, o, 1)
+    w = np.take_along_axis(W, o, 1)
+    B, n = s.shape
+    cum = np.cumsum(w, axis=1)
+    m = cum[:, -1]
+    j = np.arange(n)[None, :]
+    new = np.ones_like(s, bool)
+    new[:, 1:] = s[:, 1:] != s[:, :-1]
+    start = np.maximum.accumulate(np.where(new, j, 0), axis=1)
+    last = np.ones_like(s, bool)
+    last[:, :-1] = s[:, :-1] != s[:, 1:]
+    end = np.minimum.accumulate(np.where(last, j, n - 1)[:, ::-1], axis=1)[:, ::-1]
+    rows = np.arange(B)[:, None]
+    gt = np.where(start > 0, cum[rows, np.maximum(start - 1, 0)], 0.0)
+    eq = cum[rows, end] - gt
+    ok = (gt <= alpha * m[:, None] + 1e-9) & np.isfinite(s)
+    jj = n - 1 - np.argmax(ok[:, ::-1], axis=1)           # last (smallest value) admissible position
+    r = np.arange(B)
+    h = s[r, jj]
+    gam = np.clip((alpha * m - gt[r, jj]) / np.maximum(eq[r, jj], 1e-12), 0, 1)
     return h, gam
 
 
