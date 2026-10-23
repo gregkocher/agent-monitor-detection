@@ -1,0 +1,92 @@
+{
+ "n_heldout": 1000,
+ "n_unique_heldout_ids": 1000,
+ "overlap_with_t1_sample_sets": {
+  "attack": 0,
+  "honest": 0,
+  "pilot_attack": 0,
+  "pilot_honest": 0,
+  "pilot2_attack": 0,
+  "ck_test_key": 0,
+  "ck_test_nokey": 0
+ },
+ "overlap_with_other_track_json_id_lists": {
+  "tracks/fixes/m4_subset.json": 0,
+  "tracks/r3_t2/mb_attack_ids.json": 0,
+  "tracks/r5_jev/splits.json": 948,
+  "tracks/t3_aware_attacker/selection.json": 0,
+  "tracks/r3_t1/mb_subset.json": 0,
+  "tracks/t1_matched_budget/sample.json": 0
+ },
+ "n_mb_attacks_total": 2644,
+ "dup_actions": {
+  "within_heldout_extra_copies": 0,
+  "heldout_matching_a_pilot_attack": 0,
+  "heldout_matching_an_honest": 0,
+  "all_mb_attacks_extra_copies": 0
+ },
+ "dup_actions+outputs": {
+  "within_heldout_extra_copies": 0,
+  "heldout_matching_a_pilot_attack": 0,
+  "heldout_matching_an_honest": 0,
+  "all_mb_attacks_extra_copies": 0
+ },
+ "dup_sample_uuid_within_heldout": 0,
+ "heldout_sample_uuid_in_pilot": 0,
+ "heldout_sharing_task_side_agent_cell_with_pilot": 762,
+ "heldout_sharing_task_with_pilot": 961,
+ "structure_all": {
+  "S3": 1209,
+  "S1": 714,
+  "S2": 219,
+  "S4": 475,
+  "none": 2,
+  "None": 25
+ },
+ "structure_pool": {
+  "S3": 1109,
+  "S1": 614,
+  "S2": 119,
+  "none": 2,
+  "None": 25
+ },
+ "structure_pilot775": {
+  "S1": 100,
+  "S2": 100,
+  "S3": 100,
+  "S4": 475
+ },
+ "n_tasks_honest550": 116,
+ "n_tasks_heldout": 101,
+ "n_tasks_shared": 90,
+ "heldout_attacks_on_shared_tasks": 973,
+ "attacks_per_task_quantiles": [
+  1.0,
+  2.0,
+  3.0,
+  11.0,
+  15.0,
+  131.0
+ ],
+ "max_task_share_of_attacks": 0.131,
+ "honest_per_task_quantiles": [
+  1.0,
+  1.0,
+  3.0,
+  8.0,
+  12.0,
+  14.0
+ ],
+ "honest_agent_models": {
+  "anthropic/claude-opus-4-5-20251101": 550
+ },
+ "snapshot": {
+  "n_nan": 305,
+  "n_cache_rows_after_first_run": 305,
+  "nan_equals_late": true,
+  "finite_steps": 30191,
+  "finite_snapshot_vs_cache_mismatch": 0,
+  "finite_snapshot_vs_filled_mismatch": 0,
+  "trajs_with_nan": 29
+ }
+}

@@ -1,0 +1,25 @@
+{
+ "n_h": 550,
+ "n_a": 1000,
+ "n_x": 200,
+ "len_mismatch_honest": 0,
+ "len_mismatch_attack": 0,
+ "len_mismatch_ext_stripped": 0,
+ "len_mismatch_ext_unstripped": 199,
+ "attack_llm_incomplete": 28,
+ "cal_size_mean": 273.28,
+ "cal_size_range": [
+  201,
+  332
+ ],
+ "expected_cal_exceedances_at_1pct": 2.7327999999999997,
+ "fpr_r": 0.013852415389782524,
+ "fpr_l": 0.013221040917603668,
+ "lev_r_eq": 0.008438818569606248,
+ "ach_r_eq": 0.013214827900754025,
+ "lev_r_1pct": 0.004444444448878777,
+ "lev_l_1pct": 0.006896551727558227,
+ "auroc_r": 0.8170427272727272,
+ "auroc_l": 0.7152145454545454,
+ "reader_cal_points_strictly_above_threshold_mean": 2.085
+}

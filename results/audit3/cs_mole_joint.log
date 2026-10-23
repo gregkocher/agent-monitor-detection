@@ -1,0 +1,26 @@
+  gpt53_single_day:luna done
+  gpt53_single_day:qwen_int done
+  deepseek_v4_flash_single_day:luna done
+  deepseek_v4_flash_single_day:qwen_int done
+  qwen36_27b_single_day:luna done
+  qwen36_27b_single_day:qwen_int done
+  kimi_k26_single_day:luna done
+  kimi_k26_single_day:qwen_int done
+identical account order across corpora: True
+     monitor  drop_attack_days  alpha detector  re_mu  dl_independent_lo  dl_independent_hi  joint_account_lo  joint_account_hi  joint_p_le0   tau2  mean_between_corpus_boot_corr                   per_corpus
+0       luna             False   0.10     kth3  0.047             -0.019              0.114            -0.026             0.125        0.116  0.000                          0.122  -0.019 +0.087 +0.041 +0.087
+1       luna             False   0.10  top3sum  0.030             -0.013              0.072            -0.008             0.091        0.050  0.000                          0.198  +0.024 +0.066 -0.025 +0.065
+2       luna             False   0.05     kth3  0.030             -0.030              0.091            -0.023             0.112        0.138  0.000                          0.143  -0.059 +0.068 +0.024 +0.084
+3       luna             False   0.05  top3sum  0.011             -0.023              0.045            -0.007             0.069        0.075  0.000                          0.185  +0.020 +0.016 -0.044 +0.041
+4       luna              True   0.10     kth3  0.041             -0.019              0.101            -0.009             0.102        0.051  0.001                          0.115  +0.051 +0.018 -0.044 +0.115
+5       luna              True   0.10  top3sum  0.003             -0.052              0.058            -0.038             0.063        0.364  0.001                          0.153  -0.005 +0.002 -0.076 +0.080
+6       luna              True   0.05     kth3  0.029             -0.010              0.068            -0.003             0.073        0.037  0.000                          0.125  +0.045 +0.012 -0.021 +0.087
+7       luna              True   0.05  top3sum -0.007             -0.045              0.031            -0.023             0.039        0.472  0.001                          0.127  +0.008 -0.009 -0.056 +0.048
+8   qwen_int             False   0.10     kth3 -0.061             -0.150              0.028            -0.123             0.008        0.968  0.003                         -0.044  -0.018 +0.018 -0.171 -0.154
+9   qwen_int             False   0.10  top3sum -0.040             -0.107              0.026            -0.096             0.021        0.904  0.000                         -0.034  -0.042 +0.095 -0.088 -0.087
+10  qwen_int             False   0.05     kth3 -0.056             -0.143              0.031            -0.105            -0.003        0.982  0.004                         -0.081  -0.004 +0.027 -0.123 -0.155
+11  qwen_int             False   0.05  top3sum -0.045             -0.099              0.008            -0.082             0.022        0.889  0.000                         -0.031  -0.022 +0.010 -0.055 -0.123
+12  qwen_int              True   0.10     kth3 -0.032             -0.109              0.045            -0.088             0.029        0.866  0.002                         -0.045  -0.020 -0.009 -0.143 +0.049
+13  qwen_int              True   0.10  top3sum -0.024             -0.086              0.037            -0.072             0.037        0.774  0.000                         -0.033  -0.038 +0.040 -0.101 +0.019
+14  qwen_int              True   0.05     kth3 -0.022             -0.064              0.020            -0.060             0.027        0.837  0.000                          0.004  -0.010 +0.001 -0.071 -0.004
+15  qwen_int              True   0.05  top3sum -0.028             -0.065              0.010            -0.049             0.029        0.834  0.000                         -0.011  -0.052 -0.005 -0.046 -0.016

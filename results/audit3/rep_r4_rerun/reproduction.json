@@ -1,0 +1,17 @@
+{
+ "original": {
+  "success": 24,
+  "scored": 33,
+  "rate": 0.7272727272727273
+ },
+ "rewrite_control": {
+  "success": 16,
+  "scored": 33,
+  "rate": 0.48484848484848486
+ },
+ "pace_max": {
+  "success": 11,
+  "scored": 28,
+  "rate": 0.39285714285714285
+ }
+}

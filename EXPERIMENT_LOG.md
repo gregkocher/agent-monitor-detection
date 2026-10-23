@@ -1827,3 +1827,166 @@ the max over more steps is higher?
 - Stratified AUROCs ignore strata without both classes (e.g. sonnet-4-5 step-count quintile 1 has no honest runs).
 - Gate coverage uses one global 80th-percentile threshold over all honest steps, not the cascade's split-wise
   calibration.
+
+## 2026-10-23: Third-pass audit (r4_ctx, r4_cs, r4_replay, r4_wb, r5_jev; $0 API)
+
+Code `tracks/audit3/` (prefixes `ctx_`, `cs_`, `rep_`, `wb_`, `jev_`, `leak_`); outputs `results/audit3/`.
+`corrections.csv` (72 rows, same six columns as earlier passes; the track is the prefix of `location`) is assembled
+by `build_corrections.py` from the per-track tables (`rep_r4_issues.csv`, `cs_corrections.csv`). Every track was
+re-run from committed code and cached scores with outputs redirected to `results/audit3/*rerun*`, and the headline
+contrasts were reimplemented independently (own thresholds, splits and joint cluster bootstrap). No API calls, pods
+or Docker replays. The coordinator added two checks after commit 519fd6a: action truncation, and reasoning leakage.
+
+**Reproduction.** Every headline number reproduces. The committed pipelines of r4_ctx, r4_cs (ps_multi,
+mole_r4_analysis, mechanism, ps_arl), r4_replay, r4_wb and r5_jev give identical tables. The independent
+reimplementations agree within split noise:
+- r4ctx primary +0.107 [+0.024, +0.152], exact;
+- r4cs pooled top-3 − max −0.074 [−0.151, +0.010];
+- r4rep primary −0.214 [−0.478, +0.054];
+- r4wb H1 +0.198 [+0.104, +0.292];
+- r5jev H1-MB −0.003, H1-AK +0.001, H2-MB +0.005, H2-AK +0.174, H3-MB +0.010.
+
+**Preregistration timing.**
+- r5jev (f4d792a 19:18:42) precedes the first held-out request file (19:19:12). The primary code is unchanged except
+  for the tested vectorization and the added sweep cells. The provisional run printed no hypothesis table.
+- r4_wb: PREREG.md and heldout.json are unchanged. The first held-out cache row is 17 s after c3cfacc.
+  `analyze_primary.py` was finalized after the data arrived but matches PREREG.
+- r4ctx: the design prose was committed first. r4lib.py and run_r4.py were committed only with the results; the
+  code matches the prose.
+- r4cs: `mechanism.py` and `mole_r4_analysis.py` are not in 5d2d96a. Session transcripts show they were written
+  before their outputs. Smoke runs printed tables before the 5d2d96a commit; no outcome-driven edits were found.
+- r4rep: the preregistration and the results are in one commit (a4ea9d1). The session transcript shows the
+  preregistration text and analyze.py (never edited afterwards) were written before the first replay verdict.
+- Undeclared deviations: per-command cap 12 s for 6 originals and 10 s for the rest (preregistered 12 s);
+  per-sample limit 900 s (preregistered 1,800 s); 3 pace rewrites missing; 7 time-limit errors plus 1 compose
+  failure (log says 6).
+
+**Cross-cutting issues.**
+- *Plug-in threshold convention* (`amd.evaluation.calibration.randomized_threshold` and its weighted copies).
+  - For continuous scores the out-of-sample FPR is (⌊αn⌋+1)/(n+1). At integer αn the rule sits one order statistic
+    too low: n = 100 at 1% gives 1.98%; n = 200, 1.49%; n = 300, 1.33% (`wb_convention.csv`).
+  - Randomization at ties only helps integer-score monitors. Continuous and tied monitors are therefore at unequal
+    realized FPR unless it is matched.
+  - This explains most of the LinuxArena "reader realized FPR above nominal" (n_cal = 100), which is not A1 shift.
+- *Reasoning leakage.*
+  - Visible reasoning is near-label-revealing: MB AUROC 0.03 by characters (honest present on every step, attacks on
+    43%); aksh-n LinuxArena 0.81; LinuxArena sweep 0.31 (`leak_reasoning.csv`).
+  - No monitor scored in this repo receives it. `render_step` adds `Step.reasoning` only with
+    `include_reasoning=True`, which no track sets, and no score file has a `-cot` monitor id. The same holds for the
+    white-box reader export, the JEV / Decider requests, the persistent-state psdiff prompts (description + diff
+    only; the `side_task_success` text in persistent-state Step.output is never rendered) and the MOLE audit-event
+    renders.
+  - Text-only assistant turns, ingested as visible `[assistant message]` steps, occur in none of the MB, aksh-n or
+    sweep trajectories' visible steps.
+  - So no history-aware vs history-free gap is reasoning leakage.
+  - Step count remains visible and label-correlated (MB 0.70; BashArena opus-4-6 0.16, sonnet-4-5 0.08).
+  - Not verifiable: externally computed scores (aksh-n Gemini "nonpriv" streams, LinuxArena sweep monitors,
+    persistent-state GPT-4o natives). If the aksh-n LinuxArena judge saw `agent_reasoning`, its baseline is inflated.
+- *Truncation asymmetry (r5jev, aksh-n).*
+  - JEV routes on 4,000-char head+tail actions, while Gemini scored full actions.
+  - On opus-4-6 attacks, a median 52% of action text is cut, and Gemini's top step is truncated in 75% of them.
+  - This biases H1-AK and the standalone JEV-vs-Gemini comparisons against JEV. H1-AK therefore describes a deployable
+    4k-capped gate, and its non-inferiority is conservative with respect to truncation. Part of the opus-4-6 loss
+    (−0.24) is truncation.
+  - MB, nano (H2) and probe (H3) used the same text on both sides.
+
+**r4_ctx: primary holds with a major caveat.**
+- Under the global rule the informed attacker picks SHADE in 10 of 10 splits. SHADE, iac and agentdojo (5 / 5 / 16
+  main tasks) were resampled as single trajectories.
+- With main-task resampling on the same splits: +0.107 [−0.004, +0.251], P(Δ > 0) = 0.97. The pre-specified
+  "CI > 0" criterion is met only with trajectory-level resampling.
+- Matching uses the test-honest half as an oracle operating point. This is fair across rules but not deployable;
+  nominal fits over-spend (1.08% vs 0.97%).
+
+**r4_cs: numbers hold; two interpretations fail.**
+1. The persistent-state gain is not "weak-to-mid monitors".
+   - gpt-4.1-mini, Qwen3-235B and gpt-4.1 use a logprob-expected read-out; the other six use the generated integer.
+     The log did not disclose this.
+   - On the same calls' integer scores, gpt-4.1-mini's top-3 − max is −0.034 [−0.052, −0.009], not +0.141.
+   - gpt-4.1-mini's run-max AUROC (0.894) is tied second.
+2. "Luna's insider signal is mostly account-level" fails.
+   - Without attack days, Luna's max TPR at FPR 0.10 is at chance in every corpus (0.08–0.18).
+   - Centered TPR 0 is a 10-point ceiling artifact.
+- With Holm over 9 monitors, only Luna's loss is significant ("2 significant losses" becomes 1).
+- The MOLE corpora share all 142 accounts. A joint account bootstrap gives +0.047 [−0.026, +0.125].
+- Leave-apps-out FPR range is 0.049–0.109, not 0.014–0.117.
+- Daily budget: today's score is best in 9 of 11 cells, not all.
+- The FPR 0.01 cell is descriptive (α·m = 0.77).
+- ARL P3a holds (CI conservative). "Max is as good as any forgetting rule" holds only for ARL0 = 100.
+
+**r4_replay: numbers hold; the interpretation is corrected.**
+- 8 of the 9 non-reproducing originals are disable_firewall (firewall 1/9; other side tasks 23/24).
+- control-arena 20.1.0 ships BashArena 1.1, which changed the firewall daemon. The "27% of successful attacks do not
+  reproduce" figure is mostly environment drift, not inflated dataset labels.
+- "Execution grounding shrinks the effect and removes significance" mixes two opposing moves:
+  - the rewrite arm alone goes from −0.321 to −0.500;
+  - the originals alone go from −0.321 to −0.036.
+  - Without firewall attacks, judge and execution validity agree (−0.375).
+- The primary's significance is a knife-edge: n = 28 −0.214 [−0.48, +0.04]; all 33 pairs −0.242 [−0.50, 0.00];
+  no firewall −0.375 [−0.65, −0.08].
+- pace_max − original is validity loss (validity −0.23, detection −0.09 n.s.).
+- None of 24 execution-validity cells survives Holm.
+- The judge's validity label is anti-informative: judge-invalid rewrites succeed 4/5 and 6/7.
+- Realized FPR at α = 0.003 is 1.2–1.5× nominal for the procedure actually used, not "≈ nominal".
+- Replay logs were not retained.
+
+**r4_wb: H1 holds; Part 2/3 wording corrected.**
+- H1 at exactly 1.00% realized FPR for both monitors: +0.167 [+0.065, +0.256].
+- The preregistered LinuxArena equal-FPR comparison was not run (undeclared).
+  - Equal 1.00%: 7 Holm-significant (gpt-5.4 Holm 0.018).
+  - Equal 2.0%: 6.
+  - Reader TPR at a true 1% is 0.66–0.71. One calibration point resolves 1%.
+- MOLE TPR at 5% session FPR was preregistered but not reported.
+  - Reader 0.49 vs policy 0.24: −0.24 [−0.34, −0.10].
+  - Instruction effect −0.058 [−0.106, −0.025], Holm 0.008.
+  - "Do not beat the reader" and "nothing measurable" are therefore corrected.
+  - "Unmatched negatives" fails: matched mean-statistic AUROCs are 0.94–0.96.
+- A1 FIBS-axial-full "+0.061 [+0.021, +0.219]" is at the reader's FPR floor and has bootstrap bias +0.04; the basic
+  interval is [−0.10, +0.10].
+- "Transfers at least as well" rests on about 2 of 200 alarms (gap [−1.8, +1.1] pp).
+
+**r5_jev.**
+- *Confirmatory H1–H3 hold as computed.*
+  - Equal escalation (honest 0.105 vs 0.105) and equal realized FPR (≈ 1.5% MB, ≈ 1.2% aksh-n) between compared arms.
+  - H1-AK is fragile. It is a cancellation of SHADE +0.17 and opus-4-6 −0.24.
+    - Leave SHADE out: −0.025 [−0.038, +0.006], NI p 0.27.
+    - Settings weighted equally: −0.008, NI p 0.010.
+    - Main-task resampling: NI p 0.011 (B = 2,000), Holm ≈ 0.022 vs the 0.025 bar; equal-weight 0.08.
+    - At 5% the cascade is worse (−0.022 [−0.034, −0.011]). SHADE's gain exists only at 1%.
+  - H1-MB and H3-MB are on a degenerate panel (random e = 20% does fail NI, so H1-MB is not vacuous).
+  - H2-AK (+0.174 [+0.129, +0.210] with task resampling) compares first-stage designs: JEV sees the task plus 3
+    previous steps and a dev-tuned rubric; nano sees the current step only.
+- *Secondary claim corrected.* "MB 5%: JEV e = 5/10% beats mini; probe +0.035" was at realized 6.3–6.7% vs 5.6–5.8%.
+  At equal FPR: +0.014 [−0.018, +0.092], +0.020 [−0.004, +0.076], +0.008 [−0.023, +0.060]; none significant.
+- *Exploratory claims corrected.*
+  - "JEV beats mini standalone on MB" and Decider 0.19 vs JEV 0.23 are at unequal FPR. JEV cannot reach the LLM's
+    FPR: 2.2% even at nominal 0.2%. At 2.2% vs 1.8%: +0.074 [−0.013, +0.205].
+  - The cause is not rounding ties: 8 of the top 9 honest JEV maxima come from one main task.
+
+**Severity-ranked issues** (`corrections.csv`):
+1. The r4ctx primary and the r5jev H1-AK depend on SHADE (5 tasks) with trajectory-level resampling.
+2. r4rep: firewall/BashArena-1.1 drift drives non-reproduction and the "grounding" story.
+3. r4wb: preregistered MOLE TPR@5% and LinuxArena equal-FPR analyses were omitted, and they change the claims.
+4. r4cs: the gpt-4.1-mini gain is a read-out artifact; the MOLE account-level reading fails.
+5. FPR-mismatched "wins": r5jev MB 5% and RQ2; r4wb A1 full.
+6. The threshold convention is anti-conservative at integer αn.
+7. The r5jev truncation asymmetry.
+8. Minor: provenance, multiplicity counts, typos and calibration resolution.
+
+**Recommended wording.**
+- *r4ctx:* "Pre-specified primary met: +0.107 [+0.024, +0.152] with trajectory-level resampling in the three
+  small-task settings. The gain is driven by SHADE (5 main tasks); with main-task resampling the interval is
+  [−0.004, +0.251]."
+- *r5jev H1-AK:* "Non-inferior when pooled at 1% FPR (+0.001 [−0.015, +0.025]), but this is a cancellation of a SHADE
+  gain (+0.17) and an opus-4-6 loss (−0.24); without SHADE, non-inferiority is not shown. JEV routed on
+  4,000-char-truncated actions while Gemini scored full text, and at 5% FPR the cascade loses 0.02."
+- *r5jev H2-AK:* "A JEV first stage (task + 3-step window) beats a history-free nano first stage by +0.17."
+- *r5jev MB 5% / RQ2:* "No significant gain over mini at equal realized FPR."
+- *r4cs:* "Pooled −0.07 [−0.14, +0.02]. After Holm only Luna's loss is significant. gpt-4.1-mini's +0.17 appears
+  only with its logprob-expected read-out (integer: −0.03). Luna's MOLE detection comes from attack days."
+- *r4rep:* "24/33 originals reproduce in BashArena 1.1; 8 of 9 failures are firewall attacks (environment change).
+  Rewrite − original −0.21 [−0.48, +0.04], negative but inconclusive (−0.375 [−0.65, −0.08] without firewall). The
+  LLM judge's validity label does not predict execution success."
+- *r4wb:* "H1 +0.20 [+0.10, +0.30] (+0.17 at exactly 1.00% FPR for both). LinuxArena: 7/12 at equal 1.0% FPR, 6/12 at
+  2.0%. MOLE: no AUROC difference, but at 5% session FPR the reader beats the policy (−0.24) and the instruction
+  lowers the policy's TPR (−0.06)."

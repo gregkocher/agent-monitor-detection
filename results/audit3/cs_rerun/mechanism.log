@@ -1,0 +1,33 @@
+/Users/gkocher/Desktop/monitoring-research/agent-monitor-detection/tracks/r4_cs/mechanism.py:53: RuntimeWarning: invalid value encountered in divide
+  return (rx * ry).sum(1) / np.sqrt((rx**2).sum(1) * (ry**2).sum(1))
+# Round 4: accumulation gain vs repeat-spike informativeness (dependence-aware)
+
+## Primary: persistent state, identical-input monitors (cross-fitted by app halves)
+
+| bootstrap | k monitors | cross-fitted Spearman (mean over 20 app partitions) | 95% CI | p(≤0) | non-cross-fitted Spearman [CI] |
+|---|---|---|---|---|---|
+| app | 9 | +0.065 | [-0.341, +0.460] | 0.319 | +0.100 [-0.417, +0.567] |
+| iid | 9 | +0.065 | [-0.347, +0.391] | 0.452 | +0.100 [-0.417, +0.500] |
+
+Per-monitor values (all gradual attacks):
+
+| monitor | rep_lr | gain_top3 | h2c |
+|---|---|---|---|
+| gpt-4.1-mini | 1.884 | 0.171 | 0.095 |
+| gemini-2.5-flash | 1.257 | 0.022 | 0.048 |
+| qwen3-235b | 0.581 | -0.063 | 0.157 |
+| gpt-4.1 | 0.902 | -0.132 | 0.162 |
+| claude-haiku-4.5 | 2.477 | 0.091 | 0.017 |
+| gemini-2.5-pro | 0.382 | 0.008 | 0.081 |
+| gpt-5-mini | 1.649 | -0.059 | 0.043 |
+| claude-haiku-5.5 | 2.722 | -0.241 | 0.019 |
+| gpt-6-luna | 1.299 | -0.425 | 0.068 |
+
+## Descriptive: all corpus x monitor cells (PS + MOLE r3 primary monitors + MOLE r4 Luna)
+
+| gain | cells | corpora | monitors | Spearman | corpus-cluster CI | monitor-cluster CI | two-way CI |
+|---|---|---|---|---|---|---|---|
+| gain_top3 | 42 | 9 | 11 | +0.016 | [-0.15, +0.45] | [-0.43, +0.40] | [-0.54, +0.59] |
+| gain_top3 (MOLE cells only) | 33 | 8 | 5 | +0.189 | [-0.16, +0.58] | [-0.11, +0.43] | [-0.43, +0.72] |
+| gain_kth3 | 42 | 9 | 11 | -0.198 | [-0.43, +0.39] | [-0.68, +0.15] | [-0.72, +0.50] |
+| gain_kth3 (MOLE cells only) | 33 | 8 | 5 | +0.140 | [-0.20, +0.52] | [-0.12, +0.43] | [-0.41, +0.66] |
