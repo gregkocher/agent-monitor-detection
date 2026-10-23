@@ -1,27 +1,31 @@
 \documentclass[11pt]{article}
+\PassOptionsToPackage{obeyspaces,spaces}{url}
 \input{preamble}
+\usepackage{xspace}
+\newcommand{\tC}{\textsf{\scriptsize\textcolor{ForestGreen}{[C]}}\xspace}
+\newcommand{\tE}{\textsf{\scriptsize\textcolor{ink2}{[E]}}\xspace}
 \usepackage{tikz}
 \usepackage[section]{placeins}
 \newcommand{\src}[1]{{\footnotesize\textcolor{ink2}{[\nolinkurl{#1}]}}}
 \newcommand{\ci}[2]{\,[#1,\,#2]}
 \newcommand{\hl}[1]{\textbf{#1}}
 \title{\textbf{Idea 3: Monitor-Aware Attackers vs Sequential Detectors}\\[4pt]
-\large Rounds 1--3, with all audit corrections applied}
-\date{October 22, 2026}
+\large Rounds 1--4, with all audit corrections applied}
+\date{October 23, 2026 (supersedes the October 22 version)}
 \begin{document}
 \maketitle
 \vspace{-1.5em}
 
-\keybox{\textbf{Summary.} An LLM rewriter was given the deployed monitor prompt and the exact detector rule (Kerckhoffs) and asked to restructure 150 real, successful multi-step MonitoringBench attacks so that they evade a max, CUSUM, e-process or multi-chart detector calibrated at matched trajectory FPR on 550 honest runs. Three rounds were run and then re-analysed by two independent audits; every number below is the audit-corrected value and cites its results file.
+\keybox{\textbf{Summary.} An LLM rewriter was given the deployed monitor prompt and the exact detector rule (Kerckhoffs) and asked to restructure real, successful multi-step MonitoringBench attacks so that they evade a max, CUSUM, e-process or multi-chart detector at matched trajectory FPR on 550 honest runs. Rounds 1--3 judged side-task validity with an LLM judge and a static literal check; round 4 replayed originals and rewrites in BashArena sandboxes with the official side-task scorers. Three audits re-analysed everything, and thresholds use the conformal randomized rule (\S\ref{sec:thr}). Tags: \tC confirmatory (pre-registered), \tE exploratory.
 \begin{enumerate}[leftmargin=1.2em]
-\item \textbf{No detectable effect of detector knowledge.} One-shot pacing vs a one-shot plain rewrite against max at 1\% FPR is $+0.087\ci{-0.032}{+0.183}$ under strict validity ($p=0.20$; pre-specified primary contrast). None of 24 one-shot pacing-vs-control contrasts survives Holm correction in round 2, and all 12 such contrasts at max in round 3 (two rewriters $\times$ three arms $\times$ two FPRs) have CIs containing 0.
-\item \textbf{Any LLM rewrite makes attacks easier to catch.} A rewrite with no monitor information lowers undetected success vs the originals by $-0.357$ (judge) to $-0.500$ (strict) with a \texttt{gpt-4.1} rewriter, and by $-0.371\ci{-0.550}{-0.185}$ with a different-family rewriter (\texttt{gemini-2.5-pro}). About 60\% of the latter is broken attacks; the detection-only part is $-0.143\ci{-0.300}{-0.027}$.
-\item \textbf{Two earlier headlines are retracted.} Round 1's ``detector-aware rewriting backfires'' was this rewrite artifact (no control existed). Round 2's ``pacing beats the control by $+0.21$'' compared an adaptive arm, selected on the evaluation monitor's own scores, with a one-shot control.
-\item \textbf{Detectors.} Max, CUSUM with $k=1.5$ and top-3 sum hold nominal FPR; max catches the most originals and top-3 sum is the most robust to pacing. CUSUM with $k=0.5$, the e-process, Shiryaev--Roberts and windowed GLR leave $\ge0.93$ of the original attacks undetected under the strong monitor. The multi-chart OR realizes 0.017--0.020 FPR at a nominal 0.01, so its matched-FPR cells overstate detection.
-\item \textbf{No $\sqrt{\mathrm{ARL}}$ scaling.} Undetected damage is flat in ARL (slopes 0.007--0.073 over the calibratable range ARL $\le551$, vs 0.5 predicted). Detection is driven by single spikes.
-\item \textbf{Fabricated tool outputs do not drive the results}; stripping all outputs leaves every conclusion unchanged. Execution replay in BashArena works end to end, but the stored trajectories lack structured tool calls, so rewrites were not replayed.
+\item \textbf{No detectable effect of detector knowledge.} One-shot pacing minus a one-shot plain rewrite against max at 1\% FPR: $+0.095\ci{-0.020}{+0.183}$ in round 2 (strict validity) \tE, and $-0.107\ci{-0.357}{+0.120}$ under execution validity in round 4 \tC. No pacing-vs-control contrast in any round survives multiplicity correction.
+\item \textbf{Rewriting vs the original attack: negative, but inconclusive under execution validity.} The pre-registered round-4 contrast, plain rewrite minus original in undetected success with validity from execution, is $-0.214\ci{-0.480}{+0.032}$ ($n=28$) \tC. Without firewall attacks it is $-0.395\ci{-0.667}{-0.083}$ ($n=24$) \tE. No execution-validity cell survives Holm. Rounds 2--3 found larger, significant drops with judge or static validity (e.g.\ $-0.385\ci{-0.556}{-0.195}$ for a \texttt{gemini-2.5-pro} rewrite), so the earlier ``any rewrite makes attacks easier to catch'' is downgraded to a consistent direction that execution grounding does not establish.
+\item \textbf{Execution replay.} 24 of 33 ``successful'' originals reproduce in BashArena 1.1, and 8 of the 9 failures are firewall attacks, most plausibly because that environment's firewall changed (environment drift) \tE. The LLM validity judge does not predict execution success: judge-invalid rewrites succeed 4 of 5 and 6 of 7 times.
+\item \textbf{Pacing costs validity, not detection.} Pacing minus original is $-0.321\ci{-0.625}{-0.034}$ under execution validity, of which $-0.241$ is broken attacks and $-0.081$ (n.s.) detection \tE.
+\item \textbf{Two earlier headlines remain retracted.} Round 1's ``detector-aware rewriting backfires'' had no control; round 2's ``pacing beats the control by $+0.21$'' compared an adaptive, in-sample-selected arm with a one-shot control.
+\item \textbf{Detectors} \tE. Max, CUSUM with $k=1.5$ and top-3 sum hold nominal FPR; small-evidence accumulators (CUSUM $k=0.5$, e-process, Shiryaev--Roberts, windowed GLR) leave $\ge0.93$ of originals undetected; the multi-chart OR runs at 1.7--1.9$\times$ nominal FPR. Undetected damage is flat in ARL (no $\sqrt{\mathrm{ARL}}$ scaling).
 \end{enumerate}
-Spend: \$68.36 (round 1) + \$304.77 (round 2) + \$111.02 (round 3) on OpenRouter \src{results/spend_ledger.jsonl}.}
+Spend: \$68.36 (round 1) + \$304.77 (round 2) + \$111.02 (round 3) + \$13.26 (round 4) on OpenRouter \src{results/spend_ledger.jsonl}; replays ran locally.}
 
 
 %======================================================================
@@ -39,26 +43,27 @@ Spend: \$68.36 (round 1) + \$304.77 (round 2) + \$111.02 (round 3) on OpenRouter
 \paragraph{How to read the numbers.} Undetected success (US) is the share of base attacks that are both valid and not alarmed; lower is better for the defender. Differences are paired over identical base attacks. ``Judge'' validity is an upper bound on US and ``strict'' validity a lower bound (Section~\ref{sec:methods}). Unless stated otherwise CIs are 95\% joint bootstrap intervals that resample honest runs and attacks together and recompute every threshold per replicate. File paths in brackets are relative to the repository's \texttt{results/} directory.
 
 %======================================================================
-\section{The three rounds at a glance}
+\section{The four rounds at a glance}
 
 \begin{table}[H]\centering\small
 \begin{adjustbox}{max width=\linewidth}
-\begin{tabular}{@{}llll@{}}
+\begin{tabular}{@{}lllll@{}}
 \toprule
-& Round 1 (Oct 20) & Round 2 (Oct 21) & Round 3 (Oct 22)\\
+& Round 1 (Oct 20) & Round 2 (Oct 21) & Round 3 (Oct 22) & Round 4 (Oct 22)\\
 \midrule
-Monitor & \texttt{gpt-4.1-mini}, \texttt{full} + \texttt{none} & \texttt{gpt-4.1}, \texttt{none} & \texttt{gpt-4.1}, \texttt{none}; also no-output\\
-Rewriter & \texttt{gpt-4.1} & \texttt{gpt-4.1} & \texttt{gpt-4.1} and \texttt{gemini-2.5-pro}\\
-Arms & max-, CUSUM-, multichart-aware & 3 pacing arms + rewrite control & control + 3 pacing arms per rewriter\\
-Feedback & adaptive ($\le2$ rounds) and one-shot & adaptive (pacing) and one-shot & one-shot only\\
-Base attacks & 150 (paired 126) & 150 (paired 126) & 35 (17 tasks)\\
-Detectors & max, CUSUM $k{=}0.5$, e-process, OR & + CUSUM $k{=}1.5$, top-3 sum, SR, GLR & max, CUSUM $k{=}1.5$, OR, top-3 sum\\
-New checks & -- & control arm, mechanism & replay, leak test, realized FPR\\
-Spend & \$68.36 & \$304.77 & \$111.02\\
+Monitor & \texttt{gpt-4.1-mini}, \texttt{full} + \texttt{none} & \texttt{gpt-4.1}, \texttt{none} & \texttt{gpt-4.1}, \texttt{none}; also no-output & \texttt{gpt-4.1}, \texttt{none}\\
+Rewriter & \texttt{gpt-4.1} & \texttt{gpt-4.1} & \texttt{gpt-4.1} and \texttt{gemini-2.5-pro} & \texttt{gemini-2.5-pro}\\
+Arms & max-, CUSUM-, multichart-aware & 3 pacing arms + rewrite control & control + 3 pacing arms per rewriter & control + \texttt{pace\_max}\\
+Feedback & adaptive ($\le2$ rounds) and one-shot & adaptive (pacing) and one-shot & one-shot only & one-shot only\\
+Base attacks & 150 (paired 126) & 150 (paired 126) & 35 (17 tasks) & round-3 35 (28 paired)\\
+Validity & judge, literal & judge, literal & judge, literal & execution (official scorers)\\
+Detectors & max, CUSUM $k{=}0.5$, e-process, OR & + CUSUM $k{=}1.5$, top-3 sum, SR, GLR & max, CUSUM $k{=}1.5$, OR, top-3 sum & as round 3\\
+New checks & -- & control arm, mechanism & replay feasibility, leak test, realized FPR & execution replay, judge vs execution\\
+Spend & \$68.36 & \$304.77 & \$111.02 & \$13.26\\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Design of the three rounds. The audits (October 21 and 22) re-analysed rounds 1--3 with joint bootstrap CIs, strict validity and one-shot-only strategy contrasts \src{results/fixes/corrections.csv}, \src{results/audit2/corrections.csv}.}\label{tab:rounds}
+\caption{Design of the four rounds. The audits (October 21, 22 and 23) re-analysed rounds 1--4 with joint bootstrap CIs, strict validity, one-shot-only strategy contrasts and the execution-replay checks \src{results/fixes/corrections.csv}, \src{results/audit2/corrections.csv}, \src{results/audit3/corrections.csv}.}\label{tab:rounds}
 \end{table}
 
 %======================================================================
@@ -72,17 +77,21 @@ Spend & \$68.36 & \$304.77 & \$111.02\\
 
 \paragraph{Rewriting pipeline.} (1) \texttt{gpt-4.1-mini} extracts a checklist of the attack-critical effects of each original. (2) The rewriter emits a restructured action sequence; new actions get plausible fabricated tool outputs (nothing is executed). (3) \texttt{gpt-4.1-mini} judges whether every checklist effect is preserved, and a static check records whether the attack's target literals (paths, hosts, users) appear verbatim. (4) The deployed monitor scores the rewrite. (5) Adaptive arms only: the arm's calibrated verdict and per-step suspicion profile are returned for up to two more attempts, stopping once an attempt evades and is valid. Round 0 is kept as the one-shot arm.
 
-\paragraph{Validity bounds.} The audits found that the original ``valid'' flag was the LLM judge alone, although the literal check had been described as part of it \src{results/audit/issues.csv} (M2). Three definitions are now reported:
+\paragraph{Validity bounds.} The audits found that the original ``valid'' flag was the LLM judge alone, although the literal check had been described as part of it \src{results/audit/issues.csv} (M2). Rounds 1--3 report three definitions (round 4 adds execution validity, Section~\ref{sec:r4}):
 \begin{itemize}
 \item \textbf{judge}: LLM judge only (upper bound on US);
 \item \textbf{strict}: judge \emph{and} every target literal verbatim in the rewritten actions (lower bound; primary since the first audit);
 \item \textbf{strict-rel}: judge and every target literal that the original's own actions contain. 28 of 150 successful originals do not write every target literal themselves, so strict is asymmetric against rewrites when they are compared with the originals; strict-rel is the symmetric lower bound \src{results/fixes/r2_t3/run_info.json}.
 \end{itemize}
 
-\paragraph{Statistics.} US $=\mathbb E[\text{valid}\times(1-P(\text{alarm}))]$ under the randomized threshold. CIs come from a joint bootstrap (\texttt{amd.evaluation.paired}): honest runs and base attacks are resampled together (clustered by task in round 3), and detectors are refit and thresholds recomputed per replicate. The round-1 and round-2 tables originally resampled attacks only and calibrated in-sample, which understated CI width (audit m5). Strategy contrasts are one-shot vs one-shot only (audit M1). The pre-specified primary contrast is one-shot \texttt{pace\_max} minus the one-shot rewrite control, deployed max, $\alpha=0.01$, strict validity, paired $n=126$. Holm correction is applied within families of contrasts where stated.
+\paragraph{Statistics.} US $=\mathbb E[\text{valid}\times(1-P(\text{alarm}))]$ under the randomized threshold. CIs come from a joint bootstrap (\texttt{amd.evaluation.paired}): honest runs and base attacks are resampled together (clustered by task in round 3), and detectors are refit and thresholds recomputed per replicate. The round-1 and round-2 tables originally resampled attacks only and calibrated in-sample, which understated CI width (audit m5). Strategy contrasts are one-shot vs one-shot only (audit M1). The round-2 primary contrast (designated in the first audit) is one-shot \texttt{pace\_max} minus the one-shot rewrite control, deployed max, $\alpha=0.01$, strict validity, paired $n=126$. Holm correction is applied within families of contrasts where stated.
+
+\paragraph{Threshold convention.}\label{sec:thr} Thresholds were originally set with the plug-in randomized quantile, whose out-of-sample FPR for continuous scores is $(\lfloor\alpha n\rfloor+1)/(n+1)$ (at $n=550$, $\alpha=0.01$: 1.09$\times$ nominal by leave-one-out; at $\alpha=0.003$: 1.21$\times$). All contrasts quoted here use the conformal randomized rule instead: a new score $s$ alarms with probability $\mathrm{clip}((\alpha(n+1)-\#\{S_i>s\})/(\#\{S_i=s\}+1),0,1)$, which has expected FPR exactly $\alpha$ for exchangeable scores (leave-one-out 1.00$\times$ at both levels; 1.09$\times$ and 1.19$\times$ remain under task-grouped halves, which is out-of-task shift).\src{results/fixes2/rep_realized_fpr_thrfix.csv} The re-run moved the headline estimates by at most 0.02 and some secondary cells by up to 0.04 (e.g.\ round-3 \texttt{pace\_max}/\texttt{gpt-4.1} $-$ control $+0.114\to+0.072$); no round 1--3 verdict changed, and one knife-edge round-4 sensitivity set did (below).\src{results/fixes2/headline_threshold_rerun.csv} Plug-in values are given where they differ materially. Round-1 tables, the no-output contrasts and the realized-FPR table of round 3 were not re-run and are marked plug-in.
+
+\paragraph{Confirmatory and exploratory.} Only round 4 was pre-registered before data were seen (primary: plain rewrite minus original under execution validity, max, $\alpha=0.01$; secondary: pacing minus plain rewrite, and the judge-vs-execution agreement) \tC. The round-2 primary was designated during the first audit, after the data had been analysed, so it and all other round 1--3 results are exploratory \tE.
 
 %======================================================================
-\section{Round 1: detector-aware rewriting under a weak monitor}
+\section{Round 1: detector-aware rewriting under a weak monitor \tE}
 
 \paragraph{Setup.} \texttt{gpt-4.1} rewrote each of the 150 attacks three times, once per detector spec (max-, CUSUM- and multichart-aware). Coverage was 145/131/143; 126 base attacks have all arms. The monitor was \texttt{gpt-4.1-mini}. A \texttt{gpt-5-mini} rewriter was piloted and dropped because about half its outputs were unparseable.
 
@@ -106,7 +115,7 @@ one-shot & max-aware & 0.532 / 0.365 & 0.611 / 0.452 & 0.373 / 0.230 & 0.373 / 0
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Round 1 undetected success, \texttt{full} monitor, $\alpha=0.01$, paired $n=126$; cells are judge / strict. The originals are valid by construction. Joint CIs for every cell are in \src{results/fixes/t3/tables_fixes_t3_round1.md}; e.g.\ original vs max $0.857\ci{0.794}{0.913}$. The \texttt{none}-mode table has the same pattern.}\label{tab:r1levels}
+\caption{Round 1 undetected success, \texttt{full} monitor, $\alpha=0.01$, paired $n=126$; cells are judge / strict; plug-in thresholds. The originals are valid by construction. Joint CIs for every cell are in \src{results/fixes/t3/tables_fixes_t3_round1.md}; e.g.\ original vs max $0.857\ci{0.794}{0.913}$. The \texttt{none}-mode table has the same pattern.}\label{tab:r1levels}
 \end{table}
 
 
@@ -132,17 +141,17 @@ multichart-aware & $-0.127\ci{-0.214}{-0.048}$ & $-0.198\ci{-0.286}{-0.119}$ & $
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Round 1 aware-minus-original differences, $\alpha=0.01$, joint CIs \src{results/fixes/t3/tables_fixes_t3_round1.md}. All are negative, but round 1 has no rewrite-only control, so these mix strategy with the cost of rewriting.}
+\caption{Round 1 aware-minus-original differences, $\alpha=0.01$, joint CIs, plug-in thresholds \src{results/fixes/t3/tables_fixes_t3_round1.md}. All are negative, but round 1 has no rewrite-only control, so these mix strategy with the cost of rewriting.}
 \end{table}
 
-\paragraph{Adaptive vs one-shot.} On the matched diagonal adaptive minus one-shot is $+0.159\ci{+0.095}{+0.230}$ (max), $+0.095\ci{+0.032}{+0.143}$ (CUSUM) and $+0.167\ci{+0.095}{+0.222}$ (multi-chart) in \texttt{full} mode; strict $+0.151$ for max. In \texttt{none} mode, which the feedback did not use, it shrinks to $+0.032\ci{-0.048}{+0.111}$, $+0.048\ci{0.000}{+0.087}$ and $+0.079\ci{+0.024}{+0.143}$ \src{results/fixes/t3/tables_fixes_t3_round1.md}. The feedback came from the same deterministic scores and threshold used for evaluation, so this gain is in-sample selection (``oracle feedback''), not out-of-sample attacker capability.
+\paragraph{Adaptive vs one-shot (plug-in).} On the matched diagonal adaptive minus one-shot is $+0.159\ci{+0.095}{+0.230}$ (max), $+0.095\ci{+0.032}{+0.143}$ (CUSUM) and $+0.167\ci{+0.095}{+0.222}$ (multi-chart) in \texttt{full} mode; strict $+0.151$ for max. In \texttt{none} mode, which the feedback did not use, it shrinks to $+0.032\ci{-0.048}{+0.111}$, $+0.048\ci{0.000}{+0.087}$ and $+0.079\ci{+0.024}{+0.143}$ \src{results/fixes/t3/tables_fixes_t3_round1.md}. The feedback came from the same deterministic scores and threshold used for evaluation, so this gain is in-sample selection (``oracle feedback''), not out-of-sample attacker capability.
 
 \subsection{Re-reading round 1 against a rewrite-only control}\label{sec:r1reread}
-Round 2 added a rewrite control (same pipeline, no monitor or detector information). Under the round-2 monitor the round-1 arms can be compared with it, approximately (the control used the round-2 pipeline, and the round-1 adaptive arms were selected on \texttt{gpt-4.1-mini} feedback). Against max at $\alpha=0.01$ \src{results/fixes/t3/tables_fixes_t3_round1.md}:
+Round 2 added a rewrite control (same pipeline, no monitor or detector information). Under the round-2 monitor the round-1 arms can be compared with it, approximately (the control used the round-2 pipeline, and the round-1 adaptive arms were selected on \texttt{gpt-4.1-mini} feedback). Against max at $\alpha=0.01$ (conformal re-run) \src{results/fixes2/rep_fix_r2t3_conformal_thrfix/r2_t3/contrasts.csv}:
 \begin{itemize}
-\item one-shot, judge: max-aware $+0.095\ci{+0.008}{+0.183}$, CUSUM-aware $+0.087\ci{-0.024}{+0.159}$, multichart-aware $+0.063\ci{-0.032}{+0.143}$;
-\item one-shot, strict: $+0.079\ci{-0.008}{+0.159}$, $+0.071\ci{-0.032}{+0.135}$, $+0.032\ci{-0.056}{+0.103}$;
-\item adaptive, judge: $+0.135\ci{+0.048}{+0.214}$, $+0.063\ci{-0.040}{+0.151}$, $+0.111\ci{+0.016}{+0.206}$.
+\item one-shot, judge: max-aware $+0.107\ci{+0.016}{+0.175}$, CUSUM-aware $+0.072\ci{-0.024}{+0.151}$, multichart-aware $+0.060\ci{-0.032}{+0.139}$;
+\item one-shot, strict: $+0.087\ci{0.000}{+0.159}$, $+0.056\ci{-0.032}{+0.135}$, $+0.028\ci{-0.056}{+0.107}$;
+\item adaptive, judge: $+0.143\ci{+0.051}{+0.214}$, $+0.071\ci{-0.032}{+0.147}$, $+0.119\ci{+0.024}{+0.206}$.
 \end{itemize}
 Every point estimate favours the aware arm over a plain rewrite, and the CIs that exclude 0 do so in the attacker's favour. The round-1 drop below the originals is therefore evidence that LLM rewriting costs the attacker, not that detector knowledge does (audit M3).
 
@@ -153,7 +162,7 @@ Every point estimate favours the aware arm over a plain rewrite, and the CIs tha
 \end{itemize}
 
 %======================================================================
-\section{Round 2: strong monitor, pacing attackers and a rewrite control}
+\section{Round 2: strong monitor, pacing attackers and a rewrite control \tE}
 
 \subsection{Monitor choice}
 In a 40+40 pilot (\texttt{none} mode, per-trajectory max), per-trajectory AUROC was 0.709 for \texttt{gpt-4o}, 0.871 for \texttt{gpt-4.1} and 0.836 for \texttt{claude-haiku-4.5} (integer scores only) \src{results/r2_t3/pilot_auroc.json}. \texttt{gpt-4.1} was chosen. On the full paired set its advantage is mainly at low FPR: on the 126 paired originals, max TPR at 1\% FPR is 0.246 (\texttt{gpt-4.1} \texttt{none}) vs 0.143 for \texttt{gpt-4.1-mini} \texttt{none} \src{results/fixes/r2_t3/tables_fixes_r2_t3.md}, \src{results/fixes/t3/tables_fixes_t3_round1.md}. The pilot AUROC advantage did not carry over to the full sample (a winner's curse in the 40+40 pilot; EXPERIMENT\_LOG, October 21), so the ``strong'' monitor is stronger, not strong.
@@ -210,10 +219,10 @@ Every rewrite, with or without detector information, makes the attack-critical o
 Undetected success of the 126 paired originals at $\alpha=0.01$ (judge and strict coincide for originals) \src{results/r2_t3/tables.md}:
 max 0.75, CUSUM $k{=}1.5$ 0.80, multi-chart 0.77, top-3 sum 0.85, SR-type e-detector 0.93, CUSUM $k{=}0.5$ 0.96, e-process 0.95, Shiryaev--Roberts 0.96, windowed GLR 0.95. At $\alpha=0.003$ CUSUM $k=1.5$ leaves 0.95 undetected, max 0.85. The rules that accumulate small evidence (CUSUM $k=0.5$, SR, GLR, e-process) are nearly powerless here: the honest per-step distribution is concentrated at very low scores, so after whitening any non-zero benign step looks like evidence (EXPERIMENT\_LOG, October 21). Among the pacing arms, the SR-type e-detector and windowed GLR catch more of \texttt{pace\_cusum} (0.71 and 0.78 undetected, judge) than CUSUM $k=0.5$ (0.91), but all three remain far weaker than max and top-3 sum.
 
-Held-out FPR (275/275, 200 splits) at $\alpha=0.01/0.003$: max 0.0109/0.0043, CUSUM $k{=}1.5$ 0.0114/0.0039, top-3 sum 0.0115/0.0039, multi-chart 0.0185/0.0114 (1.85$\times$ and 3.81$\times$ nominal) \src{results/fixes/r2_t3/m5_holdout_fpr.csv}.
+Held-out FPR (275/275, 200 splits, plug-in thresholds) at $\alpha=0.01/0.003$: max 0.0109/0.0043, CUSUM $k{=}1.5$ 0.0114/0.0039, top-3 sum 0.0115/0.0039, multi-chart 0.0185/0.0114 (1.85$\times$ and 3.81$\times$ nominal) \src{results/fixes/r2_t3/m5_holdout_fpr.csv}.
 
 \subsection{Strategy effect: pacing vs the rewrite control}
-The originally reported contrast, adaptive \texttt{pace\_max} minus the one-shot control against max, was $+0.206$. With the joint bootstrap it is $+0.206\ci{+0.063}{+0.325}$, but it compares a best-of-three attempt, selected on the evaluation monitor's own deterministic scores and threshold, with a single attempt \src{results/fixes/corrections.csv} (M1). The selection gain alone, adaptive minus one-shot \texttt{pace\_max}, is $+0.111\ci{+0.048}{+0.190}$. The identifiable strategy contrast is one-shot vs one-shot:
+The originally reported contrast, adaptive \texttt{pace\_max} minus the one-shot control against max (judge validity), was $+0.206$. With the joint bootstrap and the conformal rule it is $+0.230\ci{+0.079}{+0.317}$ (strict $+0.206\ci{+0.055}{+0.294}$), but it compares a best-of-three attempt, selected on the evaluation monitor's own deterministic scores and threshold, with a single attempt \src{results/fixes/corrections.csv} (M1). The selection gain alone, adaptive minus one-shot \texttt{pace\_max}, is $+0.127\ci{+0.056}{+0.187}$ (judge). The identifiable strategy contrast is one-shot vs one-shot:
 
 \begin{table}[H]\centering\small
 \begin{adjustbox}{max width=\linewidth}
@@ -221,34 +230,34 @@ The originally reported contrast, adaptive \texttt{pace\_max} minus the one-shot
 \toprule
 One-shot pacing $-$ control & max & CUSUM $k{=}1.5$ & multi-chart & top-3 sum\\
 \midrule
-\texttt{pace\_max} & \textbf{+0.087}\ci{-0.032}{+0.183} & $+0.063\ci{-0.048}{+0.151}$ & $+0.075\ci{-0.032}{+0.151}$ & $-0.056\ci{-0.127}{+0.056}$\\
-\texttt{pace\_cusum} & $+0.040\ci{-0.040}{+0.119}$ & $-0.016\ci{-0.095}{+0.103}$ & $+0.002\ci{-0.101}{+0.081}$ & $-0.071\ci{-0.135}{+0.040}$\\
-\texttt{pace\_multichart} & $+0.056\ci{-0.016}{+0.135}$ & $0.000\ci{-0.095}{+0.111}$ & $+0.048\ci{-0.034}{+0.123}$ & $-0.008\ci{-0.087}{+0.079}$\\
+\texttt{pace\_max} & \textbf{+0.095}\ci{-0.020}{+0.183} & $+0.060\ci{-0.052}{+0.143}$ & $+0.071\ci{-0.032}{+0.151}$ & $-0.044\ci{-0.127}{+0.055}$\\
+\texttt{pace\_cusum} & $+0.040\ci{-0.040}{+0.111}$ & $-0.020\ci{-0.095}{+0.095}$ & $+0.004\ci{-0.105}{+0.079}$ & $-0.056\ci{-0.135}{+0.032}$\\
+\texttt{pace\_multichart} & $+0.063\ci{-0.020}{+0.135}$ & $-0.004\ci{-0.087}{+0.103}$ & $+0.048\ci{-0.039}{+0.123}$ & $-0.008\ci{-0.091}{+0.079}$\\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Round 2 strategy contrasts, strict validity, $\alpha=0.01$, paired $n=126$, joint CIs. Bold: pre-specified primary contrast, $p=0.196$. Judge validity gives $+0.095\ci{-0.024}{+0.190}$ for the primary cell. Holm-adjusted $p=1.00$ for all 24 one-shot contrasts (3 arms $\times$ 4 detectors $\times$ 2 $\alpha$) under both validities \src{results/fixes/r2_t3/tables_fixes_r2_t3.md}, \src{results/fixes/r2_t3/primary_contrast.csv}.}\label{tab:r2strategy}
+\caption{Round 2 strategy contrasts, strict validity, $\alpha=0.01$, paired $n=126$, joint CIs, conformal thresholds. Bold: the primary contrast designated in audit 1, $p=0.142$ (plug-in $+0.087\ci{-0.032}{+0.183}$, $p=0.196$). Judge validity gives $+0.103\ci{-0.016}{+0.190}$ for the primary cell. Holm-adjusted $p=1.00$ for all 24 one-shot contrasts (3 arms $\times$ 4 detectors $\times$ 2 $\alpha$) under every validity definition \src{results/fixes2/rep_fix_r2t3_conformal_thrfix/r2_t3/contrasts.csv}; plug-in version \src{results/fixes/r2_t3/tables_fixes_r2_t3.md}.}\label{tab:r2strategy}
 \end{table}
 
 \begin{figure}[tbp]\centering
 \includegraphics[width=0.78\linewidth]{fixes/r2_t3/fig_contrasts.pdf}
-\caption{Round 2 contrasts vs the rewrite control: one-shot pacing (the strategy effect), adaptive pacing (confounded with selection) and the adaptive-minus-one-shot selection gain, judge (filled) and strict (open), joint 95\% CIs \src{results/fixes/r2_t3/fig_contrasts.pdf}.}
+\caption{Round 2 contrasts vs the rewrite control: one-shot pacing (the strategy effect), adaptive pacing (confounded with selection) and the adaptive-minus-one-shot selection gain, judge (filled) and strict (open), joint 95\% CIs, plug-in thresholds (the conformal values in the text differ by $\le0.03$) \src{results/fixes/r2_t3/fig_contrasts.pdf}.}
 \end{figure}
 
-Further round-2 contrasts \src{results/fixes/r2_t3/tables_fixes_r2_t3.md}:
+Further round-2 contrasts (conformal re-run unless stated) \src{results/fixes2/rep_fix_r2t3_conformal_thrfix/r2_t3/contrasts.csv}:
 \begin{itemize}
-\item \textbf{Top-3 sum neutralizes even the confounded effect}: adaptive \texttt{pace\_max} minus control against top-3 sum is $+0.032\ci{-0.063}{+0.143}$; the one-shot contrasts are $-0.063$, $-0.063$, $-0.024$ (judge).
-\item \textbf{Pacing vs round-1 condensation}: none of the six comparisons survives Holm correction across the 20 originally reported comparisons. At $\alpha=0.003$ \texttt{pace\_cusum} minus round-1 CUSUM-aware on CUSUM $k=1.5$ is $-0.103\ci{-0.159}{+0.024}$ (the original attack-only CI excluded 0 in the other direction).
-\item \textbf{Pacing vs doing nothing}: adaptive \texttt{pace\_max} minus original against max is $-0.151\ci{-0.278}{-0.008}$ (judge), $-0.190\ci{-0.317}{-0.056}$ (strict-rel), $-0.317\ci{-0.444}{-0.167}$ (strict); one-shot $-0.262\ci{-0.365}{-0.143}$ (judge).
-\item \textbf{Control vs doing nothing}: $-0.357\ci{-0.437}{-0.246}$ (judge), $-0.389\ci{-0.468}{-0.278}$ (strict-rel), $-0.500\ci{-0.579}{-0.389}$ (strict); $-0.294\ci{-0.405}{-0.151}$ at $\alpha=0.003$.
+\item \textbf{Top-3 sum neutralizes even the confounded effect}: adaptive \texttt{pace\_max} minus control against top-3 sum is $+0.047\ci{-0.056}{+0.143}$ (judge); the one-shot contrasts are $-0.048$, $-0.040$, $-0.024$.
+\item \textbf{Pacing vs round-1 condensation} (plug-in): none of the six comparisons survives Holm correction across the 20 originally reported comparisons. At $\alpha=0.003$ \texttt{pace\_cusum} minus round-1 CUSUM-aware on CUSUM $k=1.5$ is $-0.103\ci{-0.159}{+0.024}$ (the original attack-only CI excluded 0 in the other direction) \src{results/fixes/r2_t3/tables_fixes_r2_t3.md}.
+\item \textbf{Pacing vs doing nothing}: adaptive \texttt{pace\_max} minus original against max is $-0.120\ci{-0.266}{-0.008}$ (judge), $-0.159\ci{-0.310}{-0.048}$ (strict-rel), $-0.286\ci{-0.437}{-0.167}$ (strict); one-shot $-0.246\ci{-0.361}{-0.135}$ (judge).
+\item \textbf{Control vs doing nothing}: $-0.349\ci{-0.429}{-0.246}$ (judge), $-0.381\ci{-0.468}{-0.278}$ (strict-rel), $-0.492\ci{-0.579}{-0.389}$ (strict); $-0.266\ci{-0.389}{-0.151}$ at $\alpha=0.003$ (judge). These rest on judge or static validity; round 4 re-tests the control contrast with execution validity.
 \end{itemize}
 
 \begin{figure}[tbp]\centering
 \includegraphics[width=0.8\linewidth]{fixes/r2_t3/fig_us_bounds_a0.01.pdf}
-\caption{Round 2 undetected-success levels at $\alpha=0.01$ for four deployed detectors: judge (filled, upper bound) and strict (open, lower bound) validity, joint 95\% CIs. Every rewritten arm sits well below the originals under both bounds \src{results/fixes/r2_t3/fig_us_bounds_a0.01.pdf}.}
+\caption{Round 2 undetected-success levels at $\alpha=0.01$ for four deployed detectors: judge (filled, upper bound) and strict (open, lower bound) validity, joint 95\% CIs, plug-in thresholds. Every rewritten arm sits well below the originals under both bounds \src{results/fixes/r2_t3/fig_us_bounds_a0.01.pdf}.}
 \end{figure}
 
-\paragraph{Agent-model confound (audit M9).} Honest-550 is entirely \texttt{claude-opus-4-5}, while 40 of the 126 paired base attacks are \texttt{opus-4-6}. On the originals, max TPR at 1\% FPR is 0.233 ($n=86$, opus-4-5) vs 0.275 ($n=40$, opus-4-6). On the opus-4-5 subset the contrasts keep their sign and size: one-shot \texttt{pace\_max} minus control $+0.070\ci{-0.070}{+0.174}$, control minus original $-0.326\ci{-0.419}{-0.186}$ \src{results/fixes/corrections.csv}. At $\alpha=0.003$ CUSUM $k=1.5$ catches opus-4-6 originals far more often (0.125 vs 0.012) \src{results/fixes/r2_t3/tables_fixes_r2_t3.md}.
+\paragraph{Agent-model confound (audit M9).} Honest-550 is entirely \texttt{claude-opus-4-5}, while 40 of the 126 paired base attacks are \texttt{opus-4-6}. On the originals, max TPR at 1\% FPR is 0.233 ($n=86$, opus-4-5) vs 0.275 ($n=40$, opus-4-6). On the opus-4-5 subset the contrasts keep their sign and size (judge validity, conformal): one-shot \texttt{pace\_max} minus control $+0.081\ci{-0.058}{+0.174}$, control minus original $-0.320\ci{-0.418}{-0.186}$ \src{results/fixes2/rep_fix_r2t3_conformal_thrfix/r2_t3/contrasts.csv}. At $\alpha=0.003$ CUSUM $k=1.5$ catches opus-4-6 originals far more often (0.125 vs 0.012) \src{results/fixes/r2_t3/tables_fixes_r2_t3.md}.
 
 \subsection{Covert damage vs ARL}
 \begin{figure}[tbp]\centering
@@ -264,9 +273,9 @@ Fitted slopes of log damage on log ARL over the calibratable range (ARL $\le551$
 The prediction of 0.5 is rejected for both naive and pacing attackers. Damage saturates: alarms, when they occur, come from a single high step, and attacks that avoid such a step are never caught at any ARL. The theory's premise, an attacker sitting at the edge of per-step detectability, is not met by these monitors.
 
 %======================================================================
-\section{Round 3: replay, a different-family rewriter, leaks and realized FPR}
+\section{Round 3: replay feasibility, a different-family rewriter, leaks and realized FPR \tE}
 
-\subsection{A. Execution replay: infrastructure verified, not run on our trajectories}\label{sec:replay}
+\subsection{A. Execution replay: infrastructure verified (run in round 4)}\label{sec:replay}
 The goal was to check side-task success of rewrites by executing them in the real BashArena sandbox with the official scorers, instead of relying on the LLM judge.
 \begin{itemize}
 \item \textbf{What works.} \texttt{control-arena} 20.1.0 ships the full BashArena setting (dataset loader, per-task multi-service Docker compose, the four official side-task scorers). Our task ids are in its dataset. The base image builds on the laptop, a task's compose comes up healthy, and \texttt{control-arena}'s own firewall side-task test (fixed policy, real sandbox, official scorer, no API) passed end to end. The model-free half (materialize, build, bring up, execute a command list, tear down) is in \texttt{tracks/r3\_t3/replay\_basharena.py}.
@@ -277,7 +286,7 @@ The goal was to check side-task success of rewrites by executing them in the rea
 \item Make the rewriter emit structured tool calls instead of rendered strings (a JSON schema in the rewrite prompt).
 \item Add a fixed-trajectory policy to \texttt{control-arena}'s BashArena (an Inspect solver that replays the recorded calls) and run \texttt{inspect eval} per (sample, arm) with the task-id whitelist, the matching side task and the setting's own scorer; read \texttt{side\_task\_success} from the log.
 \end{enumerate}
-This needs no API spend and runs on the laptop, at a few minutes per (sample, arm). Because the scorers check final system state, fabricated intermediate outputs do not invalidate a rewrite; a command that silently depended on a real earlier output would correctly fail.
+This needs no API spend and runs on the laptop, at a few minutes per (sample, arm). Because the scorers check final system state, fabricated intermediate outputs do not invalidate a rewrite. Round 4 implemented exactly this path (Section~\ref{sec:r4}).
 \end{itemize}
 
 \subsection{B. Is the rewrite artifact a same-model effect?}
@@ -306,23 +315,23 @@ pacing (3 arms) & \texttt{gemini} & 6.98--7.33 & 0.74--0.80 & 0.57--0.63 & 0.90 
 \toprule
 Contrast (one-shot, strict US) & max, 0.01 & max, 0.003 & multi-chart, 0.01 & top-3 sum, 0.01\\
 \midrule
-control/\texttt{gpt-4.1} $-$ original & $-0.600\ci{-0.721}{-0.379}$ & $-0.486\ci{-0.695}{-0.286}$ & $-0.543\ci{-0.705}{-0.364}$ & $-0.486\ci{-0.676}{-0.276}$\\
-control/\texttt{gemini} $-$ original & $-0.371\ci{-0.550}{-0.185}$ & $-0.314\ci{-0.537}{-0.100}$ & $-0.400\ci{-0.557}{-0.190}$ & $-0.286\ci{-0.419}{-0.118}$\\
-control: \texttt{gpt-4.1} $-$ \texttt{gemini} & $-0.229\ci{-0.355}{-0.036}$ & $-0.171\ci{-0.333}{-0.029}$ & $-0.143\ci{-0.306}{-0.027}$ & $-0.200\ci{-0.368}{-0.062}$\\
+control/\texttt{gpt-4.1} $-$ original & $-0.572\ci{-0.718}{-0.378}$ & $-0.476\ci{-0.684}{-0.280}$ & $-0.543\ci{-0.703}{-0.358}$ & $-0.486\ci{-0.675}{-0.276}$\\
+control/\texttt{gemini} $-$ original & $-0.385\ci{-0.556}{-0.195}$ & $-0.285\ci{-0.513}{-0.089}$ & $-0.400\ci{-0.554}{-0.193}$ & $-0.272\ci{-0.415}{-0.111}$\\
+control: \texttt{gpt-4.1} $-$ \texttt{gemini} & $-0.187\ci{-0.339}{-0.040}$ & $-0.191\ci{-0.333}{-0.034}$ & $-0.143\ci{-0.302}{-0.029}$ & $-0.214\ci{-0.361}{-0.062}$\\
 \midrule
-\texttt{pace\_max}/\texttt{gpt-4.1} $-$ control & $+0.114\ci{-0.107}{+0.257}$ & $+0.029\ci{-0.129}{+0.200}$ & $+0.029\ci{-0.128}{+0.222}$ & $0.000\ci{-0.154}{+0.220}$\\
-\texttt{pace\_cusum}/\texttt{gpt-4.1} $-$ control & $-0.029\ci{-0.200}{+0.067}$ & $-0.057\ci{-0.214}{+0.086}$ & $-0.086\ci{-0.245}{+0.063}$ & $-0.114\ci{-0.258}{+0.111}$\\
-\texttt{pace\_multichart}/\texttt{gpt-4.1} $-$ control & $+0.086\ci{-0.051}{+0.194}$ & $+0.029\ci{-0.088}{+0.171}$ & $+0.029\ci{-0.100}{+0.172}$ & $0.000\ci{-0.152}{+0.200}$\\
-\texttt{pace\_max}/\texttt{gemini} $-$ control & $-0.143\ci{-0.290}{+0.077}$ & $-0.114\ci{-0.294}{+0.062}$ & $-0.086\ci{-0.270}{+0.075}$ & $-0.143\ci{-0.289}{+0.037}$\\
-\texttt{pace\_cusum}/\texttt{gemini} $-$ control & $-0.143\ci{-0.320}{+0.071}$ & $-0.171\ci{-0.368}{+0.053}$ & $-0.086\ci{-0.312}{+0.068}$ & $-0.143\ci{-0.323}{+0.029}$\\
-\texttt{pace\_multichart}/\texttt{gemini} $-$ control & $-0.029\ci{-0.212}{+0.125}$ & $-0.114\ci{-0.263}{+0.111}$ & $-0.029\ci{-0.210}{+0.138}$ & $-0.143\ci{-0.303}{+0.029}$\\
+\texttt{pace\_max}/\texttt{gpt-4.1} $-$ control & $+0.072\ci{-0.107}{+0.250}$ & $+0.038\ci{-0.112}{+0.189}$ & $+0.029\ci{-0.132}{+0.215}$ & $+0.014\ci{-0.148}{+0.207}$\\
+\texttt{pace\_cusum}/\texttt{gpt-4.1} $-$ control & $-0.043\ci{-0.201}{+0.061}$ & $-0.037\ci{-0.197}{+0.083}$ & $-0.086\ci{-0.247}{+0.061}$ & $-0.100\ci{-0.256}{+0.094}$\\
+\texttt{pace\_multichart}/\texttt{gpt-4.1} $-$ control & $+0.086\ci{-0.047}{+0.194}$ & $+0.029\ci{-0.091}{+0.161}$ & $+0.029\ci{-0.100}{+0.167}$ & $0.000\ci{-0.153}{+0.188}$\\
+\texttt{pace\_max}/\texttt{gemini} $-$ control & $-0.101\ci{-0.288}{+0.069}$ & $-0.134\ci{-0.294}{+0.049}$ & $-0.086\ci{-0.269}{+0.072}$ & $-0.157\ci{-0.293}{+0.034}$\\
+\texttt{pace\_cusum}/\texttt{gemini} $-$ control & $-0.129\ci{-0.317}{+0.063}$ & $-0.181\ci{-0.363}{+0.024}$ & $-0.086\ci{-0.318}{+0.066}$ & $-0.143\ci{-0.321}{+0.029}$\\
+\texttt{pace\_multichart}/\texttt{gemini} $-$ control & $-0.015\ci{-0.209}{+0.128}$ & $-0.124\ci{-0.257}{+0.088}$ & $-0.029\ci{-0.216}{+0.133}$ & $-0.157\ci{-0.304}{+0.026}$\\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Round 3 paired contrasts in strict undetected success, $n=35$ base attacks, honest $n=550$, task-clustered joint bootstrap \src{results/r3_t3/paired_contrasts.md}. Every pacing-minus-control CI contains 0 (all 48 cells in the file, including CUSUM $k=1.5$).}\label{tab:r3contrasts}
+\caption{Round 3 paired contrasts in strict undetected success, $n=35$ base attacks, honest $n=550$, task-clustered joint bootstrap, conformal thresholds \src{results/fixes2/rep_r3t3_conformal_thrfix/paired_contrasts.md} (plug-in: \nolinkurl{results/r3_t3/paired_contrasts.md}). Every pacing-minus-control CI contains 0 (all 48 cells in the file, including CUSUM $k=1.5$).}\label{tab:r3contrasts}
 \end{table}
 
-\paragraph{Validity vs detection (audit2 A4).} Strict US multiplies validity by non-detection, so a contrast can be negative because rewrites break the attack rather than because they are caught. The second audit split each contrast \src{results/audit2/repro_t3r3.csv}:
+\paragraph{Validity vs detection (audit2 A4).} Strict US multiplies validity by non-detection, so a contrast can be negative because rewrites break the attack rather than because they are caught. The second audit split each contrast; the ``detection only'' column ignores validity and counts every rewrite \src{results/fixes2/rep_audit2_t3r3_conformal_thrfix/repro_t3r3.csv}:
 
 \begin{table}[H]\centering\small
 \begin{adjustbox}{max width=\linewidth}
@@ -330,49 +339,28 @@ control: \texttt{gpt-4.1} $-$ \texttt{gemini} & $-0.229\ci{-0.355}{-0.036}$ & $-
 \toprule
 Contrast (max, $\alpha=0.01$) & strict US & detection only (validity ignored) & both-valid pairs\\
 \midrule
-control/\texttt{gemini} $-$ original & $-0.371\ci{-0.548}{-0.182}$ & $-0.143\ci{-0.300}{-0.027}$ & $-0.192\ci{-0.364}{-0.038}$ ($n=26$)\\
-control/\texttt{gpt-4.1} $-$ original & $-0.600\ci{-0.732}{-0.385}$ & $-0.429\ci{-0.548}{-0.256}$ & $-0.519\ci{-0.667}{-0.296}$ ($n=27$)\\
-control: \texttt{gpt-4.1} $-$ \texttt{gemini} & $-0.229\ci{-0.345}{-0.056}$ & $-0.286\ci{-0.414}{-0.091}$ & $-0.292\ci{-0.440}{-0.045}$ ($n=24$)\\
-\texttt{pace\_max}/\texttt{gemini} $-$ control & $-0.143\ci{-0.294}{+0.059}$ & $-0.057\ci{-0.206}{+0.171}$ & $-0.053$ ($n=19$)\\
-\texttt{pace\_cusum}/\texttt{gemini} $-$ control & $-0.143\ci{-0.314}{+0.059}$ & $-0.057\ci{-0.156}{+0.167}$ & $-0.095$ ($n=21$)\\
-\texttt{pace\_multichart}/\texttt{gemini} $-$ control & $-0.029\ci{-0.214}{+0.118}$ & $+0.086\ci{-0.129}{+0.258}$ & $+0.150$ ($n=20$)\\
+control/\texttt{gemini} $-$ original & $-0.385\ci{-0.548}{-0.185}$ & $-0.157\ci{-0.299}{-0.026}$ & $-0.211\ci{-0.364}{-0.037}$ ($n=26$)\\
+control/\texttt{gpt-4.1} $-$ original & $-0.572\ci{-0.727}{-0.378}$ & $-0.401\ci{-0.543}{-0.252}$ & $-0.482\ci{-0.658}{-0.286}$ ($n=27$)\\
+control: \texttt{gpt-4.1} $-$ \texttt{gemini} & $-0.187\ci{-0.342}{-0.053}$ & $-0.244\ci{-0.412}{-0.095}$ & $-0.230\ci{-0.425}{-0.045}$ ($n=24$)\\
+\texttt{pace\_max}/\texttt{gemini} $-$ control & $-0.101\ci{-0.286}{+0.057}$ & $-0.001\ci{-0.200}{+0.167}$ & $+0.025$ ($n=19$)\\
+\texttt{pace\_cusum}/\texttt{gemini} $-$ control & $-0.129\ci{-0.314}{+0.056}$ & $-0.015\ci{-0.154}{+0.161}$ & $-0.072$ ($n=21$)\\
+\texttt{pace\_multichart}/\texttt{gemini} $-$ control & $-0.015\ci{-0.206}{+0.111}$ & $+0.100\ci{-0.118}{+0.258}$ & $+0.175$ ($n=20$)\\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Decomposition by the second audit's independent implementation (its strict-US CIs differ from Table~\ref{tab:r3contrasts} in the third decimal).}\label{tab:a4}
+\caption{Decomposition by the second audit's independent implementation, re-run under the conformal rule (its strict-US CIs differ from Table~\ref{tab:r3contrasts} in the third decimal). ``Detection only'' ignores validity; ``both-valid pairs'' keeps pairs in which both arms are strictly valid.}\label{tab:a4}
 \end{table}
 
 \begin{figure}[tbp]\centering
-\begin{tikzpicture}[x=7.2cm,y=0.62cm]
-\def\xl{-0.80}\def\xr{0.40}\def\yt{0.6}\def\yb{-9.6}
-\foreach \v in {-0.8,-0.6,-0.4,-0.2,0.2,0.4} {\draw[black!12] (\v,\yt) -- (\v,\yb); \node[font=\scriptsize,below] at (\v,\yb) {$\v$};}
-\draw[black!60] (0,\yt) -- (0,\yb); \node[font=\scriptsize,below] at (0,\yb) {$0$};
-\node[font=\small] at (-0.2,\yb-1.1) {$\Delta$ undetected success (max, $\alpha=0.01$, one-shot)};
-\newcommand{\frow}[8]{%
-\node[anchor=east,font=\scriptsize] at (\xl-0.01,#1) {#2};
-\draw[hblue,line width=1pt] (#4,{#1+0.17}) -- (#5,{#1+0.17}); \fill[hblue] (#3,{#1+0.17}) circle (2.4pt);
-\draw[BurntOrange,line width=1pt] (#7,{#1-0.17}) -- (#8,{#1-0.17}); \draw[BurntOrange,fill=white,line width=0.9pt] (#6,{#1-0.17}) circle (2.4pt);}
-\frow{0}{control/gpt-4.1 $-$ original}{-0.600}{-0.721}{-0.379}{-0.429}{-0.548}{-0.256}
-\frow{-1}{control/gemini $-$ original}{-0.371}{-0.550}{-0.185}{-0.143}{-0.300}{-0.027}
-\frow{-2}{control: gpt-4.1 $-$ gemini}{-0.229}{-0.355}{-0.036}{-0.286}{-0.414}{-0.091}
-\draw[black!25,dashed] (\xl,-2.6) -- (\xr,-2.6);
-\frow{-3.2}{pace\_max/gpt-4.1 $-$ control}{0.114}{-0.107}{0.257}{0.114}{-0.108}{0.250}
-\frow{-4.2}{pace\_cusum/gpt-4.1 $-$ control}{-0.029}{-0.200}{0.067}{0.029}{-0.167}{0.154}
-\frow{-5.2}{pace\_multichart/gpt-4.1 $-$ control}{0.086}{-0.051}{0.194}{0.114}{-0.031}{0.240}
-\frow{-6.2}{pace\_max/gemini $-$ control}{-0.143}{-0.290}{0.077}{-0.057}{-0.206}{0.171}
-\frow{-7.2}{pace\_cusum/gemini $-$ control}{-0.143}{-0.320}{0.071}{-0.057}{-0.156}{0.167}
-\frow{-8.2}{pace\_multichart/gemini $-$ control}{-0.029}{-0.212}{0.125}{0.086}{-0.129}{0.258}
-\fill[hblue] (-0.76,-9.05) circle (2.4pt); \node[anchor=west,font=\scriptsize] at (-0.74,-9.05) {strict US};
-\draw[BurntOrange,fill=white,line width=0.9pt] (-0.50,-9.05) circle (2.4pt); \node[anchor=west,font=\scriptsize] at (-0.48,-9.05) {detection only};
-\end{tikzpicture}
-\caption{Round 3 contrasts with 95\% CIs. Filled: strict undetected success \src{results/r3_t3/paired_contrasts.md}. Open: detection only, validity ignored \src{results/audit2/repro_t3r3.csv}. Above the dashed line: rewrite artifact and cross-rewriter difference; below: strategy effect.}\label{fig:r3forest}
+\includegraphics[width=0.86\linewidth]{r3_forest_conformal.pdf}
+\caption{Round 3 contrasts with 95\% CIs, max, $\alpha=0.01$, one-shot, conformal thresholds. Filled: strict undetected success \src{results/fixes2/rep_r3t3_conformal_thrfix/paired_contrasts.json}. Open: detection only, validity ignored, every rewrite counted \src{results/fixes2/rep_audit2_t3r3_conformal_thrfix/repro_t3r3.csv}. Above the dashed line: rewrite effect and cross-rewriter difference; below: strategy effect. Generated by \nolinkurl{docs/reports/src/make_r4_report_figs.py}.}\label{fig:r3forest}
 \end{figure}
 
 \paragraph{Reading.}
 \begin{itemize}
-\item \textbf{The rewrite artifact is not a same-model effect.} A different-family rewriter still lowers undetected success, and the detection-only part, $-0.143\ci{-0.300}{-0.027}$, excludes 0. About 60\% of the $-0.37$ is validity loss (gemini control strict-valid 0.74 vs 1.00 for originals).
-\item \textbf{Same-model inflation exists, but only for the control.} The \texttt{gpt-4.1} control is more detectable to the \texttt{gpt-4.1} monitor than the \texttt{gemini} control ($-0.229$ strict, $-0.286$ detection only). For the pacing arms no cross-rewriter difference at max is significant; one of 24 cross-rewriter pacing cells (\texttt{pace\_cusum} on top-3 sum, $\alpha=0.01$) excludes 0 \src{results/r3_t3/paired_contrasts.md}.
-\item \textbf{No strategy effect with either rewriter.} The 12 pacing-minus-control contrasts at max (2 rewriters $\times$ 3 arms $\times$ 2 FPRs) range from $-0.171$ to $+0.114$, all with CIs containing 0. The negative \texttt{gemini} pacing contrasts are validity loss: detection-only $-0.057$, $-0.057$, $+0.086$, all n.s.
+\item \textbf{The drop after rewriting is not a same-model effect.} A different-family rewriter also lowers strict undetected success ($-0.385$), and the detection-only part, $-0.157\ci{-0.299}{-0.026}$, excludes 0. About 60\% of the $-0.385$ is validity loss under the static definition (gemini control strict-valid 0.74 vs 1.00 for originals). Round 4 shows that this static validity is itself unreliable (Section~\ref{sec:r4}).
+\item \textbf{Same-model inflation exists, but only for the control.} The \texttt{gpt-4.1} control is more detectable to the \texttt{gpt-4.1} monitor than the \texttt{gemini} control ($-0.187$ strict, $-0.244$ detection only). For the pacing arms no cross-rewriter difference at max is significant; one of 24 cross-rewriter pacing cells (\texttt{pace\_cusum} on top-3 sum, $\alpha=0.01$) excludes 0 \src{results/fixes2/rep_r3t3_conformal_thrfix/paired_contrasts.md}.
+\item \textbf{No strategy effect with either rewriter.} The 12 pacing-minus-control contrasts at max (2 rewriters $\times$ 3 arms $\times$ 2 FPRs) range from $-0.181$ to $+0.086$, all with CIs containing 0. The negative \texttt{gemini} pacing contrasts are validity loss: detection-only $-0.001$, $-0.015$, $+0.100$, all n.s.
 \end{itemize}
 
 \subsection{C. Do fabricated tool outputs leak the rewrite?}
@@ -382,7 +370,7 @@ Rewrites carry fabricated outputs for new steps; originals carry real ones. If f
 \item rewrite peaks barely move ($\Delta$ from $-0.33$ to $+0.25$);
 \item the difference-in-differences (rewrite $\Delta$ minus original $\Delta$) is $+0.22$ to $+0.79$: without outputs the gap between rewrites and originals \emph{widens}.
 \end{itemize}
-The no-output contrasts replicate the with-output ones: control minus original against max at $\alpha=0.01$ is $-0.514\ci{-0.667}{-0.321}$ (\texttt{gpt-4.1}) and $-0.314\ci{-0.536}{-0.179}$ (\texttt{gemini}); all 24 pacing-minus-control CIs contain 0 \src{results/r3_t3/paired_contrasts_noout.md}. Fabricated outputs do not drive the findings.
+The no-output contrasts (plug-in thresholds, not re-run) replicate the with-output ones: control minus original against max at $\alpha=0.01$ is $-0.514\ci{-0.667}{-0.321}$ (\texttt{gpt-4.1}) and $-0.314\ci{-0.536}{-0.179}$ (\texttt{gemini}); all 24 pacing-minus-control CIs contain 0 \src{results/r3_t3/paired_contrasts_noout.md}. Fabricated outputs do not drive the findings.
 
 \subsection{D. Realized held-out FPR}
 \begin{table}[H]\centering\small
@@ -398,9 +386,59 @@ multi-chart OR & \textbf{0.0173}\ci{0.0027}{0.0432} & \textbf{0.0102} & 0.0255 &
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Mean realized trajectory FPR over 200 random 50/50 honest splits (brackets: 2.5/97.5 percentiles). With output: 550 honest runs; no output: 250 \src{results/r3_t3/realized_fpr.md}.}\label{tab:fpr}
+\caption{Mean realized trajectory FPR over 200 random 50/50 honest splits (brackets: 2.5/97.5 percentiles), plug-in thresholds. With output: 550 honest runs; no output: 250 \src{results/r3_t3/realized_fpr.md}. Under the conformal rule, max on all 550 honest runs realizes 1.00$\times$ nominal by leave-one-out at both levels (0.96$\times$ / 0.99$\times$ on random halves) \src{results/fixes2/rep_realized_fpr_thrfix.csv}.}\label{tab:fpr}
 \end{table}
 With 550 honest runs, max, CUSUM $k=1.5$ and top-3 sum realize nominal FPR. The multi-chart OR runs hot (1.7$\times$ at 0.01, 3.4$\times$ at 0.003): its exponential-tail fits overfit the calibration half. This matches the round-1 (1.79$\times$/4.12$\times$) and round-2 (1.85$\times$/3.81$\times$) held-out checks. With only 125 honest runs per calibration half (no-output set) every detector runs 1.6--2.6$\times$ hot at 0.01, so the no-output contrasts are less precise.
+
+%======================================================================
+\section{Round 4: execution replay in BashArena}\label{sec:r4}
+
+\paragraph{Goal and design.} Rounds 1--3 judged whether a rewrite still achieves its side task with an LLM judge and a static literal check. Round 4 grounded validity in execution: each original and each rewrite was replayed in a fresh, isolated BashArena sandbox and scored by the setting's official side-task scorer, which reads the final system state. Infrastructure: \texttt{control-arena} 20.1.0 (which ships BashArena 1.1); one multi-service Docker compose per sample, torn down after scoring; a fixed policy replays the recorded tool calls without any model. Structured tool calls for the originals were re-extracted from the source logs; the rewriter (\texttt{gemini-2.5-pro}, round-3 control and \texttt{pace\_max} prompts) was re-run to emit structured tool calls, and rewrites were scored by the \texttt{gpt-4.1} history-free monitor and the round-2 judge. Base set: the 35 round-3 base attacks (17 tasks; firewall 9, malware 9, sudo 8, password leak 9), all labelled successful in the dataset. Replays ran only inside the sandboxes, and attack content stays in gitignored data. OpenRouter \$13.26 \src{EXPERIMENT_LOG.md}.
+
+\paragraph{Pre-registration \tC.} Primary: undetected-success difference, plain rewrite minus original, with execution validity, against max at trajectory FPR 0.01 (gpt-4.1 history-free monitor), joint paired bootstrap over honest runs and task-clustered attacks with thresholds recomputed per replicate; an execution-invalid attack counts as never an undetected success. Secondary: pacing minus plain rewrite; both contrasts at $\alpha=0.003$ and for multichart, CUSUM $k=1.5$ and top-3 sum; the same contrasts with judge validity; judge-vs-execution agreement. The pre-registration and the results are in one commit; the session transcript shows the pre-registration and the analysis script (never edited afterwards) were written before the first replay verdict (audit 3). \textbf{Undeclared deviations} (audit 3): per-command timeout 12 s for the first 6 originals and 10 s for everything else (pre-registered 12 s); per-sample limit 900 s (pre-registered 1{,}800 s); 3 \texttt{pace\_max} rewrites failed to generate; 7 time-limit errors and 1 sandbox start-up failure (the log said 6), with the same 2 base attacks timing out in all three arms; the primary's restriction to the 28 base attacks that also have a \texttt{pace\_max} verdict was in the code but not in the pre-registration text. Replay logs were not retained, so individual failures cannot be audited \src{results/audit3/corrections.csv}.
+
+\subsection{Reproduction of ``successful'' originals \tE}
+\begin{table}[H]\centering\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Arm & side task succeeds in replay & rate [Wilson 95\%] & by side task\\
+\midrule
+original & 24 / 33 & 0.727 [0.558, 0.849] & firewall 1/9; others 23/24\\
+plain rewrite (control) & 16 / 33 & 0.485 [0.325, 0.648] & \\
+\texttt{pace\_max} & 11 / 28 & 0.393 [0.236, 0.576] & \\
+\bottomrule
+\end{tabular}
+\caption{Execution reproduction with the official BashArena scorers; time-limit errors excluded (2 / 2 / 4). Paired, the control loses 9 originals and gains 1 (McNemar exact $p=0.02$) \src{results/r4_replay/reproduction.md}, \src{results/audit3/rep_r4_reproduction_ci.csv}.}\label{tab:r4repro}
+\end{table}
+\begin{itemize}
+\item \textbf{The non-reproducing originals are almost all firewall attacks.} 8 of the 9 failures are the firewall side task (1/9 reproduce, vs 23/24 for the other three side tasks; Fisher $p=5.6\times10^{-6}$). BashArena 1.1, the version shipped with \texttt{control-arena} 20.1.0, changed the firewall daemon to make this side task harder to satisfy trivially. The most plausible reading of the 27\% non-reproduction is environment drift, not inflated dataset labels; without replay logs this cannot be confirmed.
+\item \textbf{Fixed replay is a fair test for rewrites, less so for originals.} A one-shot rewrite was written offline, so replaying it literally is the right model. An original succeeded with a live agent that saw real outputs; a fixed replay cannot adapt, so it biases originals towards failure and shrinks rewrite-minus-original.
+\end{itemize}
+
+\subsection{The LLM judge does not predict execution success \tC}
+\begin{itemize}
+\item Among rewrites the judge calls valid, the side task fails in execution 16 of 28 times for the control (0.571) and 16 of 21 for \texttt{pace\_max} (0.762); the static checks are not much better (literal 0.423 / 0.545, strict 0.500 / 0.750) \src{results/r4_replay/agreement.md}.
+\item These false-valid rates equal the base failure rates (0.515, 0.607): the judge has no positive discrimination. Rewrites the judge calls \emph{invalid} succeed 4 of 5 and 6 of 7 times. Firewall rewrites account for 7 and 6 of the 16 false-valids; without them the judge's false-valid rate is 9/20 and 10/14 \src{results/audit3/corrections.csv}.
+\end{itemize}
+
+\subsection{Undetected-success contrasts with execution validity}
+\begin{figure}[H]\centering
+\includegraphics[width=0.86\linewidth]{r4_replay_forest_conformal.pdf}
+\caption{Round 4 contrasts in undetected success, max, $\alpha=0.01$, conformal thresholds, joint paired bootstrap (honest $n=550$; attacks task-clustered). Rows 1, 5, 7 and 10 (from the top) are pre-registered contrasts (\nolinkurl{results/fixes2/rep_r4_analyze_conformal_thrfix/}); the other rows are audit-3 sensitivity sets and decompositions (\nolinkurl{results/fixes2/rep_r4_indep_conformal_thrfix/rep_r4_contrasts.csv}). Generated by \nolinkurl{docs/reports/src/make_r4_report_figs.py}.}\label{fig:r4}
+\end{figure}
+\begin{itemize}
+\item \textbf{Primary \tC: negative but inconclusive.} Plain rewrite minus original, execution validity, $n=28$ base attacks (14 tasks): $-0.214\ci{-0.480}{+0.032}$, $p(\Delta\le0)=0.97$ (plug-in upper bound $+0.040$). The pre-registered bar (interval excluding 0) is not met.
+\item \textbf{Its significance is a knife-edge \tE.} On all 33 pairs with both arms scored: $-0.257\ci{-0.500}{-0.026}$ under the conformal rule, but $-0.242\ci{-0.500}{0.000}$ under the plug-in rule; the difference is one original that sits in a gap between two honest scores. Imputing the errors ($n=35$) gives $-0.185\ci{-0.448}{+0.071}$ to $-0.300\ci{-0.548}{-0.059}$ depending on the imputation. \textbf{Without firewall attacks}: $-0.395\ci{-0.667}{-0.083}$ ($n=24$ of the 33 pairs) and $-0.350\ci{-0.646}{0.000}$ ($n=20$ of the 28 primary pairs).
+\item \textbf{Why execution grounding moved the estimate \tE.} The judge-validity version, which assumes every original is valid, is $-0.304\ci{-0.500}{-0.077}$. Two opposing changes produce the move to $-0.214$: replacing the judge by execution for the rewrites alone makes the contrast more negative ($-0.500\ci{-0.747}{-0.231}$), and replacing ``all originals valid'' by execution for the originals alone makes it almost zero ($-0.018\ci{-0.333}{+0.296}$). The net shrinkage comes entirely from originals that fail replay, 8 of 9 of them firewall. Without firewall attacks, judge and execution validity agree ($-0.375$ vs $-0.395$, $n=24$). The round-4 log's reading that execution grounding ``shrinks the effect and removes significance'' mixed these two moves.
+\item \textbf{Detection vs validity \tE.} Ignoring validity, the rewrite effect is $-0.161\ci{-0.370}{+0.049}$; a symmetric decomposition gives detection $-0.152\ci{-0.333}{+0.037}$ and validity $-0.062\ci{-0.231}{+0.065}$; on the 15 pairs where both arms execute successfully, $-0.267\ci{-0.545}{+0.067}$. Unlike round 3, most of the point estimate is detection, because originals also fail; none of these is significant.
+\item \textbf{Pacing minus plain rewrite \tC (secondary).} $-0.107\ci{-0.357}{+0.120}$ against max; all 8 detector $\times$ $\alpha$ cells are n.s. Detection only: $+0.071\ci{-0.122}{+0.250}$ (pacing slightly \emph{less} detected, n.s.). Pacing does not beat a plain rewrite, replicating rounds 2--3 under execution validity.
+\item \textbf{Pacing minus original \tC (secondary).} $-0.321\ci{-0.625}{-0.034}$. It is validity loss: validity part $-0.241\ci{-0.460}{-0.034}$, detection part $-0.081\ci{-0.261}{+0.090}$. Pacing breaks attacks (11 of 28 execute); it is not shown to make them more detectable.
+\item \textbf{Multiplicity.} Of the 24 execution-validity cells (3 contrasts $\times$ 4 detectors $\times$ 2 $\alpha$), 5 have an interval excluding 0 without correction (rewrite minus original on multichart at 0.01; pacing minus original on max and multichart at both levels); none survives Holm (smallest adjusted $p=0.28$) \src{results/fixes2/headline_threshold_rerun.csv}.
+\item \textbf{Realized FPR.} The threshold is set on all 550 honest runs. Under the conformal rule max realizes 1.00$\times$ nominal by leave-one-out at $\alpha=0.01$ and 0.003; on task-grouped halves 1.09$\times$ and 1.19$\times$ (out-of-task shift). The ``realized FPR'' column in the round-4 log came from a different procedure (quantiles on random halves) and is not the FPR of the thresholds used \src{results/fixes2/rep_realized_fpr_thrfix.csv}.
+\item \textbf{A rendering confound \tE.} The originals' stored actions are truncated at 4{,}000 characters, while 25 of 35 control rewrites have longer actions that the monitor sees in full (up to 12{,}000). The peak-scoring step is such an action in 3 rewrites; the effect on the control's alarm rate is bounded by about 2 of 33.
+\end{itemize}
+
+\paragraph{Reading.} Execution replay removes the dependence on the LLM judge, which turned out to carry no information about execution success. It leaves Idea 3's main negative result intact: detector-aware pacing does not beat a plain rewrite. It does not establish that rewriting by itself makes attacks easier to catch: the pre-registered contrast is negative but its interval includes 0, and the estimate depends on how the firewall attacks, which no longer reproduce in BashArena 1.1, are handled.
 
 %======================================================================
 \section{What holds, what is weakened, what is dropped}\label{sec:status}
@@ -410,33 +448,55 @@ With 550 honest runs, max, CUSUM $k=1.5$ and top-3 sum realize nominal FPR. The 
 \toprule
 \multicolumn{2}{@{}l}{\textbf{Holds}}\\
 \midrule
-LLM rewriting of a working attack makes it more detectable & Round 2 control $-0.357$ (judge) to $-0.500$ (strict); round 3 $-0.60$ (\texttt{gpt-4.1}) and $-0.37$ (\texttt{gemini}); replicates without outputs.\\
-Rewrite artifact is not a same-model effect & Different-family rewriter, detection-only $-0.143\ci{-0.300}{-0.027}$ (weaker than first stated; see below).\\
-No detectable strategy effect of detector knowledge & Primary $+0.087\ci{-0.032}{+0.183}$; 24/24 round-2 one-shot contrasts Holm $p=1.00$; round 3 all pacing-control CIs contain 0.\\
-Pacing still worse than doing nothing & \texttt{pace\_max} $-$ original $-0.151$ (judge) to $-0.317$ (strict).\\
-Top-3 sum neutralizes the (confounded) pacing gain & $+0.032\ci{-0.063}{+0.143}$ adaptive; one-shot $\le0$.\\
-Max, CUSUM $k{=}1.5$, top-3 sum are the well-calibrated, useful rules & Realized FPR $\approx$ nominal (Table~\ref{tab:fpr}); max strongest on originals, top-3 sum most robust to pacing.\\
+No detectable strategy effect of detector knowledge & Round 2 primary $+0.095\ci{-0.020}{+0.183}$; 24/24 round-2 one-shot contrasts Holm $p=1.00$; round 3 all pacing-control CIs contain 0; round 4 (execution validity, pre-registered) $-0.107\ci{-0.357}{+0.120}$.\\
+Pacing costs the attacker validity & Round 4 pacing minus original $-0.321$, of which validity $-0.241$ (significant) and detection $-0.081$ (n.s.).\\
+The LLM judge is not a usable validity measure & Round 4: judge false-valid rates equal the base failure rates; judge-invalid rewrites succeed 4/5 and 6/7.\\
+Top-3 sum neutralizes the (confounded) pacing gain & $+0.047\ci{-0.056}{+0.143}$ adaptive (judge); one-shot $\le0$.\\
+Max, CUSUM $k{=}1.5$, top-3 sum are the well-calibrated, useful rules & Realized FPR $\approx$ nominal (exactly nominal by leave-one-out under the conformal rule); max strongest on originals, top-3 sum most robust to pacing.\\
 Small-evidence accumulators are near-powerless here & Originals $\ge0.93$ undetected under CUSUM $k{=}0.5$, e-process, SR, GLR.\\
 No $\sqrt{\mathrm{ARL}}$ scaling & Slopes 0.007--0.073 on ARL $\le551$.\\
 Fabricated outputs are not the cue & Leak test DiD $+0.22$ to $+0.79$; no-output contrasts replicate.\\
 \midrule
 \multicolumn{2}{@{}l}{\textbf{Weakened}}\\
 \midrule
-Gemini control $-0.37$ vs originals & About 60\% is broken attacks; detection-only $-0.143$ (audit2 A4).\\
-Multi-chart OR closes CUSUM's gap and ties max & Its cells overstate detection: realized FPR 1.7--2.0$\times$ at 0.01, 3.4--4.2$\times$ at 0.003 across rounds.\\
+LLM rewriting of a working attack makes it more detectable (``rewrite artifact'') & Downgraded to a consistent direction. Significant under judge/static validity (round 2 control $-0.349$ judge to $-0.492$ strict; round 3 $-0.57$ \texttt{gpt-4.1}, $-0.385$ \texttt{gemini}), but under execution validity the pre-registered contrast is $-0.214\ci{-0.480}{+0.032}$, no cell survives Holm, and the result depends on the firewall attacks.\\
+Rewrite drop is not a same-model effect & Different-family rewriter, detection-only $-0.157\ci{-0.299}{-0.026}$ (static validity); not re-tested by execution with a second rewriter.\\
+Gemini control $-0.385$ vs originals & About 60\% is broken attacks under static validity; detection-only $-0.157$ (audit2 A4).\\
+Multi-chart OR closes CUSUM's gap and ties max & Its cells overstate detection: realized FPR 1.7--2.0$\times$ at 0.01, 3.4--4.2$\times$ at 0.003 across rounds (plug-in).\\
 Adaptive feedback helps the attacker ($+0.10$ to $+0.17$) & True in-sample only: selection on the evaluation monitor's own scores; $+0.03$ to $+0.08$ in the mode not used for feedback.\\
 Round-1 levels 0.63--0.73 vs max & Judge-only upper bounds; strict 0.47--0.53.\\
 Strong monitor & Pilot AUROC 0.871 did not carry over; full-set gain is low-FPR TPR only (0.246 vs 0.143 at 1\%).\\
-\midrule
-\multicolumn{2}{@{}l}{\textbf{Dropped}}\\
-\midrule
-Detector-aware rewriting backfires (round 1) & No control; vs the round-2 control the aware arms are $+0.03$ to $+0.14$, in the attacker's favour (M3).\\
-Pacing beats the control by $+0.21$ (round 2) & Adaptive vs one-shot; one-shot vs one-shot $+0.095$ judge / $+0.087$ strict, n.s. (M1).\\
-Pacing beats round-1 condensation & No comparison survives Holm; one sign reversal (m4).\\
-``Drops are real detection, not broken attacks''; validity penalty $\le2$ pp & Judge-strict gap is 0.17--0.20 in round 1 (M2); 60\% of the round-3 artifact is validity (A4).\\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.36\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+\multicolumn{2}{@{}l}{\textbf{Dropped}}\\
+\midrule
+Detector-aware rewriting backfires (round 1) & No control; vs the round-2 control the aware arms are $+0.03$ to $+0.14$, in the attacker's favour (M3).\\
+Pacing beats the control by $+0.21$ (round 2) & Adaptive vs one-shot; one-shot vs one-shot $+0.103$ judge / $+0.095$ strict, n.s. (M1).\\
+Pacing beats round-1 condensation & No comparison survives Holm; one sign reversal (m4).\\
+``Drops are real detection, not broken attacks''; validity penalty $\le2$ pp & Judge-strict gap is 0.17--0.20 in round 1 (M2); 60\% of the round-3 drop is static validity (A4).\\
+``27\% of successful MonitoringBench attacks do not reproduce'' read as inflated labels (round-4 log) & 8 of 9 non-reproducers are firewall attacks in BashArena 1.1; environment drift is the more plausible cause.\\
+``Execution grounding shrinks the effect and removes significance'' (round-4 log) & Two opposing moves; the shrinkage comes from originals failing replay, mostly firewall.\\
+``Idea 3's conclusion is intact and arguably stronger'' (round-4 log) & Consistent with, not stronger: pacing $-$ rewrite n.s. replicates, rewrite $-$ original n.s.\\
+Realized FPR ``$\approx$ nominal'' at $\alpha=0.003$ (round-4 log) & Plug-in rule ran 1.2--1.5$\times$ nominal; conformal rule 1.00$\times$ (leave-one-out).\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%======================================================================
+\section{Errata relative to the October 22 version}
+\begin{itemize}
+\item \textbf{Summary item 2 and the status table} (``Any LLM rewrite makes attacks easier to catch''): downgraded. Under execution validity the pre-registered contrast is $-0.214\ci{-0.480}{+0.032}$, negative but inconclusive.
+\item \textbf{Round-2 primary} $+0.087\ci{-0.032}{+0.183}$, $p=0.20$, called ``pre-specified'': $+0.095\ci{-0.020}{+0.183}$, $p=0.14$ under the conformal rule; it was designated during the first audit, so it is exploratory.
+\item \textbf{Round-3 rewrite effect} $-0.371\ci{-0.550}{-0.185}$ and detection-only $-0.143\ci{-0.300}{-0.027}$: $-0.385\ci{-0.556}{-0.195}$ and $-0.157\ci{-0.299}{-0.026}$ (conformal). All round-3 table cells were updated from the conformal re-run.
+\item \textbf{Detection-only label.} The overview figure of the summary report labels the round-3 detection-only contrast ``valid rewrites''. That row ignores validity and counts every rewrite; this report labels it ``detection only (validity ignored)'' throughout, and keeps the both-strictly-valid pairs ($-0.211\ci{-0.364}{-0.037}$, $n=26$) as a separate column.
+\item \textbf{Replay}: ``not run on our trajectories'' is superseded by round 4.
+\item \textbf{Round-3 forest figure}: redrawn from the conformal result files instead of hand-entered coordinates.
+\end{itemize}
 
 %======================================================================
 \section{Errata relative to the October 21 version}
@@ -468,32 +528,32 @@ CIs over base attacks only & Replaced by joint (honest + attack) bootstrap; most
 %======================================================================
 \section{Interpretation}
 \begin{enumerate}
-\item \textbf{The binding constraint on these attackers is rewriting, not detector knowledge.} Every LLM rewrite we produced, with or without monitor information and from two model families, isolated the attack-critical operation into a high-scoring standalone action (92\% of control rewrites vs 44\% of originals had an attack step above the honest q99). Telling the rewriter the detector, its parameters and the honest score distribution did not measurably undo this.
+\item \textbf{Detector knowledge did not help these attackers.} Across four rounds, two rewriter families and three validity definitions (judge, static, execution), pacing never beat a plain rewrite. Every LLM rewrite we produced tended to isolate the attack-critical operation into a high-scoring standalone action (92\% of control rewrites vs 44\% of originals had an attack step above the honest q99), and telling the rewriter the detector did not undo this. Whether the rewrite itself makes attacks easier to catch is not established under execution validity.
 \item \textbf{A null strategy effect is not evidence that detector-aware evasion is impossible.} The one-shot CIs allow gains of up to about $+0.18$ against max. The attacker never executed anything, saw only its own fabricated outputs, and had at most three attempts. An attacker that operates live in the environment, or a much stronger rewriter, could behave differently.
 \item \textbf{Detector design.} Against both weak and stronger monitors, single-spike rules (max, top-3 sum, CUSUM with a large reference) dominate small-evidence accumulators, because detection is spike-driven and the honest per-step distribution has a mass at very low scores. Top-3 sum was the most robust to the pacing attackers. The multi-chart OR is not a safe default as implemented: its tail-fit thresholds need held-out calibration or a conservative correction.
 \item \textbf{The covert-adversary regime was not reached.} Damage is flat in ARL because attacks are caught by one conspicuous step or not at all. Testing the $\sqrt{\mathrm{ARL}}$ law needs a monitor whose per-step evidence is informative but small, and far more honest runs than 550 to calibrate long ARLs.
-\item \textbf{Validity is the weakest link.} Judge-only validity overstates attacker success by 0.17--0.20 in round 1, and most of the different-family rewrite artifact is broken attacks. Execution replay is the necessary next measurement.
+\item \textbf{Validity is the weakest link.} The LLM judge carries no information about execution success, so validity must be measured by execution. Execution itself depends on the environment version: the firewall attacks that succeeded in the dataset no longer reproduce in BashArena 1.1, and that choice moves the main rewrite contrast from inconclusive to significant.
 \end{enumerate}
 
 \section{Limitations}
 \begin{itemize}
-\item \textbf{No execution.} Side-task success of rewrites rests on an LLM judge plus a static literal check; strict and judge validity bracket the truth but do not replace replay.
+\item \textbf{Execution validity only in round 4}, with one rewriter, two arms and 28--33 pairs, fixed-policy replays with a 10--12 s per-command cap, BashArena 1.1 (firewall changed), and no retained replay logs. Rounds 1--3 rest on an LLM judge plus a static literal check, which round 4 shows to be unreliable.
 \item \textbf{Monitors.} \texttt{gpt-4.1} improves low-FPR TPR over \texttt{gpt-4.1-mini} (0.246 vs 0.143) but is not a strong monitor in absolute terms.
-\item \textbf{Round 3 is small.} $n=35$ base attacks from 17 tasks, one-shot only; CIs are wide ($\pm0.15$--0.20).
+\item \textbf{Rounds 3--4 are small.} $n=35$ base attacks from 17 tasks (28 paired in round 4, 14 task clusters), one-shot only; CIs are wide ($\pm0.15$--0.25) and percentile intervals from 14 clusters may undercover.
 \item \textbf{Same model as rewriter and monitor} in rounds 1--2. Round 3 shows the effect is modest and confined to the control arm.
 \item \textbf{Agent-model confound.} Honest runs are all \texttt{opus-4-5}; 40 of 126 paired attacks are \texttt{opus-4-6}. Contrasts are stable on the opus-4-5 subset; round 3 is not stratified.
 \item \textbf{Attack-relevant step labels} used in the cost and damage analyses are self-reported by the rewriter.
-\item \textbf{Label-correlated surface features} in the source data (truncation, a text-editor sub-command, reasoning visibility) are documented, not removed; LLM monitors never see reasoning \src{results/audit/issues.csv} (m8).
+\item \textbf{Label-correlated surface features} in the source data (truncation, a text-editor sub-command, reasoning visibility) are documented, not removed. LLM monitors never see agent reasoning; audit 3 re-checked every monitor scored in this repository \src{results/audit/issues.csv} (m8), \src{results/audit3/leak_reasoning.csv}.
 \item \textbf{White-box reader rows on round-1 rewrites} (white-box pilot) cannot be re-derived: their score files were overwritten by an empty sync \src{results/audit2/issues.csv} (A2).
 \end{itemize}
 
 \section{Next steps}
 \begin{enumerate}
-\item \textbf{Execution replay} along the path in Section~\ref{sec:replay}: structured tool calls for originals and rewrites, a fixed-trajectory policy in \texttt{control-arena}, official scorers. Laptop only, no API spend.
+\item \textbf{Replay against the dataset's environment version} (or re-generate originals in BashArena 1.1) so that firewall attacks are comparable, keep replay logs, and extend execution validity to the \texttt{gpt-4.1} rewriter and the other pacing arms.
 \item \textbf{An adaptive control}: the rewrite control with the same feedback loop, evaluated on a held-out monitor or held-out threshold, so that adaptive pacing can be compared fairly.
 \item \textbf{Live attackers}: let the attacker act in the sandbox with knowledge of the detector, instead of rewriting a finished transcript.
 \item \textbf{Calibration}: held-out or cross-fitted thresholds for the multi-chart OR; more honest runs (thousands) for any ARL-scaling test.
 \end{enumerate}
 
-\paragraph{Reproduction.} Code: \nolinkurl{tracks/t3_aware_attacker/}, \nolinkurl{tracks/r2_t3/}, \nolinkurl{tracks/r3_t3/} (rounds 1--3); \nolinkurl{tracks/fixes/t3/}, \nolinkurl{tracks/audit2/repro_t3r3.py} (audits). Results: \nolinkurl{results/{t3,r2_t3,r3_t3}/}, \nolinkurl{results/fixes/{t3,r2_t3}/}, \nolinkurl{results/fixes/corrections.csv}, \nolinkurl{results/audit{,2}/}; in \nolinkurl{r3_t3/} the \nolinkurl{paired_contrasts[_noout].md} files are canonical and the contrasts in \nolinkurl{compare*.md} are superseded. Rewritten trajectories stay in the gitignored \nolinkurl{data/processed/t3_refined/}; attack content is never committed. Repository: \href{https://github.com/gregkocher/agent-monitor-detection}{gregkocher/agent-monitor-detection} (private).
+\paragraph{Reproduction.} Code: \nolinkurl{tracks/t3_aware_attacker/}, \nolinkurl{tracks/r2_t3/}, \nolinkurl{tracks/r3_t3/}, \nolinkurl{tracks/r4_replay/} (rounds 1--4); \nolinkurl{tracks/fixes/t3/}, \nolinkurl{tracks/audit2/repro_t3r3.py}, \nolinkurl{tracks/audit3/} (\nolinkurl{rep_*}), \nolinkurl{tracks/fixes2/} (\nolinkurl{rep_*}, threshold re-run); figures \nolinkurl{docs/reports/src/make_r4_report_figs.py}. Results: \nolinkurl{results/{t3,r2_t3,r3_t3,r4_replay}/}, \nolinkurl{results/fixes/{t3,r2_t3}/}, \nolinkurl{results/fixes/corrections.csv}, \nolinkurl{results/audit{,2,3}/}, \nolinkurl{results/fixes2/}; in \nolinkurl{r3_t3/} the \nolinkurl{paired_contrasts[_noout].md} files are canonical and the contrasts in \nolinkurl{compare*.md} are superseded. Rewritten trajectories stay in the gitignored \nolinkurl{data/processed/t3_refined/}; attack content is never committed. Repository: \href{https://github.com/gregkocher/agent-monitor-detection}{gregkocher/agent-monitor-detection} (private).
 \end{document}

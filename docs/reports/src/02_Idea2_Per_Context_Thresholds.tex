@@ -1,5 +1,9 @@
 \documentclass[11pt]{article}
+\PassOptionsToPackage{obeyspaces,spaces}{url}
 \input{preamble}
+\usepackage{xspace}
+\newcommand{\tC}{\textsf{\scriptsize\textcolor{ForestGreen}{[C]}}\xspace}
+\newcommand{\tE}{\textsf{\scriptsize\textcolor{ink2}{[E]}}\xspace}
 \usepackage[section]{placeins}
 \usepackage{xltabular}
 \newcommand{\src}[1]{{\footnotesize\textcolor{ink2}{[\nolinkurl{#1}]}}}
@@ -8,22 +12,22 @@
 \newcommand{\DROP}{\textcolor{BrickRed}{\textbf{dropped}}}
 \newcommand{\NE}{\textit{n.e.}}
 \title{\textbf{Idea 2: Per-Context Thresholds for AI-Agent Monitors}\\[4pt]
-\large Rounds 1--3 after two audits: heterogeneity, CFAR vs global vs Stackelberg allocation, transfer, poisoning, white-box probes, and Watcher-like severity tiers}
-\date{October 22, 2026 (supersedes the October 21 version)}
+\large Rounds 1--4 after three audits: heterogeneity, allocation rules, transfer, poisoning, white-box probes and severity tiers}
+\date{October 23, 2026 (supersedes the October 22 version)}
 \begin{document}
 \maketitle
 \vspace{-1.5em}
 
-\keybox{\textbf{Summary.} Honest monitor-score distributions differ across deployment contexts, so a single global threshold over-audits some contexts and under-audits others. Radar's answer is CFAR: hold the false-alarm rate constant in every context. Three rounds of experiments tested CFAR and alternatives at a fixed \emph{global} audit budget $B$ on real monitor streams (Gemini-3.1-Pro on 7 settings and ControlArena, the 12-monitor LinuxArena sweep, MRT, MonitoringBench with gpt-4.1/-mini/-nano, and 14 Qwen3.5-27B white-box probe streams), against uniform, context-selecting, probing, poisoning and severity-aware attackers. Every number below comes from a results file or log entry and reflects both audits' corrections; claims that changed are listed in Section~\ref{sec:verdicts}.
+\keybox{\textbf{Summary.} Honest monitor-score distributions differ across deployment contexts, so one global threshold over-audits some contexts and under-audits others; Radar-style CFAR holds the false-alarm rate constant in every context. Four rounds tested CFAR and alternatives at a fixed \emph{global} audit budget $B$ on real monitor streams (Gemini-3.1-Pro on 7 settings and ControlArena, LinuxArena, MRT, MonitoringBench, 14 white-box probe streams) against uniform, context-selecting, probing, poisoning and severity-aware attackers. Numbers reflect three audits and the threshold-convention fix (\S\ref{sec:thr}); changed claims are listed in Section~\ref{sec:verdicts}. Tags: \tC confirmatory (pre-specified), \tE exploratory.
 \begin{enumerate}[leftmargin=1.2em]
-\item \textbf{Heterogeneity is real across deployments, small within one, and large for white-box probes.} One monitor and rubric over 7 settings: per-setting FPR 0--9.0\% at a global 5\% threshold ($\tau=1.34$ logit, $p<0.001$). Within LinuxArena: 2.1--7.2\% across environments, nothing across agent models. Probe scores: $\tau$ up to 3.79, per-cluster FPR up to 25.5\%, while the LLM monitors on the same trajectories have $\tau\le0.46$ (n.s.).
-\item \textbf{CFAR is the worst rule against an attacker who chooses where to attack}, and the attacker needs little information. 7 settings, $B=1\%$, spend-matched: 0.38 vs 0.64 for global (paired $-0.52..-0.10$). Three to five alarm-feedback probes per context recover most of the gain (ControlArena 1\%: CFAR safety $0.83\to0.25$).
-\item \textbf{Damage-equalizing (Stackelberg) thresholds beat global against selection at 5\%}, not demonstrably at 1\%. 7 settings at 5\%: 0.97 vs 0.89 (paired $+0.03..+0.12$; 0.957 with attacker information independent of the defender's fit). They need attack data from the deployed side-task distribution and $\gtrsim$10--20 attacks per context (or shrinkage). Fit on other side tasks they lose the gain.
-\item \textbf{Per-context rules have a spend floor.} With $n_c$ honest calibration runs, plug-in per-context thresholds cannot spend less than $\approx\sum_c w_c/(n_c+1)$. At $n_c=10$ CFAR spends 6.2--7.7$\times$ the budget. On the white-box panel the floor is 2.5\%, so the earlier ``CFAR doubles probe TPR at 1\%'' is not estimable. At equal realized spend ($\approx$3\%) CFAR gains 1.3--1.5$\times$ for the two probes behind that claim.
-\item \textbf{Recalibration can be poisoned, and no rule separates poisoning from genuine deployment-wide drift without a trusted refresh.} CFAR breaks at poisoned share $\varepsilon\approx B$. Round 1's OS-CFAR with a leave-one-context-out tail resists poison in one context but breaks at $\varepsilon\approx B$ when the poison is spread over the other contexts. A tail taken from a frozen trusted reference holds (worst-case TPR 0.59--0.81 at $\varepsilon=10\%$) but over-spends 2.0--2.9$\times$ under genuine deployment-wide tail drift.
-\item \textbf{Watcher-like fixed severity tiers lose to a plain suspicion threshold.} A blind per-action severity rater does not separate attacks from honest work (AUROC 0.53--0.54). The always-block tier alone flags 1.5\% of honest trajectories, so tiered policies cannot run at 1\%. At 5\% they lose 0.06--0.12 damage-weighted detection to global (gpt-4.1-mini: $-0.08$ [$-0.19,-0.03$] permissive, $-0.06$ [$-0.16,-0.01$] strict).
+\item \textbf{Heterogeneity is real across deployments, small within one, large for white-box probes} \tE: per-setting FPR 0--9.0\% at a global 5\% threshold over 7 settings ($\tau=1.34$, $p<0.001$); probe $\tau$ up to 3.79 vs $\le0.46$ (n.s.) for LLM monitors on the same trajectories.
+\item \textbf{CFAR is the worst rule against an attacker who chooses where to attack} \tE: 7 settings, $B=1\%$, exact spend matching, $-0.280$ [$-0.46$, $-0.22$] selection safety vs global, and worst at every budget. Three to five alarm-feedback probes per context suffice to exploit it.
+\item \textbf{Damage-equalizing (Stackelberg) thresholds beat global against selection at 5\%} \tE ($+0.076$ [$+0.026$, $+0.124$], 7 settings). \textbf{At 1\% the pre-specified round-4 test was met but is not robust} \tC: $+0.107$ [$+0.024$, $+0.152$] with trajectory-level resampling, driven by SHADE (5 main tasks); with main-task resampling [$-0.003$, $+0.251$]. The spend matching picks the operating point on held-out honest data: fair across rules, not deployable. Fit on other side tasks Stackelberg loses 0.13 to global at 1\% \tE.
+\item \textbf{Per-context rules have a spend floor} $\approx\sum_c w_c/(n_c+1)$, so they need roughly $1/B$ calibration runs per context (about 300 at 1\%); with $\approx$110--125 per context (ControlArena, public LinuxArena) they are not estimable at 1\%, and the white-box ``CFAR doubles probe TPR at 1\%'' is not estimable \tE.
+\item \textbf{Recalibration can be poisoned} \tE: CFAR breaks at poisoned share $\varepsilon\approx B$; a frozen trusted-reference tail holds (worst-case TPR 0.59--0.81 at $\varepsilon=10\%$) but over-spends 2.0--2.9$\times$ under genuine deployment-wide drift.
+\item \textbf{Watcher-like fixed severity tiers lose to a plain suspicion threshold} \tE: blind severity AUROC 0.53--0.54; tiers cannot run at 1\%; at 5\% they lose 0.06--0.12 damage-weighted detection (gpt-4.1-mini permissive $-0.082$ [$-0.191$, $-0.021$]).
 \end{enumerate}
-Spend: \$17.11 (round 1) + \$0 (round 2) + \$21.82 (round 3) = \$38.93 OpenRouter; both audits \$0 for this track.}
+Spend: \$38.93 OpenRouter over four rounds (round 4 \$0); audits and threshold re-run \$0.}
 
 
 \section{Question and scope}
@@ -32,11 +36,12 @@ How much do honest monitor-score distributions vary by context (environment, set
 \item \textbf{Round 1} (Oct 20): heterogeneity; CFAR vs global vs detection-maximizing vs damage-equalizing (Stackelberg) allocation against uniform and context-selecting attackers; small samples; poisoning of one context's recalibration data; slow (``boiling frog'') poisoning.
 \item \textbf{Round 2} (Oct 21): transfer to new attack distributions, new agent models and new monitors (E1); poisoning spread over several contexts (E2); severity-weighted damage (E3); probing attackers and estimation error (E4); white-box and strong-monitor streams (E5).
 \item \textbf{Round 3} (Oct 21): Watcher-like products that combine per-action suspicion with intent-agnostic severity tiers.
-\item \textbf{Audits} (Oct 21--22): the first audit (C1, M5, m2, m3, m11) and the second audit (m9 on the round-3 matcher) changed several claims; Section~\ref{sec:verdicts} lists them.
+\item \textbf{Round 4} (Oct 22, track \texttt{r4ctx}, pre-specified): allocation at $B=1\%$ on panels with hundreds of honest runs per context, with an exact spend matcher; the round-3 Watcher tables re-summarized without clamping.
+\item \textbf{Audits} (Oct 21--23): the first audit (C1, M5, m2, m3, m11), the second audit (m9 on the round-3 matcher) and the third audit (round-4 resampling unit and operating point) changed several claims; the threshold-convention re-run changed none here. Section~\ref{sec:verdicts} lists them.
 \end{itemize}
 \textbf{Prior expectations.} Per-context thresholds are requested by several research agendas (\emph{Salient Directions}, Scale MRT, UK AISI Async Control, GDM's UEBA mention). Pinto (2607.06596) shows that a 1\% threshold transferred across model families realizes 0--94\% audit spend. Detection theory (Ghafouri et al.) predicts that against a threshold-aware attacker the optimal per-context thresholds equalize worst-case \emph{damage}, not FPR, so CFAR may be exploitable.
 
-\textbf{Sources.} All paths in brackets are relative to \texttt{results/} unless they start with \texttt{data/} or \texttt{EXPERIMENT\_LOG}. Round 1: \src{t2/tables.md}; round 2: \src{r2_t2/tables.md}; E5: \src{r2_t2/e5_tables.md} and the corrected \src{fixes/r2_t2/e5_tables_corrected.md}; round 3: \src{r3_t2/tables.md}, \src{r3_t2/watcher_summary.csv}; audits: \src{fixes/corrections.csv}, \src{audit/issues.csv}, \src{audit2/issues.csv}, \src{audit2/r3t2_matched_check.csv}.
+\textbf{Sources.} All paths in brackets are relative to \texttt{results/} unless they start with \texttt{data/} or \texttt{EXPERIMENT\_LOG}. Round 1: \src{t2/tables.md}; round 2: \src{r2_t2/tables.md}; E5: \src{r2_t2/e5_tables.md} and the corrected \src{fixes/r2_t2/e5_tables_corrected.md}; round 3: \src{r3_t2/tables.md}, \src{r3_t2/watcher_summary.csv}, re-summarized in \src{r4_ctx/r3t2_corrected/}; round 4: \src{r4_ctx/tables.md}, \src{r4_ctx/summary.csv}, \src{r4_ctx/primary.csv}; audits: \src{fixes/corrections.csv}, \src{audit/issues.csv}, \src{audit2/issues.csv}, \src{audit2/r3t2_matched_check.csv}, \src{audit3/corrections.csv}, \src{audit3/ctx_primary_checks.csv}; threshold re-run: \src{fixes2/headline_threshold_rerun.csv}.
 
 \section{Data, rules and evaluation}
 \subsection{Panels}
@@ -99,10 +104,17 @@ sev\_tilt (r3) & one global threshold on $\max_i(s_i+\beta v_i)$, $\beta\in\{0,.
 \item \textbf{Splits.} Round 1: 60 stratified 50/50 splits (points) and 150 split-then-bootstrap replicates (95\% intervals; paired differences vs global are percentiles of the replicate differences). Round 2: 150 paired bootstrap replicates. E5 corrected: 30 plain + 60 bootstrap splits with the attack split grouped by base attack. Round 3: 40 replicates.
 \item \textbf{Nominal mode}: each rule at its nominal level; per-context rules can over-spend out of sample.
 \item \textbf{Spend-matched mode}: the nominal level is swept and the metrics are interpolated at realized test spend $=B$. Rounds 1--3 swept $B\times[0.25,2]$ with \texttt{np.interp}, which \emph{clamps} when the sweep never reaches $B$; \texttt{matched\_ok} marks the share of replicates that were bracketed (audit C1). The fixed matcher (\texttt{tracks/fixes/e5/}) sweeps $B\times\{0,0.01..3\}$ and declares a split unmatched otherwise; rows matched in $<80\%$ of splits are reported as not estimable (\NE). It was applied to E5; the round-3 replicates were re-summarized with matched-only replicates (audit2 m9). The round-1 and round-2 tables were not re-run: in this report rows with \texttt{matched\_ok}$\,<0.8$ are marked with $^\dagger$ and not interpreted.
+\item \textbf{Exact spend matching (round 4).} For each rule the fit level is bisected until the realized \emph{test} spend $\sum_c w_c\,\FPR_c$ brackets $B$, and the two bracketing fits are mixed as a randomized policy so that realized spend equals $B$ exactly (max $|$spend$-B|=3.5\times10^{-17}$). A replicate whose spend floor exceeds $B$ is unmatched; rows matched in $<80\%$ of cells are \NE. Because the operating point is chosen on the test honest half, the comparison is at equal realized spend for every rule but is an oracle: a deployed rule must be fit at a nominal level, and nominal per-context fits over-spend (audit 3).
 \item \textbf{Small samples.} Calibration subsampled to $n\in\{10,30,100\}$ honest runs per context.
 \end{itemize}
 
-\section{Round 1: heterogeneity, allocation, small samples, single-context poisoning}
+\subsection{Threshold convention}\label{sec:thr}
+The global rule and per-context quantiles used a plug-in randomized quantile, whose out-of-sample FPR for continuous scores is $(\lfloor\alpha n\rfloor+1)/(n+1)$ (one order statistic too high at integer $\alpha n$). The repository now uses the conformal randomized rule (a new score $s$ alarms with probability $\mathrm{clip}((\alpha(n+1)-\#\{S_i>s\})/(\#\{S_i=s\}+1),0,1)$, expected FPR exactly $\alpha$ for exchangeable scores).\src{audit3/corrections.csv} For this report the change hardly matters, because every headline comparison is spend-matched on the test honest half, which fixes realized spend whatever rule produced the thresholds. The re-run left the round-4 primary unchanged (the main-task interval moved from [$-0.004$, $+0.251$] to [$-0.003$, $+0.251$]) and moved the 5\% overview contrasts by $\le0.004$.\src{fixes2/headline_threshold_rerun.csv} At nominal (unmatched) level it matters: the conformal rule removes plug-in CFAR's nominal over-spend (7 settings at 5\%: 5.11\% $\to$ 5.00\%; ControlArena 5.31\% $\to$ 5.00\%), and a conformal version of the Stackelberg hull lowers the nominal round-4 Stackelberg gain from $+0.134$ to $+0.061$ [$+0.010$, $+0.119$] (part of the nominal gain is plug-in over-spend). For per-context quantiles at small $n_c$ the conformal rule behaves like Mondrian below: it cannot alarm with certainty when $\alpha(n_c+1)<1$. Round 1--3 tables were not re-run and keep plug-in thresholds.
+
+\subsection{Confirmatory and exploratory results}
+Only the round-4 primary contrast (Stackelberg $-$ global selection safety on 7 settings at $B=1\%$, in distribution, spend-matched; supported iff the 95\% joint-bootstrap interval is above 0 and both rules are matched in $\ge80\%$ of cells) was written down before its data were analysed \tC. The design prose was committed first; the code was committed with the results and matches the prose (audit 3). Every other result in this report, in all four rounds, is exploratory \tE and is reported with its interval and without a multiplicity claim.
+
+\section{Round 1: heterogeneity, allocation, small samples, single-context poisoning \tE}
 \subsection{Heterogeneity}
 \begin{table}[!htb]\centering\small
 \begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcccc@{}}
@@ -151,12 +163,12 @@ ControlArena & global & 0.97\% & 0.798 & 0.601 & 0.607 & -- & 0.96 & 0.960 & 0.9
 & Stackelberg & 1.38\% & 0.863 & 0.729 & 0.610$^\dagger$ & $-0.36..+0.17$ & 0.66 & 0.982 & 0.973 & $-0.00..+0.13$\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Allocation rules. ``sel.'' = selection safety (TPR in the context an informed attacker picks). $\Delta$ = 2.5--97.5\% of paired replicate differences. m\_ok = \texttt{matched\_ok} at 1\% (all 5\% rows shown have m\_ok $\ge0.97$). $^\dagger$ = m\_ok $<0.8$, partly extrapolated by the clamping matcher; not interpreted. \src{t2/tables.md}}
+\caption{Allocation rules (plug-in thresholds, clamping matcher). ``sel.'' = selection safety (TPR in the context an informed attacker picks). $\Delta$ = 2.5--97.5\% of paired replicate differences. m\_ok = \texttt{matched\_ok} at 1\% (all 5\% rows shown have m\_ok $\ge0.97$). $^\dagger$ = m\_ok $<0.8$, partly extrapolated by the clamping matcher; not interpreted. \src{t2/tables.md}}
 \end{table}
 
 \begin{itemize}
 \item \textbf{CFAR is the worst rule against selection} on the heterogeneous panels: 7 settings at 1\% (spend-matched, m\_ok 0.99) and ControlArena at 5\% (m\_ok 1.00) both have paired intervals below 0. With attacker information drawn from a split independent of the defender's fit, 7 settings at 1\% gives CFAR 0.409 vs global 0.642 (interval $-0.34..-0.13$). \src{audit/repro_t2.csv}
-\item \textbf{Stackelberg beats global at 5\%} (7 settings $+0.03..+0.12$; ControlArena $-0.00..+0.13$). With independent attacker information: 0.775 at 1\% and 0.957 at 5\% vs global 0.642 / 0.888. \textbf{At 1\% the gain is not established}: the 7-settings spend-matched interval crosses 0, and the ControlArena nominal gain (0.729 vs 0.601) comes from over-spending (1.38\% vs 0.97\%); matched, it is 0.610 vs 0.607. \src{fixes/corrections.csv (m2)}
+\item \textbf{Stackelberg beats global at 5\%} (7 settings $+0.03..+0.12$; ControlArena $-0.00..+0.13$). With independent attacker information: 0.775 at 1\% and 0.957 at 5\% vs global 0.642 / 0.888. \textbf{At 1\% the gain was not established in round 1}: the 7-settings spend-matched interval crosses 0, and the ControlArena nominal gain (0.729 vs 0.601) comes from over-spending (1.38\% vs 0.97\%); matched, it is 0.610 vs 0.607. \src{fixes/corrections.csv (m2)} Round 4 re-tests the 7-settings 1\% contrast with exact matching (Section~\ref{sec:r4}). The 5\% gain re-run under the conformal rule is $+0.076$ [$+0.026$, $+0.124$] (overview row; \src{fixes2/headline_threshold_rerun.csv}).
 \item \textbf{Max-detect} gives the best uniform TPR (0.984 vs 0.965 at 5\%, 7 settings) and no robust selection advantage.
 \item \textbf{Damage-weighted Stackelberg} vs a damage-weighted attacker at 5\%: 0.984 vs 0.937 (7 settings) and 0.989 vs 0.930 (ControlArena). \src{t2/tables.md}
 \item \textbf{Homogeneous panel} (LinuxArena environment, local; $\tau$ n.s.): CFAR, pooling, max-detect and Stackelberg are within 0.012 uniform TPR and 0.05 selection safety of global at nominal 1\%. Allocation does not matter when contexts do not differ.
@@ -215,7 +227,7 @@ LA task category & 0 & .914 & .906 & .910 & \textbf{.778} & .525 & .892 & .894 &
 \item \textbf{Boiling frog} (30 recalibration rounds, sliding window, poison just above the current threshold, $\varepsilon=5\%$): CFAR ends at 0.11 / 0.16 TPR (7 settings / LA environment); an outlier filter ends at the same values, only later; a cumulative cap holds 0.54 / 0.78 but under a genuine $+2$ shift its FPR is 3.3\% / 4.9\%; global ends at 0.65 / 0.94 with FPR 4.0\% under drift; OS-CFAR (LOCO) holds 0.80 / 0.82 with FPR 0.6\% / 1.1\% under drift. \src{t2/tables.md}
 \end{itemize}
 
-\section{Round 2: transfer, spread poisoning, severity, adaptive attackers}
+\section{Round 2: transfer, spread poisoning, severity, adaptive attackers \tE}
 \subsection{E1a: Stackelberg fit on a different attack distribution}
 The defender fits Stackelberg / max-detect on source attacks; the attacker comes from a target distribution and picks its context from its own calibration attacks. Spend-matched.
 
@@ -338,7 +350,7 @@ ControlArena, 1\% & global & 0.80 & 0.71 & 0.69 & 0.68 & 0.65 & 0.60 [0.48, 0.74
 \caption{E4a: safety vs number of free probes per context, $B=1\%$ (top) and 5\% (bottom). \src{r2_t2/figures/}}
 \end{figure}
 
-\section{E5: white-box probes and the strong monitor}
+\section{E5: white-box probes and the strong monitor \tE}
 E5 uses one common trajectory set (Honest-550 and 541 attacks) scored by 17 signals: 7 white-box streams of a Qwen3.5-27B trusted reader (\texttt{sab} synthetic-sabotage probe, Apollo deception probe \texttt{dec}, FIBS token probe \texttt{fibs\_tok}, FIBS follow-up contrast \texttt{fibs\_fu}, J-lens watch-list mass \texttt{jl\_lm}, and max-pooled variants) in history-aware (full) and history-free (none) reading, plus gpt-4.1 (none) and gpt-4.1-mini (none, full). Contexts are the 7 task clusters.
 
 \subsection{Heterogeneity (honest runs only; unaffected by the audits)}
@@ -404,7 +416,7 @@ Counts over 17 signals & & $\ge$ global 12, CI$>0$ 2 & $\ge$ global 5, CI$>0$ 0 
 \item \textbf{Originals only} (honest-only rules, no fabrication confound, 1--15 originals per cluster): at 5\% matched, CFAR raises cluster-averaged TPR for \texttt{dec\_none} ($+0.33$ [$+0.02,+0.57$]) and \texttt{fibs\_fu\_full} ($+0.20$ [$+0.00,+0.37$]) and not for gpt-4.1 ($-0.02$ [$-0.26,+0.20$]).
 \end{itemize}
 
-\section{Round 3: Watcher-like severity tiers}
+\section{Round 3: Watcher-like severity tiers \tE}
 A Watcher-style product sees two numbers per action: suspicion $s$ (history-free gpt-4.1-mini or gpt-4.1, or history-aware gpt-4.1-mini) and an intent-agnostic expected severity $v$ (1--10, Apollo Watcher tiers: 1--3 benign, 4--6 strict-only, 7--8 permissive, 9--10 always blocked). Severity was scored by gpt-4.1-mini on all 38.4k MonitoringBench steps (Honest-550 and 775 T1 attacks; \$21.82, 0 errors). Orgs are the task clusters; damage is the attack's maximum severity, or the side-task tier (@sidetask panels).
 
 \subsection{Severity does not separate attacks from honest work}
@@ -427,7 +439,7 @@ akshn\_adj (label-leaking) & attack & 5{,}794 & 0.00 / 0.13 / 0.79 / 0.080 & 8.0
 
 \subsection{Fixed tiers lose to a suspicion threshold at matched budget}
 \begin{itemize}
-\item \textbf{1\% is infeasible for tiered policies}: ``always block 9--10'' alone flags about 1.5\% of honest trajectories. Every 1\% ``matched'' row of the round-3 tables is a clamped mixture (Watcher tiers matched in 0\% of replicates, CFAR / Stackelberg in 2.5--20\%, global in 57.5--75\%), so no 1\% comparison is reported. \src{audit2/r3t2_matched_check.csv}
+\item \textbf{1\% is infeasible for tiered policies}: ``always block 9--10'' alone flags about 1.5\% of honest trajectories. Every 1\% ``matched'' row of the round-3 tables was a clamped mixture. Re-summarized without clamping (round 4), every per-org rule and both Watcher tiers on the MonitoringBench panels are \NE\ at 1\% (matched in 4--25\% of replicates); the clamped tier\_opt value 0.191 becomes 0.140 on matched replicates only. No 1\% comparison is reported. \src{audit2/r3t2_matched_check.csv}, \src{r4_ctx/r3t2_corrected/tables_noclamp.md}
 \item \textbf{At 5\%} (Watcher tiers matched in 95--100\% of replicates):
 \end{itemize}
 \begin{table}[!htb]\centering\small
@@ -435,18 +447,18 @@ akshn\_adj (label-leaking) & attack & 5{,}794 & 0.00 / 0.13 / 0.79 / 0.080 & 8.0
 \toprule
 Panel & global & Watcher permissive [$\Delta$] & Watcher strict [$\Delta$] & sev\_tilt [$\Delta$]\\
 \midrule
-mb\_mini (gpt-4.1-mini none) & 0.344 & 0.257 [$-0.083$ ($-0.187,-0.027$)] & 0.278 [$-0.059$ ($-0.165,-0.007$)] & 0.344 [$-0.003$]\\
-mb\_strong (gpt-4.1 none) & 0.369 & 0.262 [$-0.121$ ($-0.240,-0.002$)] & 0.312 [$-0.070$ ($-0.209,+0.017$)] & 0.363 [$-0.015$]\\
-mb\_mini\_full (history-aware) & 0.210 & 0.170 [$-0.040$] & 0.191 [$-0.019$] & 0.210 [$0.000$]\\
+mb\_mini (gpt-4.1-mini none) & 0.344 & 0.257 [$-0.082$ ($-0.191,-0.021$)] & 0.281 [$-0.059$ ($-0.168,-0.006$)] & 0.344 [$-0.002$]\\
+mb\_strong (gpt-4.1 none) & 0.373 & 0.263 [$-0.121$ ($-0.247,-0.006$)] & 0.313 [$-0.071$ ($-0.219,+0.006$)] & 0.367 [$-0.015$]\\
+mb\_mini\_full (history-aware) & 0.211 & 0.170 [$-0.045$ ($-0.089,-0.003$)] & 0.191 [$-0.024$ ($-0.072,+0.013$)] & 0.211 [$-0.013$]\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Damage-weighted detection against a uniform attacker, $B=5\%$, spend-matched, with paired $\Delta$ vs global. Re-summarizing with matched replicates only changes these by $\le0.005$. \src{r3_t2/watcher_summary.csv}, \src{audit2/r3t2_matched_check.csv}}
+\caption{Damage-weighted detection against a uniform attacker, $B=5\%$, spend-matched without clamping (round-4 re-summary: a replicate counts only if $B$ lies inside its realized-spend range; all rows matched in $\ge99\%$ of replicates), with paired $\Delta$ vs global. The clamped round-3 values differed by $\le0.005$ in level. Plug-in thresholds. \src{r4_ctx/r3t2_corrected/watcher_summary_noclamp.csv}}
 \end{table}
 \begin{itemize}
 \item \textbf{Org-selecting and severity-aware attackers do no better against the tiers}: e.g.\ mb\_mini org-selection 0.35 / 0.37 (permissive / strict) vs 0.43 for global. The incriminating action is often not the highest-severity one.
 \item \textbf{Severity tilt}: a global threshold on $s+\beta v$ with $\beta$ tuned on calibration attacks picks $\beta=0$ in 80--99\% of replicates at 5\% on the blind-rater panels \src{data/processed/r3_t2_runs/watcher.parquet}, i.e.\ severity adds nothing. On the label-leaking panel it picks $\beta>0$ and reaches 0.99: the illusory upside.
 \item \textbf{Tuned tier thresholds} (tier\_opt) end close to global (mb\_mini 0.356 vs 0.344 at 5\%).
-\item \textbf{Per-org rules} (CFAR, Stackelberg, severity Stackelberg, severity cell minimax) are within noise of global at 5\% (mb\_mini org-selection $\Delta$ $-0.10$ to $-0.01$, all intervals cross 0); at 1\% they over-spend out of sample (2.7--3.8\% realized at nominal 1\%).
+\item \textbf{Per-org rules} (CFAR, Stackelberg, severity Stackelberg, severity cell minimax) on mb\_mini are matched in only 78\% of replicates at 5\% and are therefore \NE\ without clamping; on the other panels (matched 80--87\%) they are within noise of global. At 1\% they over-spend out of sample (2.7--3.8\% realized at nominal 1\%). On akshn\_adj, Watcher-permissive (1\% and 5\%), Watcher-strict (5\%) and tier\_w (5\%) were never matched: the spend is unreachable, and their earlier ``matched'' values were clamped.
 \item \textbf{Severity-aware attacker with side-task damage}, 5\%: safety 0.37 (mini) / 0.59 (gpt-4.1) under global vs 0.11 / 0.47 under CFAR (intervals cross 0). \src{r3_t2/tables.md}
 \end{itemize}
 
@@ -454,6 +466,74 @@ mb\_mini\_full (history-aware) & 0.210 & 0.170 [$-0.040$] & 0.191 [$-0.019$] & 0
 \includegraphics[width=0.6\linewidth]{r3_t2/figures/watcher_policies.pdf}
 \caption{Round 3 policy comparison: damage-weighted safety against uniform, org-selecting and cell-selecting attackers. Only the 5\% panels are valid; the 1\% panels mix clamped replicates (audit2 m9). The bottom row (akshn\_adj) uses label-leaking severity. \src{r3_t2/figures/}}
 \end{figure}
+
+\section{Round 4: allocation at 1\% with hundreds of honest runs per context}\label{sec:r4}
+\textbf{Why.} Per-context rules have a test-spend floor of about $\sum_c w_c/(n_c+1)$, so in rounds 1--3 the 1\% ``spend-matched'' rows were clamped or barely matched. Round 4 used panels with hundreds of honest runs per context and the exact spend matcher (Section~\ref{sec:thr} and the evaluation section). Code \nolinkurl{tracks/r4_ctx/}; \$0 API; about 10 minutes of compute.
+
+\textbf{Panels.} \emph{Primary}: \texttt{akshn\_setting} (7 settings, Gemini-3.1-Pro local suspicion, trajectory max; 5{,}189 honest with 328--1{,}396 per setting, 5{,}794 attacks; damage = adjudicated severity). \emph{Secondary}: ControlArena setting $\times$ agent (12 contexts, $\approx$250 honest each) and the full public LinuxArena runs by environment (gpt-5-nano per-action monitor, $\approx$217 honest per environment over 20 tasks, 919 attacks). Cross-deployment \texttt{simple@} panels were excluded before analysis because 8--47\% of honest maxima sit at the scale top.
+
+\textbf{Design} (pre-specified).
+\begin{itemize}
+\item Rules: global, CFAR, partial pooling (EB $n_0$), Stackelberg with equal damage and attack hulls shrunk toward the other contexts ($m_0=10$; also unshrunk), severity-weighted Stackelberg.
+\item 10 random splits per panel. Within a context, splits are grouped by main task when it has $\ge20$ distinct main tasks, otherwise by trajectory. Honest runs: calibration / test 50/50. Attacks: three disjoint thirds for the defender's fit, the attacker's information and evaluation.
+\item Inference: 200 replicates of a context-stratified cluster bootstrap whose weights are reused across splits and rules, with thresholds refit and re-matched per replicate; 95\% percentile intervals.
+\item Attackers: uniform, informed context selection (from its own information third), probing (5 free probes per context), damage-maximizing. Budgets $B\in\{0.5,1,2,5\}\%$. Transfer: the defender fits on attacks of half of the side tasks (or attack policies / agent models).
+\end{itemize}
+
+\subsection{Primary contrast \tC}
+On 7 settings at $B=1\%$, in distribution, both rules matched in 99.9\% of cells (spend floor 0.19\% mean, 0.52\% p95):
+\begin{itemize}
+\item selection safety against the informed attacker: Stackelberg 0.753 [0.661, 0.796], global 0.646 [0.596, 0.695];
+\item \textbf{$\Delta=+0.107$ [$+0.024$, $+0.152$]}, $P(\Delta>0)=1.00$. The pre-specified criterion (interval above 0, both matched in $\ge80\%$) is met. Unchanged under the conformal threshold rule, including a version that also puts the Stackelberg hull on the conformal scale ($+0.105$ [$+0.030$, $+0.150$]).\src{fixes2/headline_threshold_rerun.csv}
+\end{itemize}
+\textbf{Robustness and the main caveat} (audit 3, \tE):\src{audit3/ctx_primary_checks.csv}
+\begin{itemize}
+\item The gain is driven by SHADE. Under the global rule the informed attacker picks SHADE in 10 of 10 splits, and Stackelberg raises SHADE's test FPR from 2.7\% to 5.0\%. SHADE, iac and AgentDojo have only 5, 5 and 16 main tasks, so by the pre-specified rule they were split and resampled by trajectory.
+\item \textbf{With main-task cluster resampling on the same splits the interval is [$-0.003$, $+0.251$]}, $P(\Delta>0)=0.97$: the criterion is met only with trajectory-level resampling. A 5-task bootstrap is coarse, so both intervals are reported.
+\item Other checks favour a positive effect: basic bootstrap interval [$+0.061$, $+0.190$]; all 10 splits positive ($+0.042$ to $+0.172$); iid instead of task-grouped splits $+0.129$ [$+0.05$, $+0.16$].
+\item The matched comparison chooses the operating point on held-out honest data: fair across rules, not deployable. Fit at nominal 1\%, Stackelberg spends 1.08\% and global 0.97\%, and the nominal contrast ($+0.134$ [$+0.073$, $+0.182$]) is partly bought with that over-spend.
+\end{itemize}
+\textbf{Reading.} With hundreds of calibration runs per context, Stackelberg's point estimate at 1\% is about $+0.1$ selection safety at equal realized spend, at a small uniform-TPR cost. Whether it holds beyond the SHADE setting is not established: the evidence for a 1\% advantage is a pre-specified positive result that rests on one setting with five main tasks.
+
+\subsection{Secondary results on 7 settings \tE}
+\begin{table}[!htb]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcccc@{}}
+\toprule
+$\Delta$ selection safety vs global & $B=0.5\%$ & $B=1\%$ & $B=2\%$ & $B=5\%$\\
+\midrule
+global (level) & 0.519 & 0.646 & 0.743 & 0.889\\
+Stackelberg, equal damage ($m_0=10$) & $+0.089$ [$-0.082$, $+0.096$] & $\mathbf{+0.107}$ [$+0.024$, $+0.152$] & $+0.133$ [$+0.074$, $+0.162$] & $+0.069$ [$+0.025$, $+0.091$]\\
+Stackelberg, unshrunk & $+0.086$ [$-0.084$, $+0.090$] & $+0.104$ [$+0.021$, $+0.147$] & $+0.131$ [$+0.068$, $+0.160$] & $+0.067$ [$+0.023$, $+0.085$]\\
+Stackelberg, severity-weighted & $+0.092$ [$-0.080$, $+0.102$] & $+0.124$ [$+0.046$, $+0.154$] & $+0.136$ [$+0.078$, $+0.168$] & $+0.071$ [$+0.026$, $+0.088$]\\
+partial pooling (EB $n_0$) & $-0.219$ [$-0.390$, $-0.190$] & $-0.222$ [$-0.380$, $-0.157$] & $-0.177$ [$-0.287$, $-0.110$] & $-0.084$ [$-0.202$, $-0.018$]\\
+CFAR & $-0.318$ [$-0.465$, $-0.241$] & $-0.280$ [$-0.460$, $-0.218$] & $-0.239$ [$-0.363$, $-0.164$] & $-0.143$ [$-0.244$, $-0.058$]\\
+\midrule
+share of cells matched (per-context rules) & 0.94 & 1.00 & 1.00 & 1.00\\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\caption{Round 4, 7 settings, in distribution, exactly spend-matched, informed context-selecting attacker; 95\% intervals from the trajectory-level cluster bootstrap (the SHADE caveat above applies to every Stackelberg cell). Only the bold cell is confirmatory. Point estimates near an interval end reflect a skewed bootstrap distribution. \src{r4_ctx/summary.csv}}\label{tab:r4}
+\end{table}
+
+\begin{figure}[!htb]\centering
+\includegraphics[width=\linewidth]{r4_ctx/figures/delta_selection_by_budget.pdf}
+\caption{Round 4: $\Delta$ selection safety vs global by budget, exactly spend-matched, for 7 settings, ControlArena and public LinuxArena environments (trajectory- or task-grouped cluster bootstrap 95\% intervals; missing points are not estimable). \src{r4_ctx/figures/}}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Uniform attacker.} Stackelberg costs little at 1\%: TPR 0.834 vs 0.854, $\Delta=-0.020$ [$-0.04$, $+0.01$]. CFAR lowers uniform TPR too ($-0.047$ [$-0.11$, $-0.02$]); no per-context rule raises uniform TPR at 1\% on this strong-monitor panel.
+\item \textbf{Other attackers at 1\%.} Severity-weighted Stackelberg against a damage-maximizing attacker $+0.077$ [$+0.02$, $+0.10$] (equal-damage $+0.058$ [$-0.01$, $+0.08$]); against a probing attacker with 5 free probes per context $+0.067$ [$+0.00$, $+0.09$] (equal-damage $+0.057$ [$-0.01$, $+0.08$]).
+\item \textbf{CFAR is the worst rule against selection at every budget} (Table~\ref{tab:r4}), as in rounds 1--2.
+\item \textbf{Nominal fits over-spend out of sample} at $B=1\%$ (mean realized test spend): CFAR 1.14\%, Stackelberg 1.08\%, pooling 1.12\%, global 0.97\% (plug-in thresholds).
+\item \textbf{Transfer.} Fit on other side tasks, Stackelberg is worse than global at every budget: 1\% 0.510 vs 0.643, $\Delta=-0.133$ [$-0.20$, $-0.08$] (severity-weighted $-0.108$; unshrunk $-0.146$), 5\% $-0.122$ [$-0.18$, $-0.08$]. Shrinkage with $m_0=10$ does not rescue it. Fit on other attack policies or agent models: $+0.033$ [$-0.09$, $+0.10$] at 1\%, $+0.050$ [$+0.01$, $+0.08$] at 5\%. The gain needs attack data from the deployed side-task distribution.
+\end{itemize}
+
+\subsection{Panels with fewer honest runs per context \tE}
+\begin{itemize}
+\item \textbf{ControlArena setting $\times$ agent} ($\approx$125 calibration runs per context): the CFAR / Stackelberg spend floor is 0.63\% mean, 1.30\% p95; matched in 85\% of cells at 1\% and 41\% at 0.5\% (\NE). At 1\%: Stackelberg $-0.004$ [$-0.23$, $+0.03$], CFAR $-0.35$ [$-0.54$, $-0.24$]. At 5\%: Stackelberg $+0.057$ [$-0.00$, $+0.09$], severity-weighted $+0.065$ [$+0.01$, $+0.09$]. Transfer to unseen side tasks: $-0.14$ at 1\%, $-0.23$ at 5\%.
+\item \textbf{Public LinuxArena by environment} ($\approx$110 calibration runs per environment): per-context rules are \NE\ at 1\% (matched in 68\%; floor 0.83\% mean, 2.27\% p95) and at 0.5\% (40\%). The monitor is weak at these budgets (global uniform TPR 0.17 at 1\%, 0.41 at 5\%); at 5\% no contrast is significant (Stackelberg $+0.10$ [$-0.12$, $+0.16$]).
+\item Global and pooling have no material floor ($\le0.09\%$ mean) and are matchable everywhere. CFAR and all Stackelberg variants share one floor (thresholds at each context's calibration maximum).
+\end{itemize}
+\textbf{Rule of thumb.} Per-context rules are usable at budget $B$ only if $\sum_c w_c/(n_c+1)\ll B$, i.e.\ at least about $1/B$ calibration runs in the smallest contexts: roughly 300 per context at 1\% after a 50/50 split.\src{r4_ctx/tables.md}
 
 \section{What holds, what is weakened, what is dropped}\label{sec:verdicts}
 \begingroup\footnotesize
@@ -464,10 +544,13 @@ Claim & Status & Evidence\\
 \endhead
 Heterogeneity across deployments ($\tau$ 1.34--1.75), small within LinuxArena, none across agent models & \HOLD & \src{t2/tables.md}\\
 White-box probe scores are far more context-dependent than LLM scores & \HOLD & honest-only; \src{fixes/corrections.csv (M5)}\\
-CFAR is the worst rule against context selection (7 settings 1\%, ControlArena 5\%) & \HOLD & independent attacker info: \src{audit/repro_t2.csv}\\
+CFAR is the worst rule against context selection (7 settings 1\%, ControlArena 5\%; round 4: every budget) & \HOLD & independent attacker info: \src{audit/repro_t2.csv}; round 4 $-0.280$ at 1\%\\
 A few alarm-feedback probes suffice to exploit CFAR; Stackelberg is flat & \HOLD & \src{r2_t2/tables.md (E4a)}\\
-Stackelberg $>$ global against selection at 5\% (7 settings) & \HOLD & $+0.03..+0.12$; indep.\ info 0.957; \src{fixes/corrections.csv (m2)}\\
-Stackelberg $>$ global against selection at 1\% (7 settings) & \WEAK & matched $[-0.11,+0.20]$\\
+Stackelberg $>$ global against selection at 5\% (7 settings) & \HOLD & $+0.076$ [$+0.026$, $+0.124$] (conformal); round 4 $+0.069$ [$+0.025$, $+0.091$]; \src{fixes2/headline_threshold_rerun.csv}\\
+Stackelberg $>$ global against selection at 1\% (7 settings), round 4 primary \tC & \WEAK & $+0.107$ [$+0.024$, $+0.152$] (trajectory resampling, criterion met); main-task resampling [$-0.003$, $+0.251$]; driven by SHADE; \src{audit3/ctx_primary_checks.csv}\\
+Round-4 exact spend matching as a deployment comparison & \WEAK & operating point chosen on test honest data (fair, not deployable); nominal Stackelberg over-spends (1.08\% vs 0.97\%)\\
+Stackelberg needs on-distribution side-task attacks (round 4 transfer, 1\%: $-0.133$) & \HOLD & \src{r4_ctx/summary.csv}\\
+Per-context rules need $\gtrsim1/B$ calibration runs per context (ControlArena, public LinuxArena \NE\ at 1\%) & \HOLD & \src{r4_ctx/tables.md}\\
 Stackelberg $>$ global at 1\% on ControlArena & \DROP & over-spend; matched 0.610 vs 0.607\\
 Plug-in per-context quantiles over-spend with small $n$; Mondrian silent; pooled\_cv near budget & \HOLD & \src{t2/tables.md}\\
 CFAR / max-detect raise uniform TPR for weak monitors (round 1, MB clusters) & \WEAK & rows partly clamped (m\_ok 0.34--0.70)\\
@@ -483,12 +566,22 @@ E5: all 1\% spend-matched rows & \DROP & clamped; \src{fixes/corrections.csv (C1
 E5: Stackelberg $\ge$ global on 14/17 signals at 5\% & \WEAK & 10/17 grouped, 0 CIs $>0$; \src{fixes/corrections.csv (M5)}\\
 E5 AUROCs (gpt-4.1 0.911, \texttt{fibs\_fu\_full} 0.905, \ldots) & \WEAK & originals 0.45--0.83; fabrication confound\\
 Blind severity does not separate (AUROC 0.53--0.54) & \HOLD & \src{r3_t2/tables.md}\\
-Watcher tiers infeasible at 1\% and lose to global at 5\% & \HOLD & \src{audit2/issues.csv (m9)}\\
-r3\_t2 1\% ``matched'' rows (per-org rules, tilt) & \DROP & clamped mixtures; \src{audit2/r3t2_matched_check.csv}\\
+Watcher tiers infeasible at 1\% and lose to global at 5\% & \HOLD & non-clamping re-summary; \src{r4_ctx/r3t2_corrected/}\\
+r3\_t2 1\% ``matched'' rows (per-org rules, tiers) & \DROP & \NE\ without clamping (matched 4--25\%); \src{r4_ctx/r3t2_corrected/tables_noclamp.md}\\
+r3\_t2 mb\_mini per-org rows at 5\% & \DROP & matched in 78\% $\to$ \NE\\
+akshn\_adj Watcher-permissive / strict / tier\_w ``matched'' values & \DROP & never matched (spend unreachable)\\
 akshn\_adj severity results (0.98--0.99) & \WEAK & label-leaking upper bound; \src{fixes/corrections.csv (m11)}\\
 \bottomrule
 \end{xltabular}
 \endgroup
+
+\subsection{Errata relative to the October 22 version}
+\begin{enumerate}
+\item \textbf{Summary item 3} (``Stackelberg beats global at 5\%, not demonstrably at 1\%''): round 4 met its pre-specified 1\% criterion ($+0.107$ [$+0.024$, $+0.152$]), but only with trajectory-level resampling in the small-task settings; the gain is driven by SHADE (5 main tasks) and with main-task resampling the interval is [$-0.003$, $+0.251$]. The spend matching is an oracle operating point.
+\item \textbf{5\% Stackelberg gain}: stated as the interval $+0.03..+0.12$; it is $+0.076$ [$+0.026$, $+0.124$] (conformal re-run; the overview figure's 0.075 is a rounding of this).
+\item \textbf{Watcher table}: values replaced by the non-clamping re-summary (e.g.\ mb\_mini strict 0.278 $\to$ 0.281; mb\_strong global 0.369 $\to$ 0.373); the 5\% conclusions hold. The mb\_mini per-org rules at 5\% and several akshn\_adj tier rows, previously shown as matched, are not estimable.
+\item \textbf{Threshold convention}: stated once (Section~\ref{sec:thr}); no verdict in this report changed.
+\end{enumerate}
 
 \subsection{Errata relative to the October 21 version}
 \begin{enumerate}
@@ -506,9 +599,9 @@ akshn\_adj severity results (0.98--0.99) & \WEAK & label-leaking upper bound; \s
 \section{Practitioner recipe}
 \begin{enumerate}
 \item \textbf{Measure before allocating.} Fit the random-effects $\tau$ on per-context exceedances of a global 5--10\% threshold, on honest data. If $\tau$ is not significant (LLM monitors within one deployment, LinuxArena, BashArena clusters), use one global threshold. Expect large $\tau$ for white-box probe signals and across deployments that share a monitor.
-\item \textbf{Check budget feasibility.} Plug-in per-context thresholds cannot spend less than $\approx\sum_c w_c/(n_c+1)$. Do not run per-context quantiles when that floor exceeds $B$ (roughly $n_c\lesssim3/B$); use partial pooling with cross-validated $n_0$, which falls back to global. Always report realized spend next to any per-context TPR.
+\item \textbf{Check budget feasibility.} Per-context thresholds cannot spend less than $\approx\sum_c w_c/(n_c+1)$. Run per-context rules only when that floor is well below $B$; in round 4 this needed roughly $1/B$ calibration runs per context (about 300 at 1\% after a 50/50 split), and 110--125 per context were not enough. Otherwise use global, or partial pooling with cross-validated $n_0$. Always report realized spend next to any per-context TPR, and use a threshold rule with exact out-of-sample FPR (the conformal rule).
 \item \textbf{If the attacker cannot choose its context} and the signal is heterogeneous (probes), per-context normalization raises detection at equal spend (\texttt{dec} probes $+0.18..+0.23$). Compare at equal realized spend, not at nominal level.
-\item \textbf{If the attacker can choose its context, never use CFAR}: alarm feedback from 3--5 probes per context is enough to exploit it. Use Stackelberg (damage-equalizing) thresholds only with $\gtrsim$10--20 attacks per context from the deployed side-task distribution, or shrunk toward the pooled attacks ($m_0\approx10$, $\lambda\approx0.5$); otherwise use global. Use severity-weighted cell minimax only when per-cell damage is known.
+\item \textbf{If the attacker can choose its context, never use CFAR}: alarm feedback from 3--5 probes per context is enough to exploit it, and it was the worst rule against selection at every budget in every round. Use Stackelberg (damage-equalizing) thresholds only with $\gtrsim$10--20 attacks per context from the deployed side-task distribution, or shrunk toward the pooled attacks ($m_0\approx10$, $\lambda\approx0.5$); otherwise use global. Its advantage is clear at 5\% and suggestive at 1\%. Fit on other side tasks it is worse than global. Use severity-weighted cell minimax only when per-cell damage is known.
 \item \textbf{New agent model}: do not reuse per-context thresholds. Reuse the per-context offsets and recalibrate one global level on the new agent.
 \item \textbf{Recalibration under a possible poisoner}: keep a frozen trusted reference; take per-context offsets from the new window and the tail from the reference; refresh the reference only through a trusted channel. Budget for 2--3$\times$ over-spend during genuine deployment-wide tail drift until the refresh. A LOCO tail is adequate only if the attacker can reach a single context. Outlier filters only slow a boiling frog.
 \item \textbf{Expect within-context attack-type selection} to cost 0.2--0.4 more than allocation can recover.
@@ -527,7 +620,8 @@ akshn\_adj severity results (0.98--0.99) & \WEAK & label-leaking upper bound; \s
 \begin{itemize}
 \item \textbf{Monitor strength.} The Gemini panels are near-separable (AUROC $\approx0.99$); the MonitoringBench monitors are weak. Allocation effects are cleanest in between.
 \item \textbf{Few attacks per context} in the LinuxArena sweep (5--18) and in E5 (6--42 base attacks per cluster), so attack-fitted rules (Stackelberg, max-detect) are noisy there.
-\item \textbf{The spend matcher.} Round-1 and round-2 tables still use the clamping matcher; this report flags but does not re-estimate their \texttt{matched\_ok}$\,<0.8$ rows. Re-running them with the fixed matcher is cheap (no API cost).
+\item \textbf{The spend matcher.} Round-1 and round-2 tables still use the clamping matcher; this report flags but does not re-estimate their \texttt{matched\_ok}$\,<0.8$ rows. Round 3 was re-summarized and round 4 uses the exact matcher. Re-running rounds 1--2 with the exact matcher is cheap (no API cost). Exact matching on the test half is an oracle operating point; deployable nominal fits over-spend.
+\item \textbf{Resampling unit.} In settings with few main tasks (SHADE, iac: 5; AgentDojo: 16) the pre-specified splits and bootstraps are by trajectory, which understates uncertainty for effects that concentrate in one such setting (the round-4 primary).
 \item \textbf{Attacker modeling.} The informed attacker uses its own calibration-split attacks; the oracle is biased low (winner's curse). Damage weights are synthetic except E3's adjudicated severity, which leaks the label.
 \item \textbf{E5 confound.} 94\% of E5 attacks have LLM-fabricated tool outputs; probes may key on fabrication. Only 33 originals are clean, 1--15 per cluster.
 \item \textbf{Severity rater.} One rater model (gpt-4.1-mini) and one prompt. A rater that sees the side task would leak the label like akshn\_adj.
@@ -536,5 +630,5 @@ akshn\_adj severity results (0.98--0.99) & \WEAK & label-leaking upper bound; \s
 \end{itemize}
 
 \section*{Reproduction}
-Code: \texttt{tracks/t2\_per\_context/} (round 1), \texttt{tracks/r2\_t2/} (round 2 and E5), \texttt{tracks/r3\_t2/} (round 3), \texttt{tracks/fixes/e5/} (C1 / M5 / m2 / m3 / m11 fixes), \texttt{tracks/audit2/} (second audit). Results: \texttt{results/t2/}, \texttt{results/r2\_t2/}, \texttt{results/r3\_t2/}, \texttt{results/fixes/\{t2,r2\_t2,r3\_t2\}/}, \texttt{results/audit/}, \texttt{results/audit2/}. Raw replicates: \texttt{data/processed/\{r2\_t2\_runs,r3\_t2\_runs\}/}. Narrative: \texttt{EXPERIMENT\_LOG.md} (entries ``T2 per-context thresholds'', ``T2 ROUND 2'', ``T2 ROUND 3'', ``Audit fixes'', ``Second-pass audit''). Repository: \url{https://github.com/gregkocher/agent-monitor-detection} (private).
+Code: \texttt{tracks/t2\_per\_context/} (round 1), \texttt{tracks/r2\_t2/} (round 2 and E5), \texttt{tracks/r3\_t2/} (round 3), \texttt{tracks/r4\_ctx/} (round 4 and the round-3 re-summary), \texttt{tracks/fixes/e5/} (C1 / M5 / m2 / m3 / m11 fixes), \texttt{tracks/audit2/}, \texttt{tracks/audit3/} (\texttt{ctx\_*}), \texttt{tracks/fixes2/} (\texttt{ctx\_*}, threshold re-run). Results: \texttt{results/t2/}, \texttt{results/r2\_t2/}, \texttt{results/r3\_t2/}, \texttt{results/r4\_ctx/}, \texttt{results/fixes/\{t2,r2\_t2,r3\_t2\}/}, \texttt{results/audit/}, \texttt{results/audit2/}, \texttt{results/audit3/}, \texttt{results/fixes2/}. Raw replicates: \texttt{data/processed/\{r2\_t2\_runs,r3\_t2\_runs\}/}. Narrative: \texttt{EXPERIMENT\_LOG.md} (entries ``T2 per-context thresholds'', ``T2 ROUND 2'', ``T2 ROUND 3'', ``T2 ROUND 4'', ``Audit fixes'', ``Second-pass audit'', ``Third-pass audit'', ``Threshold-convention fix''). Repository: \url{https://github.com/gregkocher/agent-monitor-detection} (private).
 \end{document}

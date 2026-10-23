@@ -1,4 +1,5 @@
 \documentclass[11pt]{article}
+\PassOptionsToPackage{obeyspaces,spaces}{url}
 \input{preamble}
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.07}\renewcommand{\floatpagefraction}{0.75}\setcounter{totalnumber}{5}\setcounter{topnumber}{3}
 \newcommand{\m}{\ensuremath{-}}
@@ -8,25 +9,29 @@
 \newcommand{\vweak}{\textcolor{BurntOrange}{\textbf{weakened}}}
 \newcommand{\vdrop}{\textcolor{BrickRed}{\textbf{dropped}}}
 \newcommand{\vrev}{\textcolor{BrickRed}{\textbf{reversed}}}
+\usepackage{xspace}
+\newcommand{\tC}{\textsf{\scriptsize\textcolor{ForestGreen}{[C]}}\xspace}
+\newcommand{\tE}{\textsf{\scriptsize\textcolor{ink2}{[E]}}\xspace}
 \title{\textbf{Idea 1: Do Sequential Tests Beat Max-Aggregation\\at a Matched False-Alarm Budget?}\\[4pt]
-\large Matched-budget trajectory decision rules for AI-agent monitors:\\ rounds 1--3, with audit-corrected numbers}
-\date{October 22, 2026}
+\large Matched-budget trajectory decision rules for AI-agent monitors:\\ rounds 1--4, with audit-corrected numbers}
+\date{October 23, 2026 (supersedes the October 22 version)}
 \begin{document}
 \setlength{\parskip}{3pt}\setlist{itemsep=1pt,topsep=2pt,parsep=0pt}
 \maketitle
 \vspace{-1.5em}
 
-\keybox{\textbf{Summary.} AI-control evaluations turn per-step monitor scores into an audit decision by taking the \emph{maximum} score and comparing it with an honest-run quantile. Over three rounds we compared max with accumulation rules (2nd/3rd-largest, top-$k$ sums, mean, CUSUM, Shiryaev--Roberts, window GLR, conformal e-processes, OR multi-charts, rule choosers) at a \emph{matched false-positive rate}, on 40 existing stream sets, 775 MonitoringBench attacks + 550 honest runs re-scored with and without history, persistent-state PR sequences re-scored by four monitors, and all eight MOLE insider-threat corpora. Two independent audits re-derived every headline; this version reports only the corrected numbers.
+\keybox{\textbf{Summary.} AI-control evaluations turn per-step monitor scores into an audit decision by taking the \emph{maximum} score and comparing it with an honest-run quantile. Over four rounds we compared max with accumulation rules (2nd/3rd-largest, top-$k$ sums, mean, CUSUM, Shiryaev--Roberts, window GLR, conformal e-processes, OR multi-charts, rule choosers) at a \emph{matched false-positive rate}, on 40 existing stream sets, 775 MonitoringBench attacks + 550 honest runs re-scored with and without history, persistent-state PR sequences re-scored by nine monitors with identical inputs, and all eight MOLE insider-threat corpora. Three independent audits re-derived every headline, and every threshold that matters below uses the conformal randomized rule (\S\ref{sec:thr}). Tags: \tC\ confirmatory (pre-specified before the analysed data were seen), \tE\ exploratory.
 \begin{enumerate}[leftmargin=1.2em]
-\item \textbf{Max remains the default.} Textbook sequential tests lose to max-type rules on almost every set. No rule-selection procedure beats always-max out of sample (nested empirical chooser $+0.001$ [$\m0.014$, $+0.013$] TPR at 1\% FPR).
-\item \textbf{Cross-session accumulation of history-free per-PR scores} is the one positive regime, and it is monitor-specific. GPT-4o: top-3 sum $-$ max $=+0.146$ [$+0.025$, $+0.226$] (holds). gpt-4.1-mini: $+0.145$ [$\m0.001$, $+0.228$] (borderline; $+0.241$ [$+0.073$, $+0.336$] on side-task-successful attacks). Gemini 2.5 Flash and Qwen3-235B: no gain.
-\item \textbf{Deployed (no-reset) monitoring needs a forgetting accumulator.} Over long unreset PR streams, CUSUM $k{=}0.5$ beats max for history-free gpt-4.1-mini (0.71 vs 0.58 at ARL$_0=100$ PRs); non-forgetting top-$k$ sums collapse to $\approx0$.
-\item \textbf{Insider threat (MOLE): no accumulation rule beats max} for a common monitor on any of 8 corpora (pooled single-day 3rd-max $-$ max $\m0.066$ [$\m0.156$, $+0.023$]). The round-2 MOLE gain was never significant and vanishes after account centering.
-\item \textbf{The ``history double-counting'' hypothesis is not supported} on MonitoringBench once prompts are matched; the earlier ``accumulators gain more with history'' result was an instruction artifact. Stream-property correlations are descriptive only.
-\item \textbf{Re-flagging monitor designs} (explicit re-raise rule, suspicion ledger, two samples) do not beat history-free whitened top-3 sum.
+\item \textbf{Max remains the default.} Textbook sequential tests lose to max-type rules on almost every set \tE. No rule-selection procedure beats always-max out of sample (nested empirical chooser $+0.001$ [$\m0.006$, $+0.009$] TPR at 1\% FPR) \tE.
+\item \textbf{Cross-session accumulation does not generalize across monitor families.} Pooled over nine history-free per-PR monitors with identical inputs, top-3 sum $-$ max at run-level FPR 0.05 is $\m0.066$ [$\m0.147$, $+0.015$] \tC. After Holm over the nine monitors only GPT-6 Luna's loss ($\m0.42$) is significant. The earlier positive cases are fragile: GPT-4o (original scores) $+0.134$ [$+0.024$, $+0.217$] \tE; gpt-4.1-mini's $+0.145$ [$+0.007$, $+0.230$] appears only with its logprob-expected read-out (integer read-out of the same calls: $\m0.03$) \tE.
+\item \textbf{Unreset streams: no demonstrated advantage for forgetting rules.} The round-3 CUSUM result for gpt-4.1-mini holds as computed (0.72 vs 0.59 at ARL$_0=100$ PRs), but with CIs it is $+0.132$ [$\m0.086$, $+0.296$], not significant \tC. Pooled over nine monitors no forgetting rule beats max at ARL$_0=100$, and windowed top-3 sums lose ($\m0.116$ [$\m0.178$, $\m0.053$]) \tC. Non-forgetting top-$k$ sums collapse to $\approx0$.
+\item \textbf{Insider threat (MOLE): no accumulation rule beats max} for a common monitor on any of 8 corpora (pooled single-day 3rd-max $-$ max $\m0.064$ [$\m0.151$, $+0.024$]) \tC. A stronger day monitor (GPT-6 Luna) does not create a gain: $+0.047$ [$\m0.026$, $+0.125$] with a joint account bootstrap \tC. Luna's account-level detection comes from attack days, not from an account-level signal.
+\item \textbf{The proposed mechanisms are not supported.} ``History double counting'' is not supported once prompts are matched (the earlier effect was an instruction artifact) \tC. Repeat-spike informativeness does not predict the gain across monitors (cross-fitted Spearman $+0.065$ [$\m0.341$, $+0.460]$, 9 monitors; inconclusive) \tC.
+\item \textbf{Re-flagging monitor designs} (explicit re-raise rule, suspicion ledger, two samples) do not beat history-free whitened top-3 sum \tE.
 \end{enumerate}
-Spend: round 1 \$109.56, round 2 \$147.89, round 3 \$161.36, audit re-scoring \$25.31 (OpenRouter).}
+Spend: round 1 \$109.56, round 2 \$147.89, round 3 \$161.36, round 4 \$143.53, audit re-scoring \$25.31 (OpenRouter); audit 3 and the threshold rerun \$0.}
 
+\clearpage
 \setcounter{tocdepth}{1}
 \tableofcontents
 
@@ -55,6 +60,9 @@ Round 2 (Oct 21) & Persistent state re-scored by gpt-4.1-mini, Gemini 2.5 Flash,
 Audit 1 (Oct 21) & Corrected paired-gain bootstrap (C2); matched-prompt re-scoring (M4); nested chooser (M6/M7); agent-model confound (M9); realized FPR (m1); success-conditioning (m9). & \nolinkurl{results/audit/}, \nolinkurl{results/fixes/}\\
 Round 3 (Oct 22) & A: all 8 MOLE corpora with one common history-free monitor, confound controls, horizon sweep. B: re-flagging monitor designs on persistent state and MonitoringBench. Long-horizon no-reset streaming. & \nolinkurl{tracks/r3_t1/}, \nolinkurl{results/r3_t1/}\\
 Audit 2 (Oct 22) & Independent re-implementation of the round-3 analyses; 4 major, 10 minor issues (3 affect this report: A3, m5--m8). & \nolinkurl{results/audit2/}\\
+Round 4 (Oct 22) & Persistent state re-scored by six more monitor families (nine identical-input monitors); mechanism test across monitors; MOLE with GPT-6 Luna (and a gpt-4.1 subset); unreset streams with CIs. & \nolinkurl{tracks/r4_cs/}, \nolinkurl{results/r4_cs/}\\
+Audit 3 (Oct 23) & Re-ran and independently re-implemented the round-4 analyses; 21 rows concern this report (read-out disclosure, Holm, MOLE account sharing, MOLE interpretation). & \nolinkurl{results/audit3/}\\
+Threshold fix (Oct 23) & Headline numbers re-run under the conformal randomized threshold rule (\S\ref{sec:thr}). & \nolinkurl{results/fixes2/}\\
 \bottomrule
 \end{tabularx}
 \caption{Stages of Idea 1. All analyses ran on the laptop; all LLM scoring through OpenRouter.}
@@ -107,17 +115,23 @@ rule chooser & picks one of max / 2nd-max / top-3 sum / CUSUM($k\in[0.5,2.5]$) f
 
 \subsection{Matched-budget calibration}
 \begin{itemize}
-\item \textbf{Honest-only thresholds.} 10 (round 1) or 20 (rounds 2--3) repeated 50/50 honest splits, grouped by main task when there are $\ge30$ tasks; 5-fold cross-fitting of the per-unit transforms. Randomized plug-in thresholds are primary; conformal thresholds are a robustness check. $\alpha\in\{0.05,0.01,0.003\}$ for trajectories; MOLE uses account-level FPR 0.10 and 0.05.
-\item \textbf{Realized FPR.} The plug-in quantile on $\approx275$ calibration runs over-alarms at $\alpha=0.01$: realized/target 0.77--2.30 (mean 1.28) on MonitoringBench.\src{results/fixes/t1/m1_realized_fpr.csv} Realized FPR is reported next to TPR where it matters.
+\item \textbf{Honest-only thresholds.} 10 (round 1), 20 (rounds 2--3) or 40 (round 4) repeated 50/50 honest splits, grouped by main task when there are $\ge30$ tasks; 5-fold cross-fitting of the per-unit transforms. $\alpha\in\{0.05,0.01,0.003\}$ for trajectories; MOLE uses account-level FPR 0.10 and 0.05.
+\item \textbf{Realized FPR.} Under the plug-in rule (below) the threshold on $\approx275$ calibration runs over-alarmed at $\alpha=0.01$: realized/target 0.77--2.30 (mean 1.28) on MonitoringBench.\src{results/fixes/t1/m1_realized_fpr.csv} Realized FPR is reported next to TPR where it matters.
 \item \textbf{Streaming.} Matched ARL by appending attacks to 0--4 honest test prefixes without reset; detection delay from the onset label; the non-restarting e-process is excluded from ARL comparisons.
 \end{itemize}
+
+\subsection{Threshold convention (changed in this version)}\label{sec:thr}
+Earlier versions set every threshold with the \emph{plug-in} randomized quantile. For continuous scores its out-of-sample FPR is $(\lfloor\alpha n\rfloor+1)/(n+1)$, one order statistic too high when $\alpha n$ is an integer (1.98\% at $n=100$, $\alpha=1\%$), and its randomization at ties helps only integer-score monitors.\srcs{results/audit3/corrections.csv}{results/audit3/wb_convention.csv} \textbf{All thresholds now use the conformal randomized rule}: a new score $s$ alarms with probability $\mathrm{clip}\bigl((\alpha(n+1)-\#\{S_i>s\})/(\#\{S_i=s\}+1),0,1\bigr)$ over the $n$ honest calibration scores $S_i$, which gives expected out-of-sample FPR exactly $\alpha$ for exchangeable scores, tied or continuous (\texttt{amd.evaluation.calibration.conformal\_randomized\_threshold}). The headline rows were re-run with only this switch changed.\src{results/fixes2/headline_threshold_rerun.csv} For Idea 1 the change is small: the re-run headline point estimates moved by at most 0.012 (the descriptive FPR-0.01 persistent-state cell, whose thresholds sit at the calibration maximum, by 0.03), and no verdict changed except that gpt-4.1-mini's persistent-state gain now has an iid interval that excludes 0 (\S\ref{sec:ps}). Numbers quoted below are conformal when the row was re-run; tables and cells that were not re-run keep their plug-in values and say so. Unreset-stream thresholds are set by ARL matching and are not affected.
+
+\subsection{Confirmatory and exploratory results}
+\tC\ marks an analysis whose comparison and criterion were fixed before the analysed data were seen: the round-1 history DiD, the round-3 pre-specified comparisons (3rd-max, top-3 sum, CUSUM $k{=}1.5$ and the chooser vs max), and the round-4 analyses whose scripts carry their pre-specification (persistent-state pooled top-3 $-$ max at FPR 0.05, mechanism test, MOLE pooled 3rd-max $-$ max at account FPR 0.10, unreset streams P3a/P3b). Audit 3 found that two of those round-4 scripts (\texttt{mechanism.py}, \texttt{mole\_r4\_analysis.py}) were committed after the pre-commit, but session transcripts show they were written before any of their outputs existed. Everything else, including every robustness check and every audit re-analysis, is \tE.
 
 \subsection{Inference (corrected after audit 1)}\label{sec:inference}
 The round-1 and round-2 gain CIs drew new attack-bootstrap indices in each split and averaged replicates across splits, which shrinks the interval by about $\sqrt{n_\text{splits}}$; they also held thresholds fixed and resampled attacks i.i.d.\ (audit issue C2).\src{results/audit/issues.csv (C2)} All gains in this report use the corrected paired bootstrap (\texttt{amd.evaluation.paired}): one joint resample per replicate of honest runs (clustered by task or account, thresholds recomputed in every split) and attacks (same clusters), shared across splits and across the terms of each contrast. Corrected CIs are 6.4$\times$ wider (median); 792 of 1{,}560 round-1 gains remain significant (previously 1{,}397).\src{results/fixes/corrections.csv (C2, row ``t1 r1 (40 stream sets)'')} Persistent-state results also report a 5-app cluster sensitivity interval. Rule choosers use \emph{nested} calibration (select on one calibration half, threshold on the other) and a task-grouped labeled draw; set-level correlations get a cluster bootstrap over 14 set families (MOLE: over corpora).
 
 \section{Round 1: existing streams and controlled re-scoring}
 
-\subsection{1A: 40 existing stream sets (\$0)}
+\subsection{1A: 40 existing stream sets (\$0) \tE}
 
 \begin{table}[!htbp]\centering\small
 \begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcccccccc@{}}
@@ -140,7 +154,7 @@ PR \texttt{full\_diffs}: gradual & \textbf{0.24} & 0.09 & 0.16 & 0.22 & 0.22 & \
 PR trajectory monitor: gradual & 0.35 & 0.17 & 0.31 & \textbf{0.37} & \textbf{0.37} & \textbf{0.37} & 0.17 & 0.33\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{TPR at matched trajectory FPR $\alpha=0.05$ (point estimates; selected sets). CUSUM is $k=0.5$. Source: \nolinkurl{results/t1/tables/r1_tpr.md} (all 40 sets and $\alpha\in\{0.05,0.01,0.003\}$). The audit changed none of these point estimates, only the gain CIs.}
+\caption{TPR at matched trajectory FPR $\alpha=0.05$ (point estimates; selected sets). CUSUM is $k=0.5$. Source: \nolinkurl{results/t1/tables/r1_tpr.md} (all 40 sets and $\alpha\in\{0.05,0.01,0.003\}$). The audit changed none of these point estimates, only the gain CIs. Plug-in thresholds (not re-run).}
 \end{table}
 
 \begin{itemize}
@@ -148,7 +162,7 @@ PR trajectory monitor: gradual & 0.35 & 0.17 & 0.31 & \textbf{0.37} & \textbf{0.
 \item \textbf{Accumulation gain falls with honest autocorrelation} (Fig.~\ref{fig:autocorr}): Spearman $\m0.57$ ($\alpha=0.05$) and $\m0.45$ ($\alpha=0.01$) between the CUSUM$-$max gain and the honest lag-1 autocorrelation of whitened scores. These correlations treat sets as independent and are descriptive (see \S\ref{sec:mech}).
 \item \textbf{Timing.} On aksh-n, max alarms at the ideal flag step (median delay 0) and CUSUM 3--25 steps later. The onset is the adjudicator's \texttt{ideal\_flagging\_step}, itself an LLM judgment, so a delay of 0 for a spike rule is partly by construction.\src{results/fixes/corrections.csv (m12)}
 \item \textbf{Length-aware max} wins where honest and attack lengths differ. MRT $N{=}5$: $+0.365$ [$+0.127$, $+0.445$]; superaware: $+0.506$ [$+0.344$, $+0.549$] (corrected CIs). An attacker who pads benign steps controls length, so the gain is conditional on unadapted attack lengths.\src{results/fixes/corrections.csv (m7)}
-\item \textbf{Persistent state (original GPT-4o PR monitors, gradual attacks, $\alpha=0.05$).} History-free \texttt{current\_only}: top-3 sum $-$ max $=+0.146$ [$+0.025$, $+0.226$], $p(\le0)=0.008$; 5-app cluster sensitivity [$+0.046$, $+0.247$] (\vhold). CUSUM $k{=}0.5$ $-$ max $=+0.116$ [$+0.006$, $+0.171$]; app-cluster [$\m0.006$, $+0.191$] (\vweak). History-aware \texttt{full\_diffs}: top-3 sum $-$ max $=\m0.074$ [$\m0.143$, $\m0.003$] (\vhold).\src{results/fixes/t1/c2_headline.md}
+\item \textbf{Persistent state (original GPT-4o PR monitors, gradual attacks, $\alpha=0.05$).} History-free \texttt{current\_only}: top-3 sum $-$ max $=+0.134$ [$+0.024$, $+0.217$], $p(\le0)=0.008$; 5-app cluster sensitivity [$+0.038$, $+0.237$] (\vhold; plug-in $+0.146$ [$+0.025$, $+0.226$]).\src{results/fixes2/headline_threshold_rerun.csv} Realized FPR is above nominal under both rules (max 0.059, top-3 0.066; $n_\text{cal}=84$). Plug-in only (not re-run): CUSUM $k{=}0.5$ $-$ max $=+0.116$ [$+0.006$, $+0.171$], app-cluster [$\m0.006$, $+0.191$] (\vweak); history-aware \texttt{full\_diffs} top-3 sum $-$ max $=\m0.074$ [$\m0.143$, $\m0.003$] (\vhold).\src{results/fixes/t1/c2_headline.md} Round 4 puts this gain in context: it does not generalize across monitor families (\S\ref{sec:r4}).
 \end{itemize}
 
 \begin{figure}[!htbp]\centering
@@ -156,7 +170,7 @@ PR trajectory monitor: gradual & 0.35 & 0.17 & 0.31 & \textbf{0.37} & \textbf{0.
 \caption{Round 1: gain over max (TPR at FPR 0.01; point estimates) vs honest lag-1 autocorrelation of whitened scores, one point per stream set. Sets with strongly autocorrelated honest scores lose the most.}\label{fig:autocorr}
 \end{figure}
 
-\subsection{1B: controlled history experiment on MonitoringBench}
+\subsection{1B: controlled history experiment on MonitoringBench \tE; pre-registered DiD \tC}
 
 Same monitor (\texttt{gpt-4.1-mini}); the history mode differs (\texttt{full} vs \texttt{none}). Table~\ref{tab:r2} gives TPR with realized FPR.
 
@@ -176,7 +190,7 @@ length-aware max & 0.215 & 0.053 & 0.279 & 0.045 & 0.153 & 0.015 & 0.124 & 0.009
 OR(max+CUSUM) & 0.201 & 0.062 & 0.247 & 0.059 & 0.137 & 0.014 & 0.086 & 0.013\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{TPR at matched trajectory FPR with realized held-out FPR, 775 attacks vs 550 honest, original prompts (\texttt{ctrl-basic-v1}). Source: \nolinkurl{results/fixes/t1/m1_realized_fpr.csv}; full detector list in \nolinkurl{results/t1/tables/r2_main.md}.}\label{tab:r2}
+\caption{TPR at matched trajectory FPR with realized held-out FPR (plug-in thresholds, not re-run), 775 attacks vs 550 honest, original prompts (\texttt{ctrl-basic-v1}). Source: \nolinkurl{results/fixes/t1/m1_realized_fpr.csv}; full detector list in \nolinkurl{results/t1/tables/r2_main.md}.}\label{tab:r2}
 \end{table}
 
 \paragraph{Corrected gains (original prompts).}\src{results/fixes/t1/gains_r2mb_corrected.csv} With history (\texttt{full}), 2nd-max and top-3 sum beat max at $\alpha=0.05$ ($+0.116$ [$+0.026$, $+0.183$]; $+0.098$ [$+0.042$, $+0.156$]), but not at $\alpha=0.01$ (top-3 sum $+0.024$ [$\m0.025$, $+0.085$], \vdrop\ relative to the earlier [0.018, 0.031]). Without history, no accumulator beats max at any $\alpha$. CUSUM $k{=}0.5$, the e-process, length-aware max and the OR chart lose to max in every cell (e.g.\ CUSUM full, $\alpha=0.01$: $\m0.141$ [$\m0.175$, $\m0.101$]). The weak history-free monitor (\texttt{gpt-4.1-nano}) is the exception: top-3 sum 0.082 vs max 0.056 at $\alpha=0.01$, gain $+0.026$ [$+0.001$, $+0.058$] (\vhold, barely).
@@ -199,7 +213,7 @@ $\alpha$ & Detector & DiD, original prompts & DiD, matched prompts & instruction
 0.01 & CUSUM $k{=}0.5$ & $+0.021$ [$\m0.130$, $+0.073$] & $+0.068$ [$\m0.017$, $+0.149$] & $\m0.047$ [$\m0.201$, $+0.014$]\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{DiD (none $-$ full) of the gain over max on the 200 / 175 subset, all attacks. Positive = accumulation gains concentrate in history-free mode. Source: \nolinkurl{results/fixes/t1/m4_tables.md}.}\label{tab:m4}
+\caption{DiD (none $-$ full) of the gain over max on the 200 / 175 subset, all attacks (plug-in thresholds). Positive = accumulation gains concentrate in history-free mode. Source: \nolinkurl{results/fixes/t1/m4_tables.md}.}\label{tab:m4}
 \end{table}
 
 \begin{itemize}
@@ -217,7 +231,7 @@ $\alpha$ & Detector & DiD, original prompts & DiD, matched prompts & instruction
 \subsubsection{Agent-model confound in absolute TPR (audit M9)}\label{sec:m9}
 Honest-550 is 100\% claude-opus-4-5, while 281 of the 775 attacks (36\%) are claude-opus-4-6. Max TPR at $\alpha=0.01$: opus-4-5 attacks 0.121 [0.094, 0.165] (full) / 0.117 [0.083, 0.210] (none); opus-4-6 0.258 [0.200, 0.316] / 0.224 [0.163, 0.325]. Like-for-like detection is therefore about 12\%, not ``17--20\%''. Top-3 sum on opus-4-5 attacks: 0.161 [0.093, 0.241] (full), 0.148 [0.081, 0.218] (none). Detector comparisons are paired and less affected.\src{results/fixes/t1/m9_tpr_by_agent_model.csv}
 
-\subsection{1C: robustness (\$0)}
+\subsection{1C: robustness (\$0) \tE}
 
 \begin{table}[!htbp]\centering\small
 \begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcccc@{}}
@@ -234,7 +248,7 @@ top-2 / top-3 / top-5 sum & 0.185 / 0.205 / 0.169 & 0.011--0.013 & 0.198 / 0.186
 GLR $W=5/10/20$ & 0.144 / 0.083 / 0.058 & 0.021--0.025 & 0.088 / 0.063 / 0.057 & 0.017--0.030\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{MonitoringBench parameter grid (775 attacks, original prompts). Source: \nolinkurl{results/t1/round3/robust/matched_kgrid_\{full,none\}.csv}.}
+\caption{MonitoringBench parameter grid (775 attacks, original prompts; plug-in thresholds). Source: \nolinkurl{results/t1/round3/robust/matched_kgrid_\{full,none\}.csv}.}
 \end{table}
 
 \begin{itemize}
@@ -243,7 +257,7 @@ GLR $W=5/10/20$ & 0.144 / 0.083 / 0.058 & 0.021--0.025 & 0.088 / 0.063 / 0.057 &
 \item Conformal thresholds give the same ranking; keeping the submit step changes nothing; Mondrian per-task whitening inflates FPR under grouped splits (inconclusive).
 \end{itemize}
 
-\section{Round 2: cross-session accumulation across monitors, MOLE, rule chooser}
+\section{Round 2: cross-session accumulation across monitors, MOLE, rule chooser \tE}
 
 \subsection{Persistent state re-scored by four monitors}\label{sec:ps}
 All 691 runs were re-scored from the full diffs (the processed data had kept 3k of a median 39k characters) with the paper's PR-review prompt in two modes that share an identical system prompt and differ only by the previous-diffs block, so the M4 confound does not apply here.\src{results/fixes/corrections.csv (M4, persistent state row)} Paired sets: 155 honest / 120 gradual / 397 positional runs, 20 splits.
@@ -253,25 +267,25 @@ All 691 runs were re-scored from the full diffs (the processed data had kept 3k 
 \toprule
 History-free monitor & max & top-3 & top-3 $-$ max [95\% CI] & $p(\le0)$ & app-cluster & DiD (free $-$ aware) & verdict\\
 \midrule
-gpt-4.1-mini & 0.59 & 0.73 & $+0.145$ [$\m0.001$, $+0.228$] & 0.026 & [$\m0.016$, $+0.246$] & $\m0.169$ [$\m0.368$, $\m0.019$] & \vweak\\
+gpt-4.1-mini$^\ast$ & 0.58 & 0.73 & $+0.145$ [$+0.007$, $+0.230$] & 0.018 & [$\m0.005$, $+0.249$] & $\m0.169$ [$\m0.368$, $\m0.019$] & \vweak\\
 GPT-4o (original scores) & 0.15 & 0.26 & $+0.101$ [$+0.015$, $+0.208$] & 0.015 & [$+0.005$, $+0.228$] & $+0.173$ [$+0.055$, $+0.271$] & \vhold\\
 Gemini 2.5 Flash & 0.23 & 0.25 & $+0.021$ [$\m0.068$, $+0.101$] & 0.346 & [$\m0.077$, $+0.139$] & $\m0.028$ [$\m0.182$, $+0.091$] & \vdrop\\
 Qwen3-235B-2507 & 0.44 & 0.42 & $\m0.025$ [$\m0.121$, $+0.061$] & 0.724 & [$\m0.133$, $+0.116$] & $+0.127$ [$\m0.040$, $+0.244$] & \vdrop\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Gradual (multi-PR) attacks, run-level FPR 0.05. TPRs: \nolinkurl{results/r2_t1/ps_tables.md}; corrected gains and DiDs: \nolinkurl{results/fixes/r2_t1/ps_gains_corrected.csv}, \nolinkurl{results/fixes/r2_t1/ps_did_corrected.csv}, \nolinkurl{results/fixes/corrections.csv}. The GPT-4o row uses the paired filter (153 honest), hence $+0.101$ rather than the round-1 $+0.146$.}\label{tab:ps}
+\caption{Gradual (multi-PR) attacks, run-level FPR 0.05. TPRs: \nolinkurl{results/r2_t1/ps_tables.md}; corrected gains and DiDs: \nolinkurl{results/fixes/r2_t1/ps_gains_corrected.csv}, \nolinkurl{results/fixes/r2_t1/ps_did_corrected.csv}, \nolinkurl{results/fixes/corrections.csv}. $^\ast$The gpt-4.1-mini gain is the conformal-rule re-run (plug-in: $+0.145$ [$\m0.001$, $+0.228$], $p(\le0)=0.026$, app-cluster [$\m0.016$, $+0.246$]; \nolinkurl{results/fixes2/headline_threshold_rerun.csv}); it uses the logprob-expected read-out (\S\ref{sec:r4ps}). All other cells, and the DiDs, are plug-in. The GPT-4o row uses the paired filter (153 honest), hence $+0.101$ rather than the round-1 $+0.134$ (conformal).}\label{tab:ps}
 \end{table}
 
 \begin{itemize}
-\item \textbf{The history-free gain is monitor-specific.} It holds for GPT-4o, is borderline for gpt-4.1-mini ($p(\le0)=0.026$; CI touches 0), and is absent for Gemini and Qwen. At FPR 0.01 none of the earlier gains survive: gpt-4.1-mini SR $+0.063$ [$\m0.003$, $+0.170$], Gemini top-3 $+0.043$ [$\m0.051$, $+0.156$] (both \vdrop).
-\item \textbf{Side-task success.} 66 of 120 gradual attacks failed their side task. gpt-4.1-mini on successful attacks ($n=54$): $+0.241$ [$+0.073$, $+0.336$]; failed: $+0.067$ [$\m0.067$, $+0.187$]. GPT-4o on successful attacks: $+0.051$ [$\m0.053$, $+0.164$]; its pooled gain comes from failed attacks ($+0.142$ [$+0.020$, $+0.269$]).\src{results/fixes/corrections.csv (m9)}
+\item \textbf{The history-free gain is monitor-specific.} It holds for GPT-4o, is borderline for gpt-4.1-mini (iid interval excludes 0 only under the conformal rule, $p(\le0)=0.018$; the app-cluster interval covers 0), and is absent for Gemini and Qwen. Audit 3 found that gpt-4.1-mini's gain exists only with the logprob-expected read-out; on the generated integers of the same calls it is negative (\S\ref{sec:r4ps}). At FPR 0.01 none of the earlier gains survive: gpt-4.1-mini SR $+0.063$ [$\m0.003$, $+0.170$], Gemini top-3 $+0.043$ [$\m0.051$, $+0.156$] (both \vdrop; plug-in).
+\item \textbf{Side-task success} (plug-in). 66 of 120 gradual attacks failed their side task. gpt-4.1-mini on successful attacks ($n=54$): $+0.241$ [$+0.073$, $+0.336$]; failed: $+0.067$ [$\m0.067$, $+0.187$]. GPT-4o on successful attacks: $+0.051$ [$\m0.053$, $+0.164$]; its pooled gain comes from failed attacks ($+0.142$ [$+0.020$, $+0.269$]).\src{results/fixes/corrections.csv (m9)}
 \item \textbf{``History kills the gain'' holds for one monitor of four.} The DiD is significantly positive only for GPT-4o; Qwen's is not significant; gpt-4.1-mini's is significantly the other way. With all prior diffs, gpt-4.1-mini keeps re-flagging gradual attacks while honest PRs stay low: its max drops to 0.35 and top-3 sum gains $+0.315$ [$+0.156$, $+0.443$] over that weak max.\src{results/fixes/r2_t1/ps_gains_corrected.csv}
 \item \textbf{Positional (single-PR) attacks:} max is best for every new monitor (gpt-4.1-mini top-3 $-$ max $\m0.164$ [$\m0.284$, $\m0.058$]).
 \item Only 5-PR sequences with matching honest runs exist, so longer horizons were tested by streaming over concatenated honest prefixes (\S\ref{sec:longh}), not by longer attacks.
 \end{itemize}
 
 \subsection{MOLE, round 2 (two corpora)}
-History-free gpt-4.1-mini account-day monitor (MOLE judge prompt and taxonomy) plus MOLE's z-score and peer-fit, 30 workdays, account-level FPR 0.10. Corrected gains:\src{results/fixes/corrections.csv (C2, MOLE rows)}
+History-free gpt-4.1-mini account-day monitor (MOLE judge prompt and taxonomy) plus MOLE's z-score and peer-fit, 30 workdays, account-level FPR 0.10. Corrected gains (plug-in thresholds):\src{results/fixes/corrections.csv (C2, MOLE rows)}
 \begin{itemize}
 \item GPT-5.3 single-day (30 insiders, 3--4 attack days each), LLM 3rd-max $-$ max: $+0.131$ [$\m0.028$, $+0.287$], $p(\le0)=0.058$; top-4 sum $+0.086$ [$\m0.021$, $+0.218$]; at FPR 0.05: $+0.088$ [$\m0.045$, $+0.259$]. All \textbf{not significant} (previously $+0.131$ [0.11, 0.15]).
 \item Peer-fit 3rd-max: $+0.172$ [$+0.042$, $+0.317$] (significant on this corpus).
@@ -287,14 +301,14 @@ The 67 sets are the 46 round-1 sets (existing streams and MonitoringBench varian
 \toprule
 Chooser (gain over always-max, FPR 0.01) & same calibration (round 2) & nested & FPR-matched\\
 \midrule
-empirical, 20 labels & $+0.023$ [$+0.011$, $+0.035$] & $+0.001$ [$\m0.014$, $+0.013$] & $+0.009$ [$\m0.003$, $+0.023$]\\
+empirical, 20 labels & $+0.023$ [$+0.011$, $+0.035$] & $+0.001$ [$\m0.006$, $+0.009$]$^\ast$ & $+0.009$ [$\m0.003$, $+0.023$]\\
 empirical, 40 labels & $+0.026$ [$+0.015$, $+0.038$] & $\m0.001$ [$\m0.013$, $+0.009$] & $+0.009$ [$\m0.006$, $+0.024$]\\
 LOSO ridge meta-chooser & $+0.019$ [$+0.007$, $+0.032$] & $\m0.006$ [$\m0.021$, $+0.006$] & $+0.007$ [$\m0.007$, $+0.025$]\\
 mechanism rule & $\m0.022$ [$\m0.049$, $+0.005$] & $\m0.017$ [$\m0.047$, $+0.009$] & $\m0.018$ [$\m0.042$, $+0.010$]\\
 empirical, FPR 0.05 & $+0.014$ [$0.005$, $0.028$] & $+0.004$ [$\m0.010$, $+0.014$] & $+0.007$ [$\m0.005$, $+0.016$]\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Rule chooser, 95\% CIs from a cluster bootstrap over 14 set families; task-grouped labeled draw. Source: \nolinkurl{results/fixes/corrections.csv} (M6, M7), \nolinkurl{results/fixes/r2_t1/chooser_fixed_summary_task_lab20.csv}.}\label{tab:chooser}
+\caption{Rule chooser, 95\% CIs from a cluster bootstrap over 14 set families; task-grouped labeled draw. Plug-in thresholds except $^\ast$, the conformal re-run of the primary nested cell (plug-in $+0.001$ [$\m0.014$, $+0.013$]; under the plug-in rule both arms realized 2.04\% FPR at nominal 1\% because the nested design thresholds on a quarter of the honest set, under the conformal rule 1.01\%). Source: \nolinkurl{results/fixes/corrections.csv} (M6, M7), \nolinkurl{results/fixes/r2_t1/chooser_fixed_summary_task_lab20.csv}, \nolinkurl{results/fixes2/cs_overview_conformal_thrfix/}.}\label{tab:chooser}
 \end{table}
 
 \begin{figure}[!htbp]\centering
@@ -318,7 +332,7 @@ The rule built on these properties loses to always-max (Table~\ref{tab:chooser})
 
 All round-3 gains use the corrected paired bootstrap, nested choosers and reported realized FPR. Pre-specified comparisons: 3rd-max, top-3 sum, CUSUM $k{=}1.5$ and the chooser vs max. The round-2 MOLE corpora are ``discovery''; the five new corpora are ``confirmation''.\src{EXPERIMENT_LOG.md (2026-10-22 r3t1 entry)}
 
-\subsection{MOLE: all eight corpora with one common monitor}
+\subsection{MOLE: all eight corpora with one common monitor \tC}
 The common monitor is a history-free Qwen3-235B-2507 account-day judge (MOLE prompt and taxonomy, compact audit rendering, integer score). Robustness monitors: gpt-4.1-mini with full rendering (GPT-5.3 corpora), MOLE z-score and peer-fit, an activity-only baseline (log events per day) and account-centered variants.
 
 \begin{table}[!htbp]\centering\small
@@ -335,11 +349,11 @@ DeepSeek-V4 multiday & 114/36 & 0.18 & $+0.070$ [$\m0.05$, $+0.18$] & $+0.052$ [
 Qwen3.6-27B multiday & 113/37 & 0.23 & $\m0.067$ [$\m0.19$, $+0.04$] & $\m0.022$ [$\m0.12$, $+0.07$] & $\m0.081$ [$\m0.14$, $\m0.01$] & $\m0.011$\\
 Kimi-K2.6 multiday & 114/36 & 0.17 & $\m0.074$ [$\m0.19$, $+0.04$] & $\m0.035$ [$\m0.13$, $+0.08$] & $\m0.018$ [$\m0.08$, $+0.07$] & $\m0.031$\\
 \midrule
-Pooled single-day (RE) & & & $\m0.066$ [$\m0.156$, $+0.023$] & $\m0.045$ [$\m0.109$, $+0.019$] & $\m0.030$ [$\m0.073$, $+0.013$] & \\
+Pooled single-day (RE) & & & $\m0.064$ [$\m0.151$, $+0.024$]$^\ast$ & $\m0.045$ [$\m0.109$, $+0.019$] & $\m0.030$ [$\m0.073$, $+0.013$] & \\
 Pooled multiday (RE) & & & $\m0.060$ [$\m0.160$, $+0.039$] & $\m0.022$ [$\m0.078$, $+0.034$] & $\m0.022$ [$\m0.073$, $+0.030$] & \\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Common monitor (Qwen3-235B, integer score), account-level FPR 0.10, paired gains with corrected CIs; realized FPR of max 0.096--0.114. Pooled rows: random-effects meta-analysis over 4 corpora. Source: \nolinkurl{results/r3_t1/mole_tables.md}.}\label{tab:mole}
+\caption{Common monitor (Qwen3-235B, integer score), account-level FPR 0.10, paired gains with corrected CIs; realized FPR of max 0.096--0.114. Pooled rows: random-effects meta-analysis over 4 corpora. Plug-in thresholds except $^\ast$, the conformal re-run (plug-in $\m0.066$ [$\m0.156$, $+0.023$]); the re-run moved the four single-day 3rd-max cells by $\le0.01$. Source: \nolinkurl{results/r3_t1/mole_tables.md}, \nolinkurl{results/fixes2/cs_overview_conformal_thrfix/}.}\label{tab:mole}
 \end{table}
 
 \begin{figure}[!htbp]\centering
@@ -354,7 +368,7 @@ Pooled multiday (RE) & & & $\m0.060$ [$\m0.160$, $+0.039$] & $\m0.022$ [$\m0.078
 \item \textbf{Daily review budget} (MOLE's R@10/day): today's score is best or within 0.01 of the best on 9 of 11 corpus$\times$monitor cells (today: 0.15--0.43). Exceptions: Kimi single-day (running max 0.18 vs today 0.15) and gpt-4.1-mini on GPT-5.3 multiday (CUSUM $k{=}1.5$ 0.46 vs 0.43). 3rd-max and top-3 sum are worse everywhere.\src{results/r3_t1/mole_tables.md (daily review budget)}
 \end{itemize}
 
-\paragraph{The round-2 MOLE gain is not robust.} Insider accounts are slightly more active (median events per day 123 on other days vs 116 routine on GPT-5.3 single-day), and the round-2 monitor separates them on non-attack days too (day AUROC 0.65).
+\paragraph{The round-2 MOLE gain is not robust \tE.} Insider accounts are slightly more active (median events per day 123 on other days vs 116 routine on GPT-5.3 single-day), and the round-2 monitor separates them on non-attack days too (day AUROC 0.65).
 
 \begin{table}[!htbp]\centering\small
 \begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcccc@{}}
@@ -372,10 +386,10 @@ activity only (no content) & 0.00 & $+0.320$ [$+0.14$, $+0.49$] & $+0.178$ [$+0.
 
 The gpt-4.1-mini gain was not significant to begin with and vanishes after account centering; without attack days that monitor barely separates insider accounts (max TPR 0.125). The data cannot separate an account-level confound from noise, so the correct statement is that \textbf{the round-2 MOLE gain is not robust}.\src{results/audit2/corrections.csv (m5)} An activity-only ``monitor'' with no content reaches 3rd-max TPR 0.32 (the log's ``0.37'' was a typo; audit 2, m6). Peer-fit keeps a significant gain on GPT-5.3 single-day even after centering, but this does not replicate: pooled over the four single-day corpora peer-fit 3rd-max is $+0.022$ [$\m0.097$, $+0.142$].\src{results/r3_t1/mole_tables.md (meta-analysis)}
 
-\paragraph{Mechanism (audit 2, A3).} Across 64 corpus$\times$monitor cells the top-3 gain correlates with repeat-spike informativeness, Spearman $+0.297$ (naive $p$ 0.017). The cells are 8 corpora $\times$ up to 10 dependent monitor variants (centered copies, activity baseline), and the predictor comes from the same insider streams. Corpus-cluster 95\% CI [$\m0.04$, $+0.54$]; primary monitors only (29 cells) $+0.18$ ($p$ 0.36). Descriptive only (\vweak).\src{results/audit2/corrections.csv (A3)} For the common monitor on single-day corpora, a repeat high day is barely more likely for insiders than for routine accounts (repeat-spike log-LR $\m0.02$ on GPT-5.3 single-day) while honest persistence is high (0.47).\src{results/r3_t1/mole_tables.md (per-corpus stream features)}
+\paragraph{Mechanism (audit 2, A3) \tE.} Across 64 corpus$\times$monitor cells the top-3 gain correlates with repeat-spike informativeness, Spearman $+0.297$ (naive $p$ 0.017). The cells are 8 corpora $\times$ up to 10 dependent monitor variants (centered copies, activity baseline), and the predictor comes from the same insider streams. Corpus-cluster 95\% CI [$\m0.04$, $+0.54$]; primary monitors only (29 cells) $+0.18$ ($p$ 0.36). Descriptive only (\vweak).\src{results/audit2/corrections.csv (A3)} For the common monitor on single-day corpora, a repeat high day is barely more likely for insiders than for routine accounts (repeat-spike log-LR $\m0.02$ on GPT-5.3 single-day) while honest persistence is high (0.47).\src{results/r3_t1/mole_tables.md (per-corpus stream features)}
 
 
-\subsection{Persistent state under continuous monitoring (no reset)}\label{sec:longh}
+\subsection{Persistent state under continuous monitoring (no reset) \tE}\label{sec:longh}
 Attack runs are appended after 0--4 random honest test runs; thresholds are set for a matched in-control ARL$_0=5/\alpha$ PRs; detection means an alarm inside the attack run given no prefix alarm. No attack longer than 5 PRs was built: concatenating independent runs would fabricate cross-run continuity that no agent produced.
 
 \begin{table}[!htbp]\centering\small
@@ -391,17 +405,17 @@ GPT-4o (original), gradual & 100 & 0.16 (120) & \textbf{0.27} (106) & 0.16 & 0.0
 GPT-4o (original), gradual & 500 & 0.01 (no honest alarm) & \textbf{0.19} (2{,}387) & 0.01 & 0.00 & 0.00\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Detection rate under continuous monitoring. Sources: \nolinkurl{results/r3_t1/ps_longhorizon.md}, \nolinkurl{results/r3_t1/ps_longhorizon_arl.csv}. No CIs were computed. ``No honest alarm'': the integer-score max threshold never fired on the honest test stream, so its realized ARL$_0$ is unresolved.}\label{tab:longh}
+\caption{Detection rate under continuous monitoring. Sources: \nolinkurl{results/r3_t1/ps_longhorizon.md}, \nolinkurl{results/r3_t1/ps_longhorizon_arl.csv}. No CIs were computed in round 3; round 4 adds them (\S\ref{sec:r4arl}). ``No honest alarm'': the integer-score max threshold never fired on the honest test stream, so its realized ARL$_0$ is unresolved.}\label{tab:longh}
 \end{table}
 
 \begin{itemize}
-\item For history-free gpt-4.1-mini on gradual attacks, CUSUM $k{=}0.5$ beats max: 0.71 vs 0.58 at ARL$_0=100$ PRs (realized ARL$_0$ 107 vs 102) and 0.59 vs 0.48 at 500. GPT-4o: 0.27 vs 0.16 at 100.
+\item For history-free gpt-4.1-mini on gradual attacks, CUSUM $k{=}0.5$ has the higher point estimate: 0.71 vs 0.58 at ARL$_0=100$ PRs (realized ARL$_0$ 107 vs 102) and 0.59 vs 0.48 at 500. GPT-4o: 0.27 vs 0.16 at 100. Round 4 re-ran this with CIs: $+0.132$ [$\m0.086$, $+0.296]$, not significant (\S\ref{sec:r4arl}).
 \item On positional (single-PR) attacks, CUSUM $k{=}0.5$ loses (0.49 vs 0.65); $k{=}1.5$ matches max.
-\item Non-forgetting accumulators (k-th largest, top-$k$ sum over the whole stream) collapse to $\approx0$. In deployment, cross-session accumulation has to forget (CUSUM) or be windowed.
-\item Caveats: point estimates without CIs; at ARL$_0=500$ the max threshold is not matched; Gemini and Qwen streams give low or mixed detection (Gemini history-free $\le0.14$ for every rule).
+\item Non-forgetting accumulators (k-th largest, top-$k$ sum over the whole stream) collapse to $\approx0$, so a deployed accumulator has to forget (CUSUM) or be windowed. Round 4 finds that forgetting rules do not beat max either (\S\ref{sec:r4arl}).
+\item Caveats: point estimates without CIs (round 3); at ARL$_0=500$ the max threshold is not matched; Gemini and Qwen streams give low or mixed detection (Gemini history-free $\le0.14$ for every rule).
 \end{itemize}
 
-\subsection{Re-flagging as a monitor design target}
+\subsection{Re-flagging as a monitor design target \tE}
 Round 2 suggested that what helps accumulation is attack re-flagging (a high repeat-spike LR), not history per se. Round 3 tested monitor designs that target it, all with gpt-4.1-mini, as matched pairs differing only in the variable under test: \emph{history-free}; \emph{history-aware} (plain); \emph{reflag} = history-aware + an explicit rule to re-raise suspicion when the current unit continues earlier suspicious work; \emph{ledger} = no history but the monitor's own ledger of open suspicions, with a \emph{ledger-null} control (identical prompt, notes always empty); two samples at $T=1$ (each alone, their mean, or both as separate units).
 
 \begin{table}[!htbp]\centering\small
@@ -421,7 +435,7 @@ sample units & 0.838 & $+1.33$ & 0.53 & 0.66 ($+0.13$ [$+0.05$, $+0.24$]) & 0.34
 length only ($-\log$ chars) & 0.585 & $+0.32$ & 0.13 & 0.28 ($+0.15$ [$+0.10$, $+0.33$]) & 0.05 & 0.16 ($+0.11$ [$+0.06$, $+0.16$])\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Persistent state, gradual attacks (155 honest / 120 attack), run-level FPR 0.05 and 0.01; top-3 sum on whitened scores; corrected paired-bootstrap CIs. Source: \nolinkurl{results/r3_t1/reflag_tables.md} (ps:gradual).}\label{tab:reflag}
+\caption{Persistent state, gradual attacks (155 honest / 120 attack), run-level FPR 0.05 and 0.01; top-3 sum on whitened scores; corrected paired-bootstrap CIs; plug-in thresholds. Source: \nolinkurl{results/r3_t1/reflag_tables.md} (ps:gradual).}\label{tab:reflag}
 \end{table}
 
 \begin{figure}[!htbp]\centering
@@ -440,21 +454,99 @@ length only ($-\log$ chars) & 0.585 & $+0.32$ & 0.13 & 0.28 ($+0.15$ [$+0.10$, $
 
 \paragraph{Validity checks: length.} Gradual-attack diffs are about 4$\times$ shorter than honest diffs (median 13{,}427 vs 53{,}602 characters), and a length-only ``monitor'' with 2nd-max reaches TPR 0.40 at 5\% FPR. Monitor scores \emph{rise} with diff length within honest PRs (gpt-4.1-mini $+0.09$, Qwen $+0.51$, ledger $+0.71$), so length works against the monitors; it also explains Qwen's high honest persistence in round 2. Length-matched subsets (25/25) are too small to conclude anything (realized FPR $\approx0.15$). On MonitoringBench, attacks are longer (stream-length AUROC 0.72); the opus-4-5-only and length-matched subsets give the same qualitative picture.\srcs{results/r3_t1/ps_length_check.csv}{results/r3_t1/reflag_tables.md}
 
+
+\section{Round 4: nine monitor families, a stronger MOLE monitor, unreset streams with CIs}\label{sec:r4}
+Track \texttt{r4cs} (October 22; OpenRouter \$143.53). Round 4 asked whether the cross-session gains of rounds 1--3 are a property of history-free per-PR monitoring or of a few monitors, whether a stronger account-day monitor creates an accumulation gain on MOLE, and whether the round-3 unreset-stream result survives CIs. Each analysis script states its pre-specification in its docstring (\S\ref{sec:thr}). Audit 3 re-ran every analysis and re-implemented the headline contrasts independently; all headline numbers reproduced, and four interpretations were corrected (below).\src{results/audit3/corrections.csv}
+
+\subsection{Persistent state: nine history-free monitors with identical inputs}\label{sec:r4ps}
+\textbf{Design.} 153 honest / 117 gradual runs that have five scored PRs under every monitor (5 apps). Six new monitors (gpt-4.1, Claude Haiku 4.5, Gemini 2.5 Pro, gpt-5-mini, Claude Haiku 5.5, GPT-6 Luna) were added to the round-2 three, all with the round-2 \texttt{current\_only} PR-review prompt and identical inputs. Only API-side settings differ (Gemini 2.5 Pro's 1{,}024-token reasoning budget, low reasoning effort for gpt-5-mini and Luna, larger completion caps where needed). One difference was not disclosed in the round-4 log: gpt-4.1-mini, Qwen3-235B and gpt-4.1 are read out as the logprob-expected score (continuous), the other six as the generated integer (audit 3).\src{results/audit3/cs_ps_granularity.csv} 40 iid 50/50 honest splits; gains use the joint bootstrap clustered by app (B = 2{,}000). GPT-4o's original round-1 scores are a reference and are not pooled.
+
+\begin{table}[!htbp]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}llcccc@{}}
+\toprule
+Monitor & read-out & run-max AUROC & max TPR (realized FPR) & top-3 sum $-$ max [app CI] & 3rd-max $-$ max [app CI]\\
+\midrule
+gpt-4.1-mini (r2) & logprob & 0.894 & 0.561 (0.046) & $+0.171$ [$+0.008$, $+0.274$] & $+0.026$ [$\m0.233$, $+0.274$]\\
+Gemini 2.5 Flash (r2) & integer & 0.623 & 0.211 (0.046) & $+0.036$ [$\m0.073$, $+0.157$] & $\m0.063$ [$\m0.283$, $+0.130$]\\
+Qwen3-235B (r2) & logprob & 0.737 & 0.446 (0.050) & $\m0.059$ [$\m0.155$, $+0.088$] & $\m0.142$ [$\m0.328$, $+0.130$]\\
+gpt-4.1 & logprob & 0.818 & 0.515 (0.044) & $\m0.138$ [$\m0.299$, $+0.166$] & $\m0.320$ [$\m0.475$, $\m0.112$]\\
+Claude Haiku 4.5 & integer & 0.707 & 0.230 (0.052) & $+0.106$ [$\m0.094$, $+0.253$] & $\m0.002$ [$\m0.236$, $+0.167$]\\
+Gemini 2.5 Pro & integer & 0.674 & 0.131 (0.041) & $+0.020$ [$\m0.152$, $+0.145$] & $\m0.022$ [$\m0.297$, $+0.046$]\\
+gpt-5-mini & integer & 0.797 & 0.460 (0.052) & $\m0.061$ [$\m0.158$, $+0.068$] & $\m0.346$ [$\m0.574$, $\m0.131$]\\
+Claude Haiku 5.5 & integer & 0.894 & 0.727 (0.051) & $\m0.247$ [$\m0.420$, $\m0.076$] & $\m0.650$ [$\m0.776$, $\m0.558$]\\
+GPT-6 Luna & integer & 0.912 & 0.748 (0.049) & $\m0.422$ [$\m0.506$, $\m0.281$] & $\m0.659$ [$\m0.780$, $\m0.531$]\\
+\midrule
+\textbf{Pooled, 9 monitors (RE, joint app bootstrap)} & & & & $\mathbf{\m0.066}$ [$\m0.147$, $+0.015$] & $\m0.250$ [$\m0.380$, $\m0.139$]\\
+GPT-4o (original, reference) & integer & 0.634 & 0.148 (0.044) & $+0.086$ [$\m0.004$, $+0.218$] & $+0.040$ [$\m0.062$, $+0.161$]\\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\caption{Round 4, gradual attacks, run-level FPR 0.05, conformal thresholds. Intervals are per-monitor and unadjusted. Source: \nolinkurl{results/fixes2/cs_ps_multi_conformal_thrfix/ps_tables.md} (plug-in version: \nolinkurl{results/r4_cs/ps_tables.md}); read-out from \nolinkurl{results/audit3/cs_ps_granularity.csv}.}\label{tab:r4ps}
+\end{table}
+
+\begin{figure}[!htbp]\centering
+\includegraphics[width=0.86\linewidth]{fixes2/cs_ps_multi_conformal_thrfix/fig_ps_forest.pdf}
+\caption{Top-3 sum $-$ max per monitor and the random-effects pool, run-level FPR 0.05 (left) and 0.01 (right), app-clustered 95\% CIs, conformal thresholds (generated by \texttt{tracks/r4\_cs/ps\_multi.py} under the conformal rule). The FPR-0.01 panel is descriptive: with about 76 calibration runs per split every threshold sits at the largest calibration statistic.}\label{fig:r4forest}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Pre-specified primary \tC: no pooled gain.} Top-3 sum $-$ max pooled over the nine identical-input monitors is $\m0.066$ [$\m0.147$, $+0.015$] (plug-in $\m0.070$ [$\m0.144$, $+0.015$]); HKSJ [$\m0.209$, $+0.077$]; $I^2=0.88$; 95\% prediction interval for a new monitor [$\m0.55$, $+0.42$]. The audit's independent implementation gives $\m0.070$ [$\m0.152$, $+0.012$] and a leave-one-app-out jackknife $\m0.069$ [$\m0.206$, $+0.068$] (plug-in).\srcs{results/fixes2/headline_threshold_rerun.csv}{results/audit3/cs_ps_jackknife.csv} The interval is conditional on these nine monitors; the prediction interval is the relevant range for another monitor.
+\item \textbf{Per monitor \tE.} With Holm over the nine monitors (app bootstrap), only GPT-6 Luna's loss is significant ($\m0.422$, $p_\text{Holm}=0.005$); Claude Haiku 5.5's $\m0.247$ has $p_\text{Holm}=0.07$. No monitor has a gain that survives Holm. Unadjusted, gpt-4.1-mini's app interval excludes 0 under the conformal rule ([$+0.008$, $+0.274$]; plug-in [$\m0.006$, $+0.275$]).
+\item \textbf{gpt-4.1-mini's gain is a read-out effect \tE.} On the generated integers of the same gpt-4.1-mini calls, top-3 sum $-$ max is $\m0.034$ [$\m0.052$, $\m0.009$], against $+0.141$ [$+0.007$, $+0.249$] for the logprob read-out in the same (audit, plug-in) implementation. gpt-4.1-mini is also not a weak monitor (run-max AUROC 0.894, tied second). The round-4 log's reading that the gain belongs to ``weak-to-mid monitors'' therefore fails. The pooled estimate barely depends on read-out ($\m0.074\to\m0.083$ with integer read-outs for all three logprob monitors; plug-in).\src{results/audit3/cs_ps_granularity.csv} The remaining positive point estimates are GPT-4o (integer, $+0.086$ [$\m0.004$, $+0.218$] on this run set) and Claude Haiku 4.5 ($+0.106$, n.s.).
+\item \textbf{Other contrasts.} 3rd-max $-$ max pooled is $\m0.250$ [$\m0.380$, $\m0.139$] (secondary \tC); after Holm three monitors remain significantly negative (gpt-5-mini, Haiku 5.5, Luna; plug-in). At FPR 0.01 the pooled top-3 contrast is $\m0.068$ [$\m0.101$, $+0.017$] (plug-in $\m0.099$); it is descriptive only, since every threshold sits at the largest of about 76 calibration statistics \tE. Plug-in robustness checks \tE: leave-apps-out calibration $\m0.076$ [$\m0.134$, $+0.012$] (max's realized FPR 0.049--0.109 across monitors), length-residualized scores $\m0.031$ [$\m0.136$, $+0.053$].
+\item \textbf{Why the strongest monitors lose \tE (post hoc).} They put a near-ceiling score on the single payload PR, so max is already high (0.73--0.75), while their honest scores rise with diff length (Spearman $+0.47$ to $+0.67$ for gpt-4.1, gpt-5-mini, Haiku 5.5 and Luna), which inflates the honest top-3 tail. Across the nine monitors the gain falls with that correlation (Spearman $\m0.73$, naive $p=0.025$, $k=9$).
+\item \textbf{GPT-4o on the common run set} is $+0.086$ [$\m0.004$, $+0.218$], below the round-1 $+0.134$ [$+0.024$, $+0.217$] (different run filter, 40 vs 10 splits, app vs iid clusters).
+\end{itemize}
+
+\paragraph{Mechanism (pre-specified, \tC).} For each monitor, $y$ = top-3 $-$ max on attacks from one half of the apps and $x$ = repeat-spike log-LR from attacks of the other half, averaged over 20 app partitions; the joint bootstrap reuses the same run weights for $x$, $y$ and every monitor. The cross-fitted Spearman correlation across the nine monitors is $+0.065$ [$\m0.341$, $+0.460$] (app clusters; not cross-fitted $+0.100$ [$\m0.417$, $+0.567$]). Across all 42 corpus$\times$monitor cells (persistent state and MOLE) it is $+0.016$, two-way cluster CI [$\m0.54$, $+0.59$]. Claude Haiku 5.5 has the highest repeat-spike LR (2.72) and the second-largest loss. With $k=9$ the test is inconclusive: it removes the round-3 support for the mechanism but is not evidence of no relationship.\src{results/r4_cs/mechanism.md}
+
+\subsection{MOLE with a stronger day monitor}\label{sec:r4mole}
+A search of Hugging Face and GitHub found no public release with more than five sessions per run and matched honest runs, so round 4 re-used MOLE's four single-day corpora (112 routine vs 30 solo insider accounts, 3--4 attack days each, 30 workdays). The renders were rebuilt with the round-2 code (account-day tables identical to rounds 2--3) and scored by GPT-6 Luna on the round-3 compact input, the same input as the common Qwen3-235B monitor. A gpt-4.1 run covers a budget subset (GPT-5.3 single-day: all 30 insiders and 50 random routine accounts). MOLE results use plug-in thresholds (not re-run; $\alpha n=5.6$ at account FPR 0.10, so the plug-in excess is small: the pooled Qwen row moved by 0.002 under the conformal rule).
+
+\begin{itemize}
+\item \textbf{Day level \tE.} Luna separates attack days from routine days better than Qwen (AUROC 0.69--0.80 vs 0.57--0.69) and also scores insiders' non-attack days somewhat higher than routine days (AUROC 0.60--0.64 vs 0.53--0.58).\src{results/r4_cs/mole_tables.md}
+\item \textbf{Primary \tC: no accumulation gain.} 3rd-max $-$ max at account-level FPR 0.10, pooled over the four corpora, is $+0.047$. The four corpora share all 142 accounts and the same 30 insiders, so they are not independent; a joint account bootstrap (same account weights in every corpus) gives [$\m0.026$, $+0.125$]. The round-4 log's interval [$\m0.019$, $+0.114$] treated the corpora as independent. Per corpus: $\m0.019$ to $+0.087$, none significant. Qwen on the same accounts: $\m0.061$ [$\m0.150$, $+0.028$]. Top-3 sum $-$ max: $+0.030$ [$\m0.008$, $+0.091$] (joint).\src{results/audit3/cs_mole_joint.csv}
+\item \textbf{Luna's detection comes from attack days \tE.} With attack days removed, Luna's max TPR at account FPR 0.10 falls to chance in every corpus (0.08--0.18 at realized FPR 0.10--0.11; GPT-5.3 single-day 0.328 $\to$ 0.120). Account centering gives TPR 0.000, which is below chance: on a bounded 0--10 scale, a monitor that saturates (insider account medians $\approx7.5$) cannot be centered meaningfully. The round-4 log's reading that Luna's insider signal is ``an account-level offset'' therefore fails. The mild offset visible at day level does not drive account-level detection. Without attack days, 3rd-max $-$ max is $+0.041$ [$\m0.009$, $+0.102$] (joint), a comparison of two near-chance rules.\srcs{results/audit3/corrections.csv}{results/r4_cs/mole_matched.csv}
+\item \textbf{Activity-only control \tE.} On GPT-5.3 single-day an activity-only score again gives a large 3rd-max $-$ max ($+0.338$ [$+0.164$, $+0.514$]) over a degenerate max (TPR 0), and no effect on the other three corpora.
+\item \textbf{gpt-4.1 subset \tE} (underpowered: 25 calibration accounts per split; realized FPR of max 0.138 at nominal 0.10). Max 0.371, 3rd-max $-$ max $+0.093$ [$\m0.075$, $+0.253$]. The realized FPR differs by rule (3rd-max 0.115) in max's favour, so the contrast is if anything understated.
+\item \textbf{Daily review budget \tE} (R@10/day, no CIs): today's score is the best rule in 9 of 11 monitor$\times$corpus rows (e.g.\ Luna on GPT-5.3 single-day 0.432 vs 0.296 for the running max). Exceptions: DeepSeek with Luna (CUSUM $k{=}1.5$ 0.243 vs 0.234) and Kimi with Qwen (running max 0.184 vs 0.153).
+\end{itemize}
+
+\subsection{Unreset streams with confidence intervals}\label{sec:r4arl}
+Pre-specified in \texttt{ps\_arl.py}: no reset across runs; each attack run follows U\{0..4\} honest runs; thresholds matched to ARL$_0$ on calibration runs (ties randomized by a $10^{-6}$ jitter); point estimate = mean over 10 splits; CI = 200 run-bootstrap replicates of the whole procedure with recalibrated thresholds, plus an app-cluster bootstrap at ARL$_0=100$. These thresholds are set by ARL matching, so the threshold convention does not apply.
+
+\begin{itemize}
+\item \textbf{P3a \tC (round-3 claim with CIs).} gpt-4.1-mini, ARL$_0=100$ PRs: CUSUM $k{=}0.5$ 0.718 vs max 0.586, $+0.132$ [$\m0.086$, $+0.296$] (app clusters [$\m0.09$, $+0.32$]). The point estimate reproduces round 3; the difference is not significant. The interval is conservative (each replicate uses one split while the point averages 10), but a split-averaged approximation, [$\m0.019$, $+0.284$], is not significant either. ARL$_0=500$: $+0.120$ [$\m0.076$, $+0.248$].\srcs{results/r4_cs/arl_tables.md}{results/audit3/cs_arl_ci_check.csv}
+\item \textbf{P3b \tC.} Windowed top-3 ($W=5$) $-$ max, gpt-4.1-mini: $+0.123$ [$\m0.084$, $+0.266$].
+\item \textbf{Pooled over the nine monitors, ARL$_0=100$ \tC.} Windowed top-3 $\m0.116$ [$\m0.178$, $\m0.053$] (survives Holm over the two pre-specified pooled contrasts); CUSUM $k{=}0.5$ $\m0.032$ [$\m0.109$, $+0.049$]. Exploratory \tE: EWMA ($\lambda=0.2$) $\m0.088$ [$\m0.162$, $\m0.009$], Shiryaev--Roberts $\m0.061$ [$\m0.133$, $+0.011$], CUSUM $k{=}1.5$ $+0.004$ [$\m0.019$, $+0.020$].
+\item \textbf{Nested best forgetting rule \tE} (chosen on attacks from one half of the apps, evaluated on the other): $+0.015$ [$\m0.010$, $+0.062$] at ARL$_0=100$. Max is not shown to be worse, but gains up to about $+0.06$ cannot be excluded. At ARL$_0=500$ it is $+0.039$ [$+0.007$, $+0.070$], but that cell is unmatched: max raises no honest alarm in 47\% of splits while CUSUM-type rules over-alarm out of sample (median realized ARL$_0$ 168--351 PRs), which favours the forgetting rules.
+\item The strong integer-score monitors (Luna, Haiku 5.5, gpt-5-mini) do best with CUSUM $k=1$--2, which behaves like max; low-$k$ CUSUM, EWMA and windowed sums lose 0.1--0.4 for them.
+\end{itemize}
+
+\begin{figure}[!htbp]\centering
+\includegraphics[width=0.86\linewidth]{r4_cs/fig_arl.pdf}
+\caption{Unreset streams: detection minus max at matched ARL$_0$ = 100 (left) and 500 (right) PRs, per monitor, for CUSUM $k{=}0.5$, windowed top-3 ($W=5$) and the nested best forgetting rule, with run-bootstrap 95\% CIs. The ARL$_0=500$ panel is not matched (see text).}\label{fig:r4arl}
+\end{figure}
+
+\subsection{Reasoning leakage (audit 3)}
+Agent reasoning is nearly label-revealing in these datasets (e.g.\ on MonitoringBench, the amount of visible reasoning separates honest from attack runs almost perfectly). Audit 3 checked every monitor scored in this repository: none receives agent reasoning (it is rendered only with an option no track sets), and no text-only assistant turn appears among the visible steps of the MonitoringBench trajectories. The history-aware vs history-free comparisons in this report are therefore not reasoning leakage. Visible step count remains label-correlated on MonitoringBench (AUROC 0.70), which history-aware and trajectory-level rules can use. Externally computed scores (the persistent-state GPT-4o natives) cannot be checked.\src{results/audit3/leak_reasoning.csv}
+
 \section{What holds, what was weakened, what was dropped}\label{sec:verdicts}
 
-Audit 1 found 2 critical, 9 major and 13 minor issues across all tracks; those touching Idea 1 are C2, M4, M6, M7, M8, M9, m1, m7, m9, m10, m12.\src{results/audit/issues.csv} Audit 2 re-implemented the round-3 analyses independently (randomized plug-in thresholds, task-grouped splits, a joint cluster bootstrap with thresholds recomputed); every round-3 Idea-1 headline reproduced within split and bootstrap noise, and the issues affecting this report are A3, m5, m6, m7 and m8.\src{results/audit2/issues.csv} Figure~\ref{fig:c2} shows the size of the main inference correction.
+Audit 1 found 2 critical, 9 major and 13 minor issues across all tracks; those touching Idea 1 are C2, M4, M6, M7, M8, M9, m1, m7, m9, m10, m12.\src{results/audit/issues.csv} Audit 2 re-implemented the round-3 analyses independently (randomized plug-in thresholds, task-grouped splits, a joint cluster bootstrap with thresholds recomputed); every round-3 Idea-1 headline reproduced within split and bootstrap noise, and the issues affecting this report are A3, m5, m6, m7 and m8.\src{results/audit2/issues.csv} Audit 3 re-ran the round-4 track from committed code (identical tables) and re-implemented its headline contrasts; it corrected four interpretations (read-out, Holm count, MOLE account sharing, MOLE account-level reading) and several minor statements.\src{results/audit3/corrections.csv} The threshold-convention re-run changed no Idea-1 verdict. Figure~\ref{fig:c2} shows the size of the audit-1 inference correction.
 
 \begin{figure}[!htbp]\centering
 \includegraphics[width=0.62\linewidth]{fixes/t1/fig_c2_headline_cis.pdf}
-\caption{Headline gains over max with the original CIs (grey; new attack indices per split, averaged; no calibration noise) and the corrected CIs (blue; one joint resample per replicate, calibration noise, task clusters).}\label{fig:c2}
+\caption{Audit-1 correction of the gain CIs: headline gains over max with the original CIs (grey; new attack indices per split, averaged; no calibration noise) and the corrected CIs (blue; one joint resample per replicate, calibration noise, task clusters). Both use the plug-in threshold rule; the figure documents the bootstrap correction, not current estimates (e.g.\ GPT-4o top-3 is now $+0.134$ [$+0.024$, $+0.217$] under the conformal rule).}\label{fig:c2}
 \end{figure}
 
 \subsection*{Holds}
 \begin{itemize}
 \item Max-type rules (max, 2nd-max, length-aware max) match or beat every accumulator on most real per-step stream sets (86\% / 67\% / 83\% of aksh-n / LinuxArena / MRT sets at FPR 0.01); textbook CUSUM $k{=}0.5$, SR, long-window GLR and e-processes lose almost everywhere.\src{results/t1/tables/r1_tpr.md}
-\item Cross-session accumulation of history-free GPT-4o per-PR scores: $+0.146$ [$+0.025$, $+0.226$] (round 1), $+0.101$ [$+0.015$, $+0.208$] (paired filter); history-aware GPT-4o loses the gain (DiD $+0.173$ [$+0.055$, $+0.271$]).
-\item Under continuous no-reset monitoring a forgetting accumulator beats max for history-free gpt-4.1-mini on gradual attacks (CUSUM $k{=}0.5$ 0.71 vs 0.58 at ARL$_0=100$); non-forgetting top-$k$ collapses (point estimates).
-\item MOLE: no accumulation rule beats max for the common monitor on any of 8 corpora (pooled single-day 3rd-max $\m0.066$ [$\m0.156$, $+0.023$]); today's score is the best (or within 0.01 of the best) daily-review rule on 9 of 11 cells.
+\item Cross-session accumulation of history-free GPT-4o per-PR scores: $+0.134$ [$+0.024$, $+0.217$] (round 1, conformal), $+0.101$ [$+0.015$, $+0.208$] (paired filter, plug-in); history-aware GPT-4o loses the gain (DiD $+0.173$ [$+0.055$, $+0.271$]). It is one monitor: across nine monitor families the pooled gain is $\m0.066$ [$\m0.147$, $+0.015$] (round 4).
+\item Non-forgetting top-$k$ collapses under continuous no-reset monitoring. The round-3 CUSUM point estimate for gpt-4.1-mini (0.71 vs 0.58 at ARL$_0=100$) reproduces in round 4, but with CIs it is $+0.132$ [$\m0.086$, $+0.296$], not significant.
+\item MOLE: no accumulation rule beats max for the common monitor on any of 8 corpora (pooled single-day 3rd-max $\m0.064$ [$\m0.151$, $+0.024$]); today's score is the best (or within 0.01 of the best) daily-review rule on 9 of 11 cells (round 3) and the best rule on 9 of 11 rows (round 4).
+\item MOLE with a stronger day monitor (GPT-6 Luna): no gain, $+0.047$ [$\m0.026$, $+0.125$] (joint account bootstrap).
+\item Round 4 pooled windowed top-3 sum loses to max on unreset streams ($\m0.116$ [$\m0.178$, $\m0.053$]); only Luna's per-monitor top-3 loss survives Holm.
 \item CUSUM's reference value is critical ($k\approx1.5$--2 $\approx$ max on whitened LLM scores; small $k$ over-alarms); e-process Ville thresholds over-alarm on dependent streams.
 \item Length-aware max on MRT ($+0.365$ [$+0.127$, $+0.445]$), conditional on unadapted attack lengths.
 \item Weak history-free monitor (gpt-4.1-nano): top-3 sum $+0.026$ [$+0.001$, $+0.058$] at FPR 0.01.
@@ -464,7 +556,9 @@ Audit 1 found 2 critical, 9 major and 13 minor issues across all tracks; those t
 
 \subsection*{Weakened}
 \begin{itemize}
-\item History-free gpt-4.1-mini PR gain: $+0.145$ [$\m0.001$, $+0.228$], $p(\le0)=0.026$ (borderline); significant on side-task-successful attacks ($+0.241$ [$+0.073$, $+0.336$]); the round-3 whitened top-3 gain ($+0.16$ [$+0.02$, $+0.23$]) shrinks to $+0.031$ with raw scores.
+\item History-free gpt-4.1-mini PR gain: $+0.145$ [$+0.007$, $+0.230$] (conformal; plug-in [$\m0.001$, $+0.228$]); the app-cluster interval covers 0; it exists only with the logprob-expected read-out (integer read-out of the same calls $\m0.034$ [$\m0.052$, $\m0.009$]); significant on side-task-successful attacks ($+0.241$ [$+0.073$, $+0.336$], plug-in); the round-3 whitened top-3 gain ($+0.16$ [$+0.02$, $+0.23$]) shrinks to $+0.031$ with raw scores.
+\item Repeat-spike mechanism: inconclusive across monitors (cross-fitted Spearman $+0.065$ [$\m0.341$, $+0.460$], $k=9$).
+\item ``Max is as good as any forgetting rule'' on unreset streams (round-4 log): non-significance only; nested best forgetting rule $+0.015$ [$\m0.010$, $+0.062$] at ARL$_0=100$.
 \item GPT-4o CUSUM gain $+0.116$ [$+0.006$, $+0.171$]; app-cluster interval crosses zero. GPT-4o's pooled gain comes from side-task-failed attacks.
 \item ``History removes the gain'': significant for 1 of 4 monitors (GPT-4o), reversed for gpt-4.1-mini.
 \item Mechanism correlations (repeat-spike LR, honest persistence): descriptive; family/corpus-cluster CIs include or approach zero (67 sets: $+0.30$ [$\m0.03$, $+0.45$]; MOLE: $+0.297$ [$\m0.04$, $+0.54$]).
@@ -483,34 +577,61 @@ Audit 1 found 2 critical, 9 major and 13 minor issues across all tracks; those t
 \item Qwen's history DiD ($+0.127$ [$\m0.040$, $+0.244$]).
 \item MOLE round-2 3rd-max gain ($+0.131$ [$\m0.028$, $+0.287$]) as a positive result.
 \item Rule chooser gain ($+0.023$ $\to$ $+0.001$ nested) and the practitioner lesson ``estimate stream properties, then pick the rule''.
+\item ``Deployed (no-reset) monitoring needs a forgetting accumulator'' as a demonstrated advantage over max (round 3 summary); only the collapse of non-forgetting rules stands.
+\item ``The cross-session gain is a property of weak-to-mid monitors'' (round-4 log): gpt-4.1-mini's gain is a read-out effect and gpt-4.1-mini is not weak.
+\item ``Luna's MOLE insider signal is mostly account-level'' (round-4 log): without attack days its detection is at chance; centering fails at the score ceiling.
 \end{itemize}
-Sources for this section: \nolinkurl{results/fixes/corrections.csv}, \nolinkurl{results/audit2/corrections.csv} and the tables cited above.
+Sources for this section: \nolinkurl{results/fixes/corrections.csv}, \nolinkurl{results/audit2/corrections.csv}, \nolinkurl{results/audit3/corrections.csv}, \nolinkurl{results/fixes2/headline_threshold_rerun.csv} and the tables cited above.
 
 \section{Conclusions}
 \begin{enumerate}
 \item \textbf{Keep max as the default decision rule, with a length-aware null where honest and attack lengths differ.} At a matched budget, textbook sequential tests with default parameters lose to max-type rules on almost every per-step stream set, and no data-driven rule selection we tried beats always-max out of sample.
-\item \textbf{Cross-session accumulation is the one positive regime, and it is fragile.} With a history-free per-PR monitor it helps for GPT-4o and (borderline) gpt-4.1-mini, not for Gemini or Qwen. In a deployment that monitors continuously without resets, use a forgetting statistic (CUSUM $k\approx0.5$--1.5) rather than a k-th largest or top-$k$ sum.
-\item \textbf{Insider-style account monitoring does not benefit} from per-account accumulation of a content monitor across eight MOLE corpora; review today's highest-scoring account-days.
-\item \textbf{The history double-counting hypothesis is not supported} on MonitoringBench, and the earlier opposite effect was an instruction artifact. Prompt wording moves detection as much as history does, so history-mode comparisons must hold the instructions fixed.
-\item \textbf{If using CUSUM on LLM scores, tune $k$ to the score distribution} ($k\approx1.5$--2 on whitened scores) and calibrate thresholds empirically, reporting realized FPR.
+\item \textbf{Cross-session accumulation is not a general gain.} Across nine history-free per-PR monitors with identical inputs the pooled top-3 $-$ max is $\m0.066$ [$\m0.147$, $+0.015$], with strong heterogeneity: GPT-4o gains, gpt-4.1-mini gains only with its logprob read-out, and the strongest monitors lose up to 0.42. Whether accumulation helps is a property of the particular monitor and score read-out, so it must be measured per monitor at a matched budget before it is deployed.
+\item \textbf{In a deployment without resets, do not use non-forgetting order statistics.} Max is not shown to be worse than CUSUM, EWMA or Shiryaev--Roberts at matched ARL$_0$, and windowed sums lose. A forgetting rule with a large reference ($k\approx1$--2) behaves like max and is a safe choice.
+\item \textbf{Insider-style account monitoring does not benefit} from per-account accumulation of a content monitor across eight MOLE corpora, also with a stronger monitor; review today's highest-scoring account-days.
+\item \textbf{The history double-counting hypothesis is not supported} on MonitoringBench, and the earlier opposite effect was an instruction artifact. Prompt wording moves detection as much as history does, so history-mode comparisons must hold the instructions fixed. Score read-out (logprob-expected vs generated integer) can also flip a conclusion, so it must be held fixed and reported.
+\item \textbf{If using CUSUM on LLM scores, tune $k$ to the score distribution} ($k\approx1.5$--2 on whitened scores), calibrate thresholds with a rule whose out-of-sample FPR is exact (the conformal randomized rule), and report realized FPR.
 \end{enumerate}
 
 \section{Limitations}
 \begin{itemize}
-\item \textbf{Small honest sets} (112--550 per set): FPR-0.01 thresholds are noisy (realized FPR up to 2.3$\times$ nominal) and many contrasts are inconclusive rather than negative.
-\item \textbf{Short cross-session sequences} (5 PRs); long-horizon results splice honest prefixes before 5-PR attacks and have no CIs.
+\item \textbf{Small honest sets} (112--550 per set): FPR-0.01 thresholds are noisy (realized FPR up to 2.3$\times$ nominal under the plug-in rule) and many contrasts are inconclusive rather than negative. Several round 1--3 tables were not re-run under the conformal rule and keep plug-in thresholds.
+\item \textbf{Short cross-session sequences} (5 PRs, 5 apps): long-horizon results splice honest prefixes before 5-PR attacks; app-clustered intervals rest on 5 clusters and are coarse, so iid intervals are given alongside. No public multi-session release with more than five sessions and matched honest runs was found.
+\item \textbf{Read-out heterogeneity.} Three of the nine round-4 monitors were read out as logprob-expected scores and six as integers; the pooled estimate is insensitive to this, the gpt-4.1-mini gain is not.
+\item \textbf{MOLE dependence.} The four single-day corpora share all accounts; only the joint account bootstrap is valid for pooled MOLE results. The gpt-4.1 MOLE subset is underpowered and runs at realized FPR 0.14.
 \item \textbf{Label and surface confounds.} MonitoringBench agent-model mismatch (honest all opus-4-5); persistent-state diff length (attacks 4$\times$ shorter); MOLE insider activity; side-task failures counted as positives in pooled persistent-state numbers.
 \item \textbf{Heuristic onset labels} (MonitoringBench execution step, aksh-n ideal-flag step).
-\item \textbf{Monitor coverage.} Re-scoring used cheap monitors; the round-3 design comparison uses gpt-4.1-mini alone.
+\item \textbf{Monitor coverage.} Rounds 1--3 used cheap monitors and the round-3 design comparison uses gpt-4.1-mini alone; round 4 adds six families on persistent state and GPT-6 Luna on MOLE.
 \item \textbf{Static attacks.} No attacker adapted to the detector (Idea 3 covers adaptive attackers).
-\item \textbf{Analyst degrees of freedom.} Round-2 chooser variants were chosen after seeing results; round 3 pre-specified its comparisons and separated discovery and confirmation corpora.
+\item \textbf{Analyst degrees of freedom.} Round-2 chooser variants were chosen after seeing results; round 3 pre-specified its comparisons and separated discovery and confirmation corpora; round 4 pre-specified its primaries in script docstrings, two of which were committed after the pre-commit (written before their outputs, per session transcripts).
 \end{itemize}
 
 \section{Next steps}
-Build persistent-state campaigns longer than 5 PRs with matching honest sequences, to test forgetting accumulators with CIs; re-test the GPT-4o cross-session gain on side-task-successful attacks with a second monitor family; combine the length-aware null with Idea 2's partially pooled per-context baselines.
+Build persistent-state campaigns longer than 5 PRs with matching honest sequences, to test forgetting accumulators with more power; analyse \texttt{idacy/ca-pse-iclr2027} (13{,}311 runs, 8 monitors) once its history mode is documented; re-run the round 1--3 tables that still use plug-in thresholds; combine the length-aware null with Idea 2's partially pooled per-context baselines.
 
 \section*{Reproduction}
-Code: \texttt{tracks/t1\_matched\_budget/}, \texttt{tracks/r2\_t1/}, \texttt{tracks/r3\_t1/}, \texttt{tracks/fixes/}, \texttt{tracks/audit2/}, and the library \texttt{amd/} (detectors, evaluation incl.\ \texttt{amd.evaluation.paired}, scoring). Outputs: \texttt{results/t1/}, \texttt{results/r2\_t1/}, \texttt{results/r3\_t1/}, \texttt{results/fixes/}, \texttt{results/audit/}, \texttt{results/audit2/}. Narrative log: \texttt{EXPERIMENT\_LOG.md}. Repository: \url{https://github.com/gregkocher/agent-monitor-detection} (private).
+Code: \texttt{tracks/t1\_matched\_budget/}, \texttt{tracks/r2\_t1/}, \texttt{tracks/r3\_t1/}, \texttt{tracks/r4\_cs/}, \texttt{tracks/fixes/}, \texttt{tracks/audit2/}, \texttt{tracks/audit3/}, \texttt{tracks/fixes2/}, and the library \texttt{amd/} (detectors, evaluation incl.\ \texttt{amd.evaluation.paired} and the conformal threshold rule, scoring). Outputs: \texttt{results/t1/}, \texttt{results/r2\_t1/}, \texttt{results/r3\_t1/}, \texttt{results/r4\_cs/}, \texttt{results/fixes/}, \texttt{results/audit/}, \texttt{results/audit2/}, \texttt{results/audit3/}, \texttt{results/fixes2/}. Narrative log: \texttt{EXPERIMENT\_LOG.md}. Repository: \url{https://github.com/gregkocher/agent-monitor-detection} (private).
+
+\section{Errata relative to the October 22 version}
+Table~\ref{tab:errata22} lists the statements of the October 22 version that audit 3 or the threshold-convention re-run changed.
+\begin{table}[!htbp]\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5.2cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{2.7cm}@{}}
+\toprule
+October 22 statement & Corrected statement & Source\\
+\midrule
+GPT-4o top-3 $-$ max $+0.146$ [$+0.025$, $+0.226$] & $+0.134$ [$+0.024$, $+0.217$] (conformal rule); holds & fixes2\\
+gpt-4.1-mini PR gain $+0.145$ [$\m0.001$, $+0.228$], borderline & $+0.145$ [$+0.007$, $+0.230$] (conformal); app-cluster CI covers 0; exists only with the logprob read-out & fixes2; audit 3\\
+``Deployed (no-reset) monitoring needs a forgetting accumulator'' (CUSUM 0.71 vs 0.58) & Point estimate reproduces; $+0.132$ [$\m0.086$, $+0.296]$ with CIs; pooled over 9 monitors no forgetting rule beats max & r4\_cs; audit 3\\
+Nested chooser $+0.001$ [$\m0.014$, $+0.013$] & $+0.001$ [$\m0.006$, $+0.009$] (conformal; both arms now at 1.01\% realized FPR instead of 2.04\%) & fixes2\\
+MOLE pooled single-day 3rd-max $\m0.066$ [$\m0.156$, $+0.023$] & $\m0.064$ [$\m0.151$, $+0.024$] (conformal) & fixes2\\
+Cross-session accumulation is ``the one positive regime'' & Not general: pooled over nine monitors $\m0.066$ [$\m0.147$, $+0.015$] & r4\_cs\\
+Thresholds: randomized plug-in primary & Conformal randomized rule; plug-in cells labelled & audit 3; fixes2\\
+\bottomrule
+\end{tabularx}
+\caption{Changes relative to the October 22 version. ``fixes2'' = \nolinkurl{results/fixes2/headline_threshold_rerun.csv}; ``audit 3'' = \nolinkurl{results/audit3/corrections.csv}.}\label{tab:errata22}
+\end{table}
+
+Corrections to the round-4 log itself (EXPERIMENT\_LOG, October 22) that this report applies: ``no monitor has a significant gain; 2 have significant losses'' becomes ``after Holm only Luna's loss is significant''; ``a property of weak-to-mid monitors'' is dropped (read-out effect); the pooled MOLE interval uses the joint account bootstrap; ``Luna's insider signal is mostly account-level'' is dropped; the leave-apps-out realized-FPR range is 0.049--0.109, not 0.014--0.117; ``today's score is best or tied everywhere'' becomes 9 of 11; ``max is as good as any forgetting rule'' holds only as non-significance at ARL$_0=100$.\src{results/audit3/corrections.csv}
 
 \section{Errata relative to the October 21 version}
 Table~\ref{tab:errata} lists every statement of the October 21 version of this report that the audits changed, with the corrected statement and its source. Statements not listed (e.g.\ the round-1 TPR tables and the $k$-grid) are unchanged point estimates.
@@ -520,7 +641,7 @@ Table~\ref{tab:errata} lists every statement of the October 21 version of this r
 \toprule
 October 21 statement & Corrected statement & Source (issue)\\
 \midrule
-Top-3 sum vs max on history-free PR monitor $+0.15$ [0.12, 0.17] & $+0.146$ [$+0.025$, $+0.226$]; holds with a wider CI (corrected bootstrap) & fixes C2\\
+Top-3 sum vs max on history-free PR monitor $+0.15$ [0.12, 0.17] & $+0.146$ [$+0.025$, $+0.226$]; holds with a wider CI (corrected bootstrap); $+0.134$ [$+0.024$, $+0.217$] under the conformal rule & fixes C2\\
 ``The gain disappears once the per-PR monitor sees prior diffs'' & True for GPT-4o only; gpt-4.1-mini gains more with history; Qwen, Gemini n.s. & fixes C2\\
 ``First matched-budget evidence that cross-session accumulation beats max'' & Monitor-specific: GPT-4o holds, gpt-4.1-mini borderline, Gemini/Qwen none; needs a forgetting statistic under continuous monitoring & fixes C2, m9; r3\_t1\\
 Accumulation predicted by honest persistence ($\rho=\m0.67$) and repeat-spike informativeness ($+0.47$) & Descriptive only; out-of-sample $+0.30$, family CI [$\m0.03$, $+0.45$]; $\m0.56$ [$\m0.69$, $\m0.05$] & fixes M7\\

@@ -1,40 +1,36 @@
 \documentclass[11pt]{article}
+\PassOptionsToPackage{obeyspaces,spaces}{url}
 \input{preamble}
+\usepackage{xspace}
+\newcommand{\tC}{\textsf{\scriptsize\textcolor{ForestGreen}{[C]}}\xspace}
+\newcommand{\tE}{\textsf{\scriptsize\textcolor{ink2}{[E]}}\xspace}
 \newcommand{\uv}{\textsuperscript{\dag}}
 \newcommand{\rf}[1]{\texttt{\small #1}}
 \setlist{itemsep=1pt,topsep=2pt,parsep=0pt}
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.07}\renewcommand{\floatpagefraction}{0.85}\setcounter{topnumber}{3}\setcounter{totalnumber}{4}
-\title{\textbf{White-Box Monitors Pilot: a Trusted Qwen3.5-27B Reader}\\[4pt]
-\large Probes, J-lens readouts and their decision layer on MonitoringBench, LinuxArena and MOLE, with second-audit corrections}
-\date{October 2026}
+\title{\textbf{White-Box Monitors: a Trusted Qwen3.5-27B Reader}\\[4pt]
+\large Pilot and round-4 follow-ups: probes, J-lens readouts and their decision layer on MonitoringBench, LinuxArena and MOLE, after three audits}
+\date{October 23, 2026 (supersedes the October 22 version)}
 \begin{document}
 \maketitle
 \vspace{-1.5em}
 
-\keybox{\textbf{Summary.} We ran an open model, Qwen3.5-27B, as a \emph{trusted reader} over agent transcripts and read its activations with off-the-shelf and cheaply trained probes. It read 1{,}325 MonitoringBench trajectories (775 attacks, 550 honest) that \texttt{gpt-4.1-mini} had already scored step by step. It read them two ways: \emph{full} (each step sees all earlier steps) and \emph{per-step} (each step read alone). It also read 1{,}210 detector-aware rewrites, the LinuxArena sweep, and MOLE insider sessions. All of Idea 1--3's decision-layer machinery was then applied to the probe streams. Cost: about \$70 of H200 time and \$2.95 of API. An independent second audit re-derived every headline that the stored data still support; the corrected numbers are the ones stated here.
+\keybox{\textbf{Summary.} We ran an open model, Qwen3.5-27B, as a \emph{trusted reader} over agent transcripts and read its activations with off-the-shelf and cheaply trained probes, \emph{full} (each step sees all earlier steps) and \emph{per-step} (each step read alone). The pilot read 1{,}325 MonitoringBench (MB) trajectories, 1{,}210 detector-aware rewrites, the LinuxArena sweep and MOLE insider sessions. Round 4 ran a preregistered replication on 1{,}000 new MB attacks, regenerated the lost LinuxArena streams, and added an account-matched MOLE design. Three audits re-derived the headlines; thresholds use the conformal randomized rule (\S\ref{sec:stats}). Tags: \tC confirmatory (preregistered), \tE exploratory.
 \begin{enumerate}[leftmargin=1.2em]
-\item \textbf{Holds: the FIBS axial probe on a per-step follow-up question beats the LLM monitor.} TPR at 1\% trajectory FPR is $+0.19$ to $+0.21$ above \texttt{gpt-4.1-mini} (0.34 vs 0.15), equally on both attack agent models. The gain is unchanged at equal realized FPR ($+0.18$). It is the only one of 18 pre-planned reader-vs-LLM contrasts that survives Holm correction.
-\item \textbf{Holds: a probe-triage cascade.} The synthetic-sabotage probe sends the 10\% most suspicious honest-calibrated steps (13\% of all steps) to the LLM. This raises TPR from 0.17 to 0.30 ($+0.13$) at matched realized FPR, with about 87\% fewer LLM calls.
-\item \textbf{Weakened.}
-  \begin{itemize}
-  \item Full-reading sabotage probe $+0.10$: Holm $p=0.22$; the gain is confined to attacks by the same agent model as the honest runs.
-  \item Full-reading FIBS axial probe and every fusion built on it: the threshold does not transfer across tasks (2.05\% realized FPR at nominal 1\%).
-  \item LinuxArena ranking: no paired test, and the reader score files were lost.
-  \end{itemize}
-\item \textbf{Negative.}
-  \begin{itemize}
-  \item No accumulation rule beats max on any probe stream.
-  \item Probe streams are more context-heterogeneous than LLM streams ($\tau$ up to 3.8 vs $\le$0.46), but per-context thresholds gain little at matched spend.
-  \item J-lens watch-lists are weak monitors.
-  \item Policy activations do not beat the trusted reader on MOLE.
-  \end{itemize}
-\item \textbf{Rewrite artifact.} Detector-aware rewrites are detected \emph{more} by the LLM and the follow-up probes, but not by token-level probes.
-\end{enumerate}}
+\item \textbf{Confirmed: the FIBS axial probe on a per-step follow-up question beats \texttt{gpt-4.1-mini}} \tC. On 1{,}000 held-out MB attacks, TPR at 1\% trajectory FPR is higher by $+0.194$ [$+0.089$, $+0.288]$ (0.26 vs 0.06), and by $+0.164$ with both monitors at exactly 1.00\% realized FPR. The replication covers structures S1--S3 only (no S4 attacks were left) and compares against one cheap LLM monitor.
+\item \textbf{A probe-triage cascade} \tE: escalating the 10\% most suspicious honest-calibrated steps (13\% of all steps) to the LLM raises TPR by $+0.123$ [$+0.059$, $+0.217$] at matched realized FPR with about 87\% fewer LLM calls.
+\item \textbf{LinuxArena, paired (regenerated streams)} \tE. In full reading the FIBS axial probe runs at realized FPR 0.8--1.1\% with TPR 0.66--0.72 at nominal 1\%. It is Holm-significantly above 6--7 of 12 sweep monitors (the count depends on the split code) and below \texttt{claude-opus-4-6}. Comparisons at exactly equal 1\% FPR are rule-dependent (one calibration point); at equal 2\% it is 6 of 12 above and 1 below.
+\item \textbf{Dropped} \tE: the full-reading FIBS axial gain at equal FPR ($-0.015$ [$-0.055$, $+0.097$] under the conformal rule; the earlier $+0.061$ sat at a plug-in FPR floor).
+\item \textbf{MOLE, account-matched negatives} \tC. Session AUROC does not differ between the policy's own activations and the trusted reader, but at 5\% session FPR the reader detects more (policy $-$ reader $-0.24$), and the insider instruction in the policy's context lowers the policy probe's TPR ($-0.06$ vs the instruction-neutralized arm). ``Unmatched negatives explain the pilot AUROCs'' fails (matched mean-statistic AUROCs 0.94--0.96). A \texttt{gpt-4.1-mini} session monitor beats every max-over-turns probe arm.
+\item \textbf{Negative} \tE: no accumulation rule beats max on any probe stream; J-lens watch-lists are weak monitors; probe streams are far more context-heterogeneous than LLM streams.
+\item \textbf{No reasoning leak}: no monitor scored in this repository, including the reader, sees agent reasoning (audit 3).
+\end{enumerate}
+Cost: GPU $\approx$\$70 (pilot) + $\approx$\$70 (round 4); OpenRouter \$2.95 + \$34.47.}
 
 
 \section{Motivation and prior work}\label{sec:prior}
 
-\paragraph{Source and caveat.} This section condenses an internal literature note (\rf{docs/reports/White box monitors for AI control.md}, 21 Oct 2026). Its numbers were \emph{not} re-checked against the primary sources for this report. Numbers that the note itself says reached it only through an automated summary or a search snippet are marked \uv\ (unverified secondhand). Treat them as leads, not citations.
+\paragraph{Source and caveat.} This section condenses an internal literature note (\nolinkurl{docs/reports/White box monitors for AI control.md}, 21 Oct 2026). Its numbers were \emph{not} re-checked against the primary sources for this report. Numbers that the note itself says reached it only through an automated summary or a search snippet are marked \uv\ (unverified secondhand). Treat them as leads, not citations.
 
 \subsection{Probes roughly match frontier text monitors where misbehavior is salient}
 \begin{itemize}
@@ -86,7 +82,7 @@ FIBS did not do trajectory aggregation, sequential tests, per-environment thresh
 \toprule
 Stream (code) & Definition\\
 \midrule
-Sabotage probe (\texttt{sab}) & Logistic regression per layer on 1{,}012 \texttt{gpt-4.1}-generated honest vs covert-malicious step pairs. The pairs cover 36 task themes $\times$ 8 generic objective categories taken from the monitor prompt. Theme-grouped CV AUROC is 0.945--0.971 by layer (\rf{scores/probes\_report.json}). Primary form: mean over the 6 layers, mean-pooled over step tokens. Variants: max-token; single layers (L43 is \emph{post hoc}).\\
+Sabotage probe (\texttt{sab}) & Logistic regression per layer on 1{,}012 \texttt{gpt-4.1}-generated honest vs covert-malicious step pairs. The pairs cover 36 task themes $\times$ 8 generic objective categories taken from the monitor prompt. Theme-grouped CV AUROC is 0.945--0.971 by layer (\nolinkurl{scores/probes_report.json}). Primary form: mean over the 6 layers, mean-pooled over step tokens. Variants: max-token; single layers (L43 is \emph{post hoc}).\\
 Apollo probe (\texttt{dec}) & Instructed-Pairs deception probe on 306 true facts. CV AUROC 1.0, a known caveat: the instruction is in context.\\
 FIBS linear on tokens (\texttt{fibs\_tok}) & Released FIBS linear probe read directly on the step tokens.\\
 FIBS linear follow-up (\texttt{fibs\_fu}) & FIBS linear probe at the follow-up answer; score = reading(\texttt{No.}) $-$ reading(\texttt{Yes.}).\\
@@ -99,9 +95,9 @@ LLM baseline & \texttt{gpt-4.1-mini}, prompt \texttt{ctrl-basic-v1}, logprob-exp
 \caption{Per-step signals. Each is pooled over the step's tokens (mean / max / last). The trajectory statistic is the max over steps unless stated otherwise.}
 \end{table}
 
-\noindent\textbf{Primary streams.} The results log designates \texttt{sab} (layer mean), the FIBS follow-up contrasts and J-lens mass as ``pre-specified primary''. The second audit found that this designation first appears in the results entry, not the setup entry (\rf{results/audit2/issues.csv}, m2). This report therefore treats the 18 stream$\times$mode reader-vs-LLM contrasts as one family and applies Holm.
+\noindent\textbf{Primary streams.} The results log designates \texttt{sab} (layer mean), the FIBS follow-up contrasts and J-lens mass as ``pre-specified primary''. The second audit found that this designation first appears in the results entry, not the setup entry (\nolinkurl{results/audit2/issues.csv}, m2). This report therefore treats the 18 stream$\times$mode reader-vs-LLM contrasts as one family and applies Holm.
 
-\noindent\textbf{What the probe directions decode to} (J-lens decoding of the probe weight vectors; qualitative, \rf{scores/probe\_direction\_jlens.json}): \texttt{sab} at L51/L58 to \emph{hidden, disguised, simultaneously, conceal, suspicious, rogue}, and at L43 to delete/remove/hide tokens (mostly Chinese); \texttt{dec} and FIBS at L35--43 to \emph{fake, false, falsehood}; FIBS at L51/58 to \emph{Wait, False, Actually}.
+\noindent\textbf{What the probe directions decode to} (J-lens decoding of the probe weight vectors; qualitative, \nolinkurl{scores/probe_direction_jlens.json}): \texttt{sab} at L51/L58 to \emph{hidden, disguised, simultaneously, conceal, suspicious, rogue}, and at L43 to delete/remove/hide tokens (mostly Chinese); \texttt{dec} and FIBS at L35--43 to \emph{fake, false, falsehood}; FIBS at L51/58 to \emph{Wait, False, Actually}.
 
 \subsection{Data}
 \begin{table}[!htbp]\centering\small
@@ -110,29 +106,35 @@ LLM baseline & \texttt{gpt-4.1-mini}, prompt \texttt{ctrl-basic-v1}, logprob-exp
 Set & Honest / attack & Modes & Comparators & Score files now\\
 \midrule
 MonitoringBench (MB) & 550 / 775 (S1--S3 100 each, S4 475), 37.7k steps & full, none & \texttt{gpt-4.1-mini} & intact\\
-T3 round 1 rewrites & same honest / 509 unique (126 base attacks) & full, none & \texttt{gpt-4.1-mini}, \texttt{gpt-4.1} & \textbf{lost (0 bytes)}\\
+T3 round 1 rewrites & same honest / 509 unique (126 base attacks) & full, none & \texttt{gpt-4.1-mini}, \texttt{gpt-4.1} & lost; regenerated (round 4)\\
 T3 round 2 rewrites & same honest / 701 unique (150 base attacks) & none & \texttt{gpt-4.1} & intact\\
-LinuxArena & 200 / 142, 10 environments & full, none & 12 per-action LLM monitors & \textbf{lost (0 bytes)}\\
+LinuxArena & 200 / 142, 10 environments & full, none & 12 per-action LLM monitors & lost; regenerated (round 4)\\
 MOLE \texttt{qwen36\_27b} single-day & 200 benign / 233 insider sessions & policy, reader & none & intact\\
+MB held-out (round 4) & Honest-550 / 1{,}000 new attacks (S1--S3) & none & \texttt{gpt-4.1-mini} & new\\
+MOLE matched (round 4) & 233 same-account same-day benign / 233 insider & policy, policy\_neutral, reader & \texttt{gpt-4.1-mini} & new\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Scored sets. Honest-550 is entirely \texttt{claude-opus-4-5}. Of the 775 MB attacks, 494 are opus-4-5 and 281 are opus-4-6. ``Lost'': the reader per-step files were overwritten with empty files by the last pod sync, after the LinuxArena and T3-r1 analyses had run. The pods have since been deleted (\rf{results/audit2/issues.csv}, A2).}
+\caption{Scored sets. Honest-550 is entirely \texttt{claude-opus-4-5}. Of the 775 MB attacks, 494 are opus-4-5 and 281 are opus-4-6. ``Lost'': the reader per-step files were overwritten with empty files by the last pod sync, after the LinuxArena and T3-r1 analyses had run (\nolinkurl{results/audit2/issues.csv}, A2). Round 4 re-read both sets with the unchanged code; the pilot's published tables reproduce (Section~\ref{sec:r4}).}
 \end{table}
 
-\subsection{Statistics}
-Randomized plug-in thresholds are set on the honest calibration half of task-grouped 50/50 splits, at trajectory FPR 0.05 / 0.01 / 0.003. Intervals are 95\% task-cluster bootstraps that include calibration noise; contrasts use \texttt{amd.evaluation.paired} (one joint resample per replicate, thresholds recomputed). The project analysis (\rf{results/wb/}) used only 10 splits, so its point estimates carry a few points of split noise. The second audit (\rf{results/audit2/}) re-implemented everything independently (\texttt{a2lib.py}, no reuse of \texttt{amd.evaluation}) with 40 and 200 splits, reports the \emph{realized} test FPR, and equalizes realized FPR by bisection on the nominal level. ``Holds / weakened / dropped'' verdicts follow \rf{results/audit2/corrections.csv}.
+\subsection{Statistics}\label{sec:stats}
+Randomized thresholds are set on the honest calibration half of task-grouped 50/50 splits, at trajectory FPR 0.05 / 0.01 / 0.003. Intervals are 95\% task-cluster bootstraps that include calibration noise; contrasts use \texttt{amd.evaluation.paired} (one joint resample per replicate, thresholds recomputed). The project analysis (\nolinkurl{results/wb/}) used only 10 splits, so its point estimates carry a few points of split noise. The second audit (\nolinkurl{results/audit2/}) re-implemented everything independently (\texttt{a2lib.py}, no reuse of \texttt{amd.evaluation}) with 40 and 200 splits, reports the \emph{realized} test FPR, and equalizes realized FPR by bisection on the nominal level. ``Holds / weakened / dropped'' verdicts follow \nolinkurl{results/audit2/corrections.csv} and \nolinkurl{results/audit3/corrections.csv}.
+
+\textbf{Threshold convention.} The pilot and the round-4 analyses originally used the plug-in randomized quantile, whose out-of-sample FPR for continuous scores is $(\lfloor\alpha n\rfloor+1)/(n+1)$: one calibration point too permissive when $\alpha n$ is an integer (1.98\% at $n=100$, $\alpha=1\%$), while tied integer-score monitors are handled exactly. Continuous probe scores were therefore compared with tied LLM scores at unequal realized FPR, most visibly on LinuxArena ($n_\text{cal}=100$). All headline numbers below use the conformal randomized rule: a new score $s$ alarms with probability $\mathrm{clip}((\alpha(n+1)-\#\{S_i>s\})/(\#\{S_i=s\}+1),0,1)$, whose expected FPR is exactly $\alpha$ for exchangeable scores (\nolinkurl{results/fixes2/headline_threshold_rerun.csv}). Plug-in values are given where they differ materially; pilot tables that were not re-run are marked plug-in. Two notes: with $\alpha(n+1)<1$ the conformal rule never alarms with certainty, so equal-FPR matching at small $n_\text{cal}$ is resolution-limited under any rule; and realized FPR above nominal that remains under the conformal rule is task shift between grouped halves, not the rule.
+
+\textbf{Confirmatory and exploratory.} The pilot's ``pre-specified primary'' streams were designated in its results entry, so every pilot result is exploratory \tE. Round 4 was preregistered (\nolinkurl{tracks/r4_wb/PREREG.md}, committed with the fixed held-out sets before any held-out item was scored): the MB replication H1 and its Holm family S1--S3, the LinuxArena paired comparison and its equal-FPR version, and the MOLE contrasts M1--M5 at session AUROC and TPR at 5\% FPR \tC. Sensitivity analyses, strata and the audit re-analyses are exploratory \tE.
 
 \subsection{Integrity checks}\label{sec:confounds}
 \begin{itemize}
-\item \textbf{Numerical (incremental vs single pass, 24 trajectories, 661 steps).} Mean-pooled step features agree to Pearson $r\ge0.999$ (median $|\Delta|\le0.02$ SD). Max-token features agree to $r=0.98$--$0.99$ (e.g.\ J-lens L43 max: $r=0.982$, max $|\Delta|=2.1$ SD) (\rf{wb/numerical\_check.json}). bf16 kernels are chunk-boundary sensitive, so max-pooled variants carry numerical noise. Mean-pooled streams are reliable.
-\item \textbf{Probe training data is disjoint from the evaluation data.} The maximum TF-IDF cosine between a contrast task and an MB task is 0.61. Only 9 of 12{,}009 contrast 8-grams appear in 400 MB attacks, and they are generic boilerplate (\rf{wb/disjointness.json}).
-\item \textbf{No source/style leakage in the generic streams.} On \emph{pre-onset} attack steps vs honest steps (9{,}188 steps), every generic probe and the LLM score AUROC 0.46--0.58 (Apollo full is highest at 0.58) (\rf{wb/mb\_preonset.csv}).
-\item \textbf{The supervised probe is leaky.} It scores 0.79 (full) / 0.70 (none) on pre-onset steps, so it partly learns trajectory-source features. It also transfers poorly: LinuxArena AUROC 0.69 / 0.55 (\rf{wb/la\_auroc.csv}). It is reported only as a leaky upper bound.
-\item \textbf{Agent model is label-correlated} (first-audit M9). All honest runs are opus-4-5; 36\% of attacks are opus-4-6. The LLM's TPR doubles on opus-4-6 attacks (full: 0.113 vs 0.253), so every contrast is also reported per agent model (\rf{wb/tables.md}).
-\item \textbf{Length.} On length-matched subsets (383 honest, 383 attacks) the stream ordering is unchanged at FPR 0.01: \texttt{sab} full 0.21 vs LLM 0.15, FIBS axial none 0.30 vs LLM 0.09 (\rf{wb/mb\_length\_matched.csv}). Realized FPRs there range 0.9--2.7\%.
+\item \textbf{Numerical (incremental vs single pass, 24 trajectories, 661 steps).} Mean-pooled step features agree to Pearson $r\ge0.999$ (median $|\Delta|\le0.02$ SD). Max-token features agree to $r=0.98$--$0.99$ (e.g.\ J-lens L43 max: $r=0.982$, max $|\Delta|=2.1$ SD) (\nolinkurl{wb/numerical_check.json}). bf16 kernels are chunk-boundary sensitive, so max-pooled variants carry numerical noise. Mean-pooled streams are reliable.
+\item \textbf{Probe training data is disjoint from the evaluation data.} The maximum TF-IDF cosine between a contrast task and an MB task is 0.61. Only 9 of 12{,}009 contrast 8-grams appear in 400 MB attacks, and they are generic boilerplate (\nolinkurl{wb/disjointness.json}).
+\item \textbf{No source/style leakage in the generic streams.} On \emph{pre-onset} attack steps vs honest steps (9{,}188 steps), every generic probe and the LLM score AUROC 0.46--0.58 (Apollo full is highest at 0.58) (\nolinkurl{wb/mb_preonset.csv}).
+\item \textbf{The supervised probe is leaky.} It scores 0.79 (full) / 0.70 (none) on pre-onset steps, so it partly learns trajectory-source features. It also transfers poorly: LinuxArena AUROC 0.69 / 0.55 (\nolinkurl{wb/la_auroc.csv}). It is reported only as a leaky upper bound.
+\item \textbf{Agent model is label-correlated} (first-audit M9). All honest runs are opus-4-5; 36\% of attacks are opus-4-6. The LLM's TPR doubles on opus-4-6 attacks (full: 0.113 vs 0.253), so every contrast is also reported per agent model (\nolinkurl{wb/tables.md}).
+\item \textbf{Length.} On length-matched subsets (383 honest, 383 attacks) the stream ordering is unchanged at FPR 0.01: \texttt{sab} full 0.21 vs LLM 0.15, FIBS axial none 0.30 vs LLM 0.09 (\nolinkurl{wb/mb_length_matched.csv}). Realized FPRs there range 0.9--2.7\%.
 \end{itemize}
 
-\section{Results}
+\section{Pilot results \tE}
 
 \subsection{Reader probes vs the LLM monitor on MonitoringBench}
 
@@ -163,7 +165,7 @@ Supervised (leaky bound) & full & $+0.764$ & $+0.808$ & $+0.773$ & 1.00 & 0.66\\
  & none & $+0.560$ & $+0.518$ & $+0.427$ & 0.98 & 0.76\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{TPR of the trajectory max, reader stream minus \texttt{gpt-4.1-mini} in the same mode (775 attacks vs 550 honest; \rf{wb/tables.md}, \rf{wb/mb\_auroc.csv}). These are nominal-FPR numbers from 10 splits. Table~\ref{tab:audit} gives the audited version for the main streams. Max-token J-lens mass is null (AUROC 0.48).}\label{tab:mb}
+\caption{TPR of the trajectory max, reader stream minus \texttt{gpt-4.1-mini} in the same mode (775 attacks vs 550 honest; \nolinkurl{wb/tables.md}, \nolinkurl{wb/mb_auroc.csv}). These are nominal-FPR numbers from 10 splits with plug-in thresholds. Table~\ref{tab:audit} gives the audited version for the main streams; the conformal re-run gives $+0.204$ [$+0.081$, $+0.308$] for FIBS axial follow-up (none) and $+0.095$ [$+0.010$, $+0.162$] for \texttt{sab} (full) (\nolinkurl{results/fixes2/wb_panel_d_thrfix.csv}). Max-token J-lens mass is null (AUROC 0.48).}\label{tab:mb}
 \end{table}
 
 \begin{table}[!htbp]\centering\small
@@ -174,7 +176,7 @@ Supervised (leaky bound) & full & $+0.764$ & $+0.808$ & $+0.773$ & 1.00 & 0.66\\
 Stream & Mode & reader $-$ LLM [CI] & opus-4-5 / 4-6 & reader / LLM & nominal & equal FPR & ($p$)\\
 \midrule
 FIBS axial follow-up & none & $\mathbf{+0.194}$ [$+0.10$, $+0.28$] & $+0.199$ / $+0.183$ & 1.64\% / 1.34\% & $+0.185$ & $\mathbf{+0.183}$ & \textbf{survives}\\
-FIBS axial follow-up & full & $+0.085$ [$+0.04$, $+0.30$] & $+0.117$ / $+0.029$ & 1.67\% / 1.36\% & $+0.096$ & $+0.059$\textsuperscript{a} & 0.31\\
+FIBS axial follow-up & full & $+0.085$ [$+0.04$, $+0.30$] & $+0.117$ / $+0.029$ & 1.67\% / 1.36\% & $+0.096$ & $\mathbf{-0.015}$\textsuperscript{a} & 0.31\\
 \texttt{sab} (mean) & full & $+0.100$ [$+0.03$, $+0.17$] & $+0.148$ / $+0.016$ & 1.46\% / 1.36\% & $+0.095$ & $+0.095$ & 0.22\\
 \texttt{sab} (mean) & none & $-0.047$ [$-0.15$, $+0.04$] & $-0.033$ / $-0.072$ & 1.34\% / 1.34\% & $-0.051$ & $-0.051$ & --\\
 FIBS linear follow-up & none & $+0.108$ [$+0.03$, $+0.18$] & $+0.114$ / $+0.098$ & 2.06\% / 1.34\% & $+0.096$ & $+0.083$ & 0.15\\
@@ -183,7 +185,7 @@ FIBS linear follow-up & full & $-0.046$ [$-0.08$, $+0.09$] & $-0.028$ / $-0.076$
 \texttt{sab} L43 (post hoc) & none & $+0.019$ [$-0.08$, $+0.11$] & $+0.036$ / $-0.010$ & 1.66\% / 1.34\% & $+0.015$ & $+0.000$ & n/a\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Second-audit reproduction at FPR 0.01 (\rf{audit2/repro\_wb\_mb.csv}, \rf{audit2/repro\_wb\_mb\_fpr\_equalized.csv}, Holm $p$ from \rf{audit2/issues.csv} m2). The Holm family is 18 stream$\times$mode contrasts; L43 is excluded as post hoc. The 200-split realized FPRs for the equal-FPR column are 2.05\% (FIBS axial full) and 1.12\% (\texttt{sab} full), vs 1.42\% for the LLM. \textsuperscript{a}The full-mode FIBS-axial threshold cannot be pushed below 1.58\% realized FPR at any nominal level. $+0.059$ is the gain at that floor, still at a higher FPR than the LLM.}\label{tab:audit}
+\caption{Second-audit reproduction at FPR 0.01 with plug-in thresholds (\nolinkurl{audit2/repro_wb_mb.csv}, \nolinkurl{audit2/repro_wb_mb_fpr_equalized.csv}, Holm $p$ from \nolinkurl{audit2/issues.csv} m2). The Holm family is 18 stream$\times$mode contrasts; L43 is excluded as post hoc. \textsuperscript{a}Under the plug-in rule the full-mode FIBS-axial threshold could not be pushed below about 1.6\% realized FPR, and the value shown before ($+0.059$; round-4 code $+0.061$ [$+0.021$, $+0.219$]) was the gain at that floor. The conformal rule can lower the reader to the LLM's FPR (1.11\% for both), and the gain vanishes: $-0.015$ [$-0.055$, $+0.097$] (\nolinkurl{results/fixes2/wb_r4a1_conformal_thrfix/}). Under the conformal rule the other equal-FPR values are $+0.183$ [$+0.080$, $+0.260$] (FIBS axial none) and $+0.093$ [$+0.012$, $+0.161$] (\texttt{sab} full).}\label{tab:audit}
 \end{table}
 
 \begin{figure}[!htbp]\centering
@@ -193,9 +195,9 @@ FIBS linear follow-up & full & $-0.046$ [$-0.08$, $+0.09$] & $-0.028$ / $-0.076$
 
 \paragraph{Findings.}
 \begin{itemize}
-\item \textbf{The per-step FIBS axial follow-up is the one robust win.} It gives TPR 0.34 vs 0.15 for the LLM at 1\% FPR. The gain is $+0.19$ to $+0.21$ across three independent estimates, is equal on opus-4-5 and opus-4-6 attacks, and is unchanged at equal realized FPR. It is the only reader-vs-LLM contrast of 18 that survives Holm. Its AUROC (0.85) is the highest of any non-leaky stream except the post hoc \texttt{sab} L43.
+\item \textbf{The per-step FIBS axial follow-up is the one robust win.} It gives TPR 0.32 vs 0.14 for the LLM at 1\% FPR (200 splits, conformal). The gain is $+0.18$ to $+0.21$ across three independent estimates, is equal on opus-4-5 and opus-4-6 attacks, and holds at equal realized FPR ($+0.183$ [$+0.080$, $+0.260$]). It is the only reader-vs-LLM contrast of 18 that survives Holm. Its AUROC (0.85) is the highest of any non-leaky stream except the post hoc \texttt{sab} L43. Round 4 replicated it on new attacks (Section~\ref{sec:r4p1}).
 \item \textbf{The full-reading sabotage probe is weakened.} It is nominally $+0.10$ and robust to realized FPR (1.12\% vs 1.42\%), but does not survive Holm ($p=0.22$), and the whole gain is on opus-4-5 attacks ($+0.148$ vs $+0.016$ on opus-4-6): the LLM finds opus-4-6 attacks twice as often, the probe does not. The probe is thus better exactly in the like-for-like comparison (honest and attack agents match), but this is not a family-wise result.
-\item \textbf{The full-reading FIBS axial probe runs hot.} At nominal 1\% its realized FPR is 2.05\% (the LLM's is 1.42\%), because some task clusters have heavy honest tails ($\tau=1.64$, \S\ref{sec:ctx}). Its reported $+0.057$ is $\approx+0.06$ at the reader's FPR floor, and that floor is still above the LLM's FPR. Treat this contrast as not shown.
+\item \textbf{The full-reading FIBS axial probe runs hot, and its gain is dropped.} At nominal 1\% its realized FPR is about 2.1\% under either rule (the LLM's is 1.1--1.4\%), because some task clusters have heavy honest tails ($\tau=1.64$, \S\ref{sec:ctx}); this is task shift, not the threshold rule. At equal realized FPR (conformal rule) the gain is $-0.015$ [$-0.055$, $+0.097$].
 \item \textbf{Generic deception and J-lens readouts lose to the LLM.} The Apollo probe (full) is $-0.09$ [$-0.14$, $-0.01$]. J-lens mass and hits are $-0.03$ to $-0.18$. Max-token J-lens is at chance.
 \item \textbf{A post hoc per-layer probe is far better, but unvalidated.} The best single \texttt{sab} layer (L43, chosen on the evaluation set) gives $+0.24$ in full mode at matched FPR. This is a hypothesis for a pre-registered replication, not an estimate.
 \end{itemize}
@@ -205,16 +207,16 @@ FIBS linear follow-up & full & $-0.046$ [$-0.08$, $+0.09$] & $-0.028$ / $-0.076$
 The same reader under two reading modes plays the role of Idea 1's history-aware vs history-free LLM monitor. The modes favor different signal families:
 \begin{itemize}
 \item \textbf{Token-level probes prefer full reading.} \texttt{sab} AUROC is 0.79 full vs 0.74 none. Read with context, a step's tokens carry more sabotage signal.
-\item \textbf{The follow-up question prefers per-step reading.} FIBS axial AUROC is 0.82 full vs 0.85 none, and TPR at 1\% is 0.25 vs 0.34 (\rf{audit2/repro\_wb\_mb.csv}). In full mode the question is asked after an ever-growing transcript, and honest follow-up scores persist: given one high step, the probability of a second is 0.66--0.77 in full mode vs 0.39--0.47 per step (\rf{wb/mb\_mechanism.csv}). Their honest tails also vary more across task clusters ($\tau$ 1.64 / 2.70 full vs 0.37 / 0.95 none).
+\item \textbf{The follow-up question prefers per-step reading.} FIBS axial AUROC is 0.82 full vs 0.85 none, and TPR at 1\% is 0.25 vs 0.34 (\nolinkurl{audit2/repro_wb_mb.csv}). In full mode the question is asked after an ever-growing transcript, and honest follow-up scores persist: given one high step, the probability of a second is 0.66--0.77 in full mode vs 0.39--0.47 per step (\nolinkurl{wb/mb_mechanism.csv}). Their honest tails also vary more across task clusters ($\tau$ 1.64 / 2.70 full vs 0.37 / 0.95 none).
 \item \textbf{The LLM, like the follow-up probe, separates better per step on AUROC} (0.66 full vs 0.76 none), but its TPRs at 1\% are nearly equal (0.165 vs 0.148).
-\item \textbf{Attack structure.} Every stream separates distributed (S4) attacks at least as well as concentrated ones (S1--S3); e.g.\ AUROC on S4 vs S1 is 0.88 vs 0.80 for per-step FIBS axial, 0.81 vs 0.81 for \texttt{sab} full, 0.79 vs 0.73 for the per-step LLM (descriptive; \rf{wb/mb\_subgroups.csv}).
+\item \textbf{Attack structure.} Every stream separates distributed (S4) attacks at least as well as concentrated ones (S1--S3); e.g.\ AUROC on S4 vs S1 is 0.88 vs 0.80 for per-step FIBS axial, 0.81 vs 0.81 for \texttt{sab} full, 0.79 vs 0.73 for the per-step LLM (descriptive; \nolinkurl{wb/mb_subgroups.csv}).
 \end{itemize}
 
 
 \subsection{J-lens watch-list}
 \begin{itemize}
 \item \textbf{As a monitor the watch-list is weak.} Layer-mean log-mass gives AUROC 0.72 / 0.67 (full / none) and TPR at 1\% below the LLM. Top-25 hit counts give 0.65 / 0.56. Max-token mass is at chance (0.48), which also reflects bf16 noise in max-pooled features.
-\item \textbf{Single layers do not help.} AUROC is 0.66 / 0.62 / 0.69 at L27 / L35 / L43 (full) (\rf{wb/mb\_auroc.csv}).
+\item \textbf{Single layers do not help.} AUROC is 0.66 / 0.62 / 0.69 at L27 / L35 / L43 (full) (\nolinkurl{wb/mb_auroc.csv}).
 \item \textbf{It is the one signal that helps on MOLE.} There the reader's top-25 hits reach session AUROC 0.96 (max) and 0.98 (mean) (\S\ref{sec:mole}).
 \item \textbf{Interpretation.} A trusted reader's J-space reflects the reader's thoughts about the transcript, not the agent's cognition. On BashArena, sysadmin work keeps tokens like \emph{hide}, \emph{monitor} and \emph{secret} high on honest runs as well. This matches the literature note's prediction that a standalone readout is swamped without a baseline.
 \end{itemize}
@@ -239,13 +241,13 @@ Apollo & none & $-0.045$ [$-0.09$, $+0.02$] & $-0.051$ [$-0.08$, $+0.01$] & $-0.
 J-lens mass & none & $-0.026$ [$-0.06$, $+0.03$] & $-0.035$ [$-0.07$, $+0.00$] & $-0.054$ [$-0.10$, $+0.03$] & $-0.061$ [$-0.10$, $-0.01$] & $-0.030$ [$-0.07$, $+0.01$]\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{TPR difference vs the trajectory max at FPR 0.01 (\rf{wb/tables.md}, \rf{wb/mb\_paired.csv}). No accumulator beats max for any probe stream (only the leaky supervised probe has non-significant positive cells).}\label{tab:acc}
+\caption{TPR difference vs the trajectory max at FPR 0.01 (\nolinkurl{wb/tables.md}, \nolinkurl{wb/mb_paired.csv}). No accumulator beats max for any probe stream (only the leaky supervised probe has non-significant positive cells).}\label{tab:acc}
 \end{table}
 
 \begin{itemize}
 \item \textbf{Max is the right rule on probe streams.} Accumulators are mostly worse, by up to $-0.25$ (CUSUM $k{=}0.5$ on per-step FIBS axial). Idea 1's lesson transfers unchanged: max-type rules first, and CUSUM only with a large reference value.
 \item \textbf{Difference-in-differences (none $-$ full) of the CUSUM $k{=}0.5$ gain over max, 1\% FPR.} The sign depends on the probe: \texttt{sab} $+0.163$ [$+0.08$, $+0.22$] (history-free reading favors accumulation, as Idea 1 predicted for LLM monitors); FIBS follow-ups the opposite ($-0.177$ [$-0.25$, $-0.05$] linear, $-0.215$ [$-0.33$, $+0.02$] axial); LLM $+0.054$ [$-0.05$, $+0.12$], n.s. These come from the 10-split analysis and were not in a pre-declared family: exploratory.
-\item \textbf{Idea 1's mechanism variables did not flip the ranking anywhere} (descriptive; unit threshold at a 5\% honest step rate, \rf{wb/mb\_mechanism.csv}). Honest spike persistence $P(\ge2\text{ high}\mid\ge1)$ is 0.52 for \texttt{sab} full, 0.77 for FIBS linear follow-up full, 0.33 for the LLM full; the repeat-spike log-LR is 0.37, 0.11 and 0.67. High persistence with low repeat-spike informativeness predicts that accumulation hurts, and it does; even \texttt{sab} none (0.53, 0.26) is outside the regime where accumulation won in Idea 1.
+\item \textbf{Idea 1's mechanism variables did not flip the ranking anywhere} (descriptive; unit threshold at a 5\% honest step rate, \nolinkurl{wb/mb_mechanism.csv}). Honest spike persistence $P(\ge2\text{ high}\mid\ge1)$ is 0.52 for \texttt{sab} full, 0.77 for FIBS linear follow-up full, 0.33 for the LLM full; the repeat-spike log-LR is 0.37, 0.11 and 0.67. High persistence with low repeat-spike informativeness predicts that accumulation hurts, and it does; even \texttt{sab} none (0.53, 0.26) is outside the regime where accumulation won in Idea 1.
 \end{itemize}
 
 \subsection{(b) Per-context probe thresholds}\label{sec:ctx}
@@ -266,7 +268,7 @@ Apollo deception & 3.79 ($<$0.001) & 1.89 (0.001) & 0.036 & 0.103\\
 J-lens mass & 0.56 (0.17) & 0.31 (0.37) & 0.030 & 0.020\\
 \bottomrule
 \end{tabular}
-\caption{Between-cluster heterogeneity of honest false-positive rates on 7 MB task clusters: logit-normal $\tau$ at a global 5\% threshold, and the share of honest-max variance explained by cluster (\rf{wb/tables.md}, \rf{wb/context\_heterogeneity.csv}). Per-cluster honest FPRs range up to 0--24.6\% for probes vs 0--12.3\% for the LLM.}\label{tab:tau}
+\caption{Between-cluster heterogeneity of honest false-positive rates on 7 MB task clusters: logit-normal $\tau$ at a global 5\% threshold, and the share of honest-max variance explained by cluster (\nolinkurl{wb/tables.md}, \nolinkurl{wb/context_heterogeneity.csv}). Per-cluster honest FPRs range up to 0--24.6\% for probes vs 0--12.3\% for the LLM.}\label{tab:tau}
 \end{table}
 
 \begin{figure}[!htbp]\centering
@@ -276,8 +278,8 @@ J-lens mass & 0.56 (0.17) & 0.31 (0.37) & 0.030 & 0.020\\
 
 \begin{itemize}
 \item \textbf{Probe streams are clearly more context-dependent than the LLM.} $\tau$ is 1.2--3.8 for four probe streams in full mode (all $p\le0.004$) vs 0.46 (n.s.) for the LLM. Cluster share of honest-max variance is 2--14\% vs 0.2--3.5\%. This replicates the context confound reported for Apollo-style probes, and it is the precondition for per-context allocation to matter.
-\item \textbf{Allocation at 10\% spend, spend-matched} (CFAR, global and Stackelberg rows matched in $\ge$87\% of replicates; \rf{wb/context\_allocation.csv}). CFAR raises uniform-attacker TPR more for probes than for the LLM, but the only interval excluding 0 is Apollo none, 0.31 $\to$ 0.46 [$+0.01$, $+0.29$], 1 of 14 MB contrasts (\texttt{sab}: full $+0.04$, none $+0.09$, n.s.; LLM $-0.02$ / $+0.02$). CFAR lowers safety against an informed context-selecting attacker (FIBS linear follow-up full: 0.36 $\to$ 0.09, [$-0.46$, $+0.01$]). Stackelberg keeps selection safety within 0.02 of global or above on all 14 MB panels (no interval excludes 0). With 7 clusters most differences are n.s. The 5\% rows (matched in 40--80\% of replicates) and the LinuxArena allocation rows (15--70\%, clamped; audit2 m10) are not used.
-\item \textbf{Related correction} (first audit C1, \rf{results/fixes/corrections.csv}). The earlier E5 claim that ``CFAR roughly doubles uniform TPR for probes at 1\%'' is replaced: 1\% spend-matching is not estimable (per-context rules have a realized-spend floor of about 2.5\%), and at equal realized spend CFAR gains $+0.18$ [$+0.08$, $+0.27$] for Apollo full (3.6\%) and $+0.15$ [$+0.03$, $+0.28$] for FIBS linear follow-up full (2.9\%), i.e.\ $1.3$--$1.5\times$, not $2\times$.
+\item \textbf{Allocation at 10\% spend, spend-matched} (CFAR, global and Stackelberg rows matched in $\ge$87\% of replicates; \nolinkurl{wb/context_allocation.csv}). CFAR raises uniform-attacker TPR more for probes than for the LLM, but the only interval excluding 0 is Apollo none, 0.31 $\to$ 0.46 [$+0.01$, $+0.29$], 1 of 14 MB contrasts (\texttt{sab}: full $+0.04$, none $+0.09$, n.s.; LLM $-0.02$ / $+0.02$). CFAR lowers safety against an informed context-selecting attacker (FIBS linear follow-up full: 0.36 $\to$ 0.09, [$-0.46$, $+0.01$]). Stackelberg keeps selection safety within 0.02 of global or above on all 14 MB panels (no interval excludes 0). With 7 clusters most differences are n.s. The 5\% rows (matched in 40--80\% of replicates) and the LinuxArena allocation rows (15--70\%, clamped; audit2 m10) are not used.
+\item \textbf{Related correction} (first audit C1, \nolinkurl{results/fixes/corrections.csv}). The earlier E5 claim that ``CFAR roughly doubles uniform TPR for probes at 1\%'' is replaced: 1\% spend-matching is not estimable (per-context rules have a realized-spend floor of about 2.5\%), and at equal realized spend CFAR gains $+0.18$ [$+0.08$, $+0.27$] for Apollo full (3.6\%) and $+0.15$ [$+0.03$, $+0.28$] for FIBS linear follow-up full (2.9\%), i.e.\ $1.3$--$1.5\times$, not $2\times$.
 \end{itemize}
 
 \subsection{(c) Fusion and triage with the LLM monitor}
@@ -295,7 +297,7 @@ FIBS lin.\ f-u & full & 0.166 (1.4\%) & 0.137 (2.7\%) & 0.214 (2.8\%) & 0.207 (1
 J-lens mass & full & 0.166 (1.4\%) & 0.112 (1.5\%) & 0.221 (2.5\%) & 0.224 (1.3\%) & 0.149 (1.4\%) & 0.162 (1.8\%)\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{TPR at nominal trajectory FPR 0.01, with \emph{realized} FPR in parentheses (\rf{wb/fusion.csv}). ``Cascade $q$'': the probe flags the top $q$ of honest-calibrated steps, and only those steps go to the LLM, whose score decides. KDE-LLR: a trajectory-level log-likelihood ratio of (probe max, LLM max). Bold FPRs are the A1 problem: realized FPR about $2\times$ nominal.}\label{tab:fusion}
+\caption{TPR at nominal trajectory FPR 0.01, with \emph{realized} FPR in parentheses, plug-in thresholds, 10 splits (\nolinkurl{wb/fusion.csv}). ``Cascade $q$'': the probe flags the top $q$ of honest-calibrated steps, and only those steps go to the LLM, whose score decides. KDE-LLR: a trajectory-level log-likelihood ratio of (probe max, LLM max). Bold FPRs are the A1 problem: realized FPR about $2\times$ nominal.}\label{tab:fusion}
 \end{table}
 
 \begin{figure}[!htbp]\centering
@@ -304,15 +306,15 @@ J-lens mass & full & 0.166 (1.4\%) & 0.112 (1.5\%) & 0.221 (2.5\%) & 0.224 (1.3\
 \end{figure}
 
 \begin{itemize}
-\item \textbf{The \texttt{sab} cascade holds.} Full reading, 10\% of honest-calibrated steps escalated (13.1\% of all steps): TPR 0.298 vs 0.168, $+0.129$ [$+0.07$, $+0.23$], at realized FPR 1.43\% vs 1.81\%, so the cascade does not over-spend (\rf{audit2/repro\_wb\_fusion.csv}). It is a power gain \emph{and} an 87\% cut in LLM calls: the probe removes honest steps the LLM would false-alarm on, so a tighter LLM threshold becomes affordable. Per-step reading gives the same $+0.129$ [$+0.04$, $+0.18$].
-\item \textbf{Cascade caveats.} $q=10\%$ was one of 5 levels $\times$ 7 rules $\times$ 5 probes $\times$ 2 modes; $q=5\%$ gives $+0.146$ and $q=20\%$ only $+0.04$ (\rf{audit2/repro\_wb\_fusion.csv}). The gain is $+0.165$ on opus-4-5 attacks vs $+0.067$ on opus-4-6 (\rf{audit2/repro\_wb\_fusion\_strata.csv}).
-\item \textbf{FIBS-axial full fusion headlines are weakened (A1).} KDE-LLR's 0.328 ($+0.16$) runs at 2.8\% realized FPR vs 1.4\% for the LLM, so it is not an FPR-matched comparison. The FIBS-axial-full cascade at 5\% (0.336, realized 1.8\%) is closer to matched but shares the problem.
+\item \textbf{The \texttt{sab} cascade holds.} Full reading, 10\% of honest-calibrated steps escalated (13.1\% of all steps): TPR 0.288 vs 0.165, $+0.123$ [$+0.059$, $+0.217$], at realized FPR 1.34\% vs 1.59\% under the conformal rule (plug-in $+0.129$ [$+0.07$, $+0.23$] at 1.43\% vs 1.81\%), so the cascade does not over-spend (\nolinkurl{audit2/repro_wb_fusion.csv}, \nolinkurl{results/fixes2/wb_a2fusion_conformal_thrfix/}). It is a power gain \emph{and} an 87\% cut in LLM calls: the probe removes honest steps the LLM would false-alarm on, so a tighter LLM threshold becomes affordable. Per-step reading gives the same $+0.129$ [$+0.04$, $+0.18$].
+\item \textbf{Cascade caveats.} $q=10\%$ was one of 5 levels $\times$ 7 rules $\times$ 5 probes $\times$ 2 modes; $q=5\%$ gives $+0.146$ and $q=20\%$ only $+0.04$ (\nolinkurl{audit2/repro_wb_fusion.csv}). The gain is $+0.165$ on opus-4-5 attacks vs $+0.067$ on opus-4-6 (\nolinkurl{audit2/repro_wb_fusion_strata.csv}).
+\item \textbf{FIBS-axial full fusion headlines are weakened (A1).} KDE-LLR's 0.328 ($+0.16$) runs at 2.8\% realized FPR vs 1.4\% for the LLM, so it is not an FPR-matched comparison, and the standalone full-reading FIBS-axial gain vanishes at equal FPR (above). The FIBS-axial-full cascade at 5\% has $+0.134$ [$+0.069$, $+0.276$] at realized 1.35\% vs 1.59\% under the conformal rule (audit-2 code), but $q$ was selected among many cells.
 \item \textbf{Per-step FIBS axial needs no LLM.} The probe alone (0.324 at 0.9\% realized FPR) is as good as any fusion. The cascade, in which the LLM decides, falls back to LLM-level TPR.
 \item \textbf{Weak probes still help fusion.} J-lens mass in rank-sum fusion is $+0.058$ [$+0.03$, $+0.11$] at 1.3\% realized FPR, although the J-lens alone is below the LLM.
 \end{itemize}
 
 \subsection{(d) Probes on detector-aware rewrites}\label{sec:t3}
-Idea 3's monitor-aware attacker rewrote MonitoringBench attacks against LLM monitors. Round 2 (pacing arms against \texttt{gpt-4.1}, plus a matched rewrite control) is fully re-analyzable. Round 1's reader streams are lost (A2).
+Idea 3's monitor-aware attacker rewrote MonitoringBench attacks against LLM monitors. Round 2 (pacing arms against \texttt{gpt-4.1}, plus a matched rewrite control) is fully re-analyzable. Round 1's reader streams were lost (A2) and regenerated in round 4; the pilot's round-1 detection rows reproduce (mean $|$diff$|$ 0.002).
 
 \begin{table}[!htbp]\centering\small
 \begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcccccc@{}}
@@ -330,18 +332,18 @@ J-lens mass & 0.073 & 0.300 & 0.260 & $-0.040$ [$-0.13$, $+0.08$] & $-0.020$ [$-
 Apollo deception & 0.113 & 0.260 & 0.253 & $-0.007$ [$-0.09$, $+0.07$] & $+0.027$ [$-0.04$, $+0.11$] & $+0.000$ [$-0.08$, $+0.08$]\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{T3 round 2 (150 base attacks, per-step reading; \rf{wb/tables.md}, \rf{wb/t3\_detection.csv}). ``Control'' is a rewrite with the same rewriter and no pacing instruction. Pacing arms were written against \texttt{gpt-4.1}.}\label{tab:t3}
+\caption{T3 round 2 (150 base attacks, per-step reading; \nolinkurl{wb/tables.md}, \nolinkurl{wb/t3_detection.csv}). ``Control'' is a rewrite with the same rewriter and no pacing instruction. Pacing arms were written against \texttt{gpt-4.1}.}\label{tab:t3}
 \end{table}
 
 \begin{figure}[!htbp]\centering
 \includegraphics[width=0.92\linewidth]{wb/figures/t3_detection.pdf}
-\caption{Detection at trajectory FPR 0.01 (max) on T3 rewrites by arm, for the LLM monitors and reader streams. Round 1 (left, middle) is not reproducible from stored data (A2). Round 2 (right) is intact.}
+\caption{Detection at trajectory FPR 0.01 (max) on T3 rewrites by arm, for the LLM monitors and reader streams. Round 1 (left, middle): pilot streams, lost and regenerated in round 4 with matching results. Round 2 (right) is intact.}
 \end{figure}
 
 \begin{itemize}
 \item \textbf{The rewrite artifact is monitor-type specific.} The control rewrite roughly doubles detection by \texttt{gpt-4.1} (0.24 $\to$ 0.57) and the follow-up probes (FIBS axial 0.38 $\to$ 0.65), but leaves token-level probes unchanged (\texttt{sab} 0.087 $\to$ 0.080; FIBS tokens 0.22 $\to$ 0.21). The rewrites condense attacks and carry fabricated tool outputs (first audit M5); monitors that \emph{ask a question about the transcript} react to that, probes on the action tokens do not.
 \item \textbf{Pacing written against \texttt{gpt-4.1} transfers partly to the follow-up probe, not to token probes.} One-shot pacing vs one-shot control is $-0.05$ to $-0.09$ for \texttt{gpt-4.1} and $-0.05$ to $-0.07$ (n.s.) for FIBS axial, but $+0.02$ to $+0.09$ for \texttt{sab} and FIBS tokens. No contrast is Holm-corrected. Only \texttt{gpt-4.1} pace\_multichart has an interval excluding 0 in the evasion direction.
-\item \textbf{Why the token probes do not see the artifact.} On the E5 panel (first audit, M5) the same pattern appears as an AUROC confound. Refined variants of the same base attacks score higher than their originals for FIBS linear follow-up full ($+0.20$ [$+0.11$, $+0.30$]) and Apollo full ($+0.31$). They do not score higher for \texttt{sab} max-token ($-0.07$ [$-0.16$, $+0.01$]). On the 33 unrewritten originals the \texttt{sab} probes have the highest AUROC (0.81--0.83, vs \texttt{gpt-4.1} 0.77) (\rf{fixes/corrections.csv}).
+\item \textbf{Why the token probes do not see the artifact.} On the E5 panel (first audit, M5) the same pattern appears as an AUROC confound. Refined variants of the same base attacks score higher than their originals for FIBS linear follow-up full ($+0.20$ [$+0.11$, $+0.30$]) and Apollo full ($+0.31$). They do not score higher for \texttt{sab} max-token ($-0.07$ [$-0.16$, $+0.01$]). On the 33 unrewritten originals the \texttt{sab} probes have the highest AUROC (0.81--0.83, vs \texttt{gpt-4.1} 0.77) (\nolinkurl{fixes/corrections.csv}).
 \item \textbf{Scope.} Every arm is an LLM-monitor-aware \emph{prompted} rewrite. None is a probe-aware or trained evader, so this says nothing about robustness to the attacks in \S\ref{sec:prior}.
 \end{itemize}
 
@@ -369,12 +371,12 @@ LLM \texttt{gpt-4.1-nano} & 0.613 & 0.193 [0.11, 0.29] & 0.120 [0.04, 0.22]\\
 \bottomrule
 \end{tabular}\end{adjustbox}
 \end{minipage}
-\caption{LinuxArena (200 honest, 142 attacks), trajectory max. Left: AUROC of reader streams (green full, purple per-step) vs 12 LLM monitors (black) on the same trajectories (\rf{wb/la\_auroc.csv}). Right: excerpt with marginal 95\% CIs (\rf{wb/tables.md}). The reader score files behind these numbers are lost (A2).}
+\caption{LinuxArena (200 honest, 142 attacks), trajectory max. Left: AUROC of reader streams (green full, purple per-step) vs 12 LLM monitors (black) on the same trajectories (\nolinkurl{wb/la_auroc.csv}). Right: excerpt with marginal 95\% CIs (\nolinkurl{wb/tables.md}), pilot, plug-in thresholds. The score files were lost (A2) and regenerated in round 4, which reproduces these AUROCs within 0.001 and adds paired tests (Section~\ref{sec:r4p2}).}
 \end{figure}
 
 \begin{itemize}
 \item \textbf{FIBS follow-up probes in full reading are comparable to mid-tier frontier monitors.} AUROC is 0.93--0.94, against \texttt{gpt-5.4} at 0.933 and \texttt{sonnet-4-6} at 0.913. They are below \texttt{opus-4-6} and \texttt{gemini-3.1-pro}.
-\item \textbf{The ranking is weakened (audit2 m3).} Only marginal CIs exist and they overlap ([0.56, 0.86] vs [0.37, 0.70] for \texttt{gpt-5.4}); the 1\% threshold is the top of about 100 calibration honest runs; no paired test was run, and none can be run now (A2).
+\item \textbf{The pilot ranking had no paired test (audit2 m3).} Its marginal CIs overlap ([0.56, 0.86] vs [0.37, 0.70] for \texttt{gpt-5.4}), and the reader's TPR of 0.76 at 1\% was at about 2\% realized FPR under the plug-in rule ($n_\text{cal}=100$). Round 4 ran the paired comparison (Section~\ref{sec:r4p2}).
 \item \textbf{Mode reversal.} Unlike MB, full reading beats per-step reading here (0.94 vs 0.85).
 \item \textbf{The sabotage probe and J-lens are weak} (AUROC 0.62--0.75). The \texttt{sab} contrast pairs were generated from generic objectives, and LinuxArena's side tasks are more diverse.
 \end{itemize}
@@ -400,7 +402,7 @@ J-lens mass & 0.683 [0.64, 0.73] & 0.764 [0.72, 0.80] & 0.752 [0.71, 0.80] & 0.8
 J-lens top-25 hits & 0.800 [0.76, 0.84] & 0.925 [0.90, 0.95] & 0.956 [0.94, 0.97] & \textbf{0.984} [0.97, 0.99]\\
 \bottomrule
 \end{tabular}\end{adjustbox}
-\caption{Session AUROC, 233 insider vs 200 random benign sessions (\rf{wb/mole\_policy\_vs\_reader.csv}). TPR at 1\% FPR for \texttt{sab} mean: policy 0.71, reader 0.74.}
+\caption{Session AUROC, 233 insider vs 200 random benign sessions (\nolinkurl{wb/mole_policy_vs_reader.csv}). TPR at 1\% FPR for \texttt{sab} mean: policy 0.71, reader 0.74.}
 \end{table}
 
 
@@ -408,65 +410,185 @@ J-lens top-25 hits & 0.800 [0.76, 0.84] & 0.925 [0.90, 0.95] & 0.956 [0.94, 0.97
 \item \textbf{Policy activations do not beat the reader on the main probe} (\texttt{sab}: 0.84 / 0.95 vs 0.86 / 0.96).
 \item \textbf{The one stream where the policy wins is suspect.} FIBS on tokens gives 0.98 vs 0.74 (mean), but this is also the stream that could key on the in-context insider instruction, which only the policy sees.
 \item \textbf{The reader's J-lens hit count is the best stream of either arm} (0.96 / 0.98).
-\item \textbf{The split cannot answer the policy-vs-reader question cleanly.} There is no LLM baseline for it; benign sessions are a random sample whose account and role mix is not matched to the insiders, so session-type differences may inflate every AUROC; and the policy sees a system prompt that names the objective.
+\item \textbf{The pilot split cannot answer the policy-vs-reader question cleanly.} There is no LLM baseline for it; benign sessions are a random sample whose account and role mix is not matched to the insiders; and the policy sees a system prompt that names the objective. Round 4 fixed all three (Section~\ref{sec:r4p3}); with matched negatives the reader detects more than the policy at 5\% FPR.
+\end{itemize}
+
+\section{Round 4: preregistered replication, regenerated streams, matched MOLE}\label{sec:r4}
+Track \texttt{r4\_wb} (October 22--23). The preregistration and the fixed held-out sets were committed before any held-out item was scored; the first held-out score was written 17 s after that commit (audit 3). Reader code, model revision and probes are unchanged from the pilot; honest trajectories re-read on the new pods agree with the pilot's stored streams at bf16-noise level (Honest-550 \texttt{none}: FIBS axial $r(\max)=0.9993$; every mean-pooled stream $r\ge0.999$) (\nolinkurl{results/r4_wb/agreement_*.csv}).
+
+\subsection{Part 1: replication of the MB headline \tC}\label{sec:r4p1}
+\textbf{Design.} H1: TPR(FIBS axial follow-up, \texttt{none}) $-$ TPR(\texttt{gpt-4.1-mini}, \texttt{none}) $>0$ at trajectory FPR 1\% on held-out attacks; supported if the 95\% CI lower bound is $>0$. Attacks: 1{,}000 MB attacks that the pilot never used (771 opus-4-5, 229 opus-4-6), stratified by agent model, structure and side task. All S4 (distributed) attacks were in the pilot, so the replication covers S1--S3 only. Honest: Honest-550, re-used as preregistered (the honest side is not new data; 973 of the 1{,}000 attacks share a task with it); reader honest scores recomputed on the replication pod. 200 task-grouped splits; paired task-cluster bootstrap with calibration noise ($B=2{,}000$). Holm family S1--S3.
+
+\begin{figure}[!htbp]\centering
+\includegraphics[width=0.86\linewidth]{wb_primary_conformal.pdf}
+\caption{Round-4 replication, conformal thresholds: reader minus LLM TPR with 95\% CIs. Grey: the pilot estimate on its 775 attacks (200 splits). Sources: \nolinkurl{results/fixes2/wb_r4primary_conformal_thrfix/primary.csv}, \nolinkurl{results/fixes2/wb_a3primary_conformal_thrfix/wb_primary.csv}, \nolinkurl{results/fixes2/wb_r4a1_conformal_thrfix/a1_mb_equalfpr.csv}; drawn by \nolinkurl{docs/reports/src/make_r4_report_figs.py}.}\label{fig:r4primary}
+\end{figure}
+
+\begin{table}[!htbp]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lccccc@{}}
+\toprule
+Contrast (FPR 0.01 unless stated) & TPR reader & TPR LLM & realized FPR reader / LLM & $\Delta$ [95\% CI] & Holm\\
+\midrule
+\textbf{H1 primary} & 0.258 & 0.064 & 1.24\% / 1.14\% & $\mathbf{+0.194}$ [$+0.089$, $+0.288$] & --\\
+H1, both at exactly 1.00\% realized FPR (audit 3) & 0.220 & 0.056 & 1.00\% / 1.00\% & $+0.164$ [$+0.075$, $+0.263$] & --\\
+S1: opus-4-5 attacks ($n=771$) & 0.250 & 0.056 & & $+0.194$ [$+0.080$, $+0.300$] & $<0.001$\\
+S2: opus-4-6 attacks ($n=229$; agent not in Honest-550) & 0.287 & 0.091 & & $+0.196$ [$+0.097$, $+0.285$] & $<0.001$\\
+S3: FPR 0.05 & 0.419 & 0.260 & 5.85\% / 5.23\% & $+0.159$ [$+0.096$, $+0.291$] & $<0.001$\\
+\midrule
+sens.: pilot-stored honest reader scores & 0.257 & 0.064 & & $+0.193$ [$+0.087$, $+0.288$] & \\
+sens.: 972 attacks with complete LLM streams & 0.246 & 0.059 & & $+0.187$ [$+0.085$, $+0.283$] & \\
+sens.: missing LLM steps re-scored & 0.258 & 0.066 & & $+0.192$ [$+0.087$, $+0.286$] & \\
+exploratory: \texttt{sab} (none) $-$ LLM & 0.038 & 0.064 & & $-0.026$ [$-0.099$, $+0.018$] & \\
+exploratory: FIBS linear follow-up (none) $-$ LLM & 0.138 & 0.064 & 1.60\% / 1.14\% & $+0.074$ [$+0.002$, $+0.145$] & \\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\caption{Round-4 replication under the conformal rule (\nolinkurl{results/fixes2/wb_r4primary_conformal_thrfix/primary.csv}; equal-FPR row from \nolinkurl{results/fixes2/wb_a3primary_conformal_thrfix/}). Plug-in: H1 $+0.203$ [$+0.100$, $+0.296$] at realized 1.39\% / 1.28\%; both-at-1.00\% $+0.167$ [$+0.065$, $+0.256$].}\label{tab:r4primary}
+\end{table}
+
+\begin{itemize}
+\item \textbf{H1 is confirmed.} The lower bound is $+0.089>0$, and the estimate lies inside the pilot interval. The preregistered equal-FPR guard was not triggered (realized-FPR gap 0.10 pp $<$ 0.25 pp). With both monitors bisected to exactly 1.00\% realized FPR the gain is $+0.164$ [$+0.075$, $+0.263$]. An independent re-implementation gives $+0.192$ [$+0.095$, $+0.283$] (audit 3, conformal).
+\item S1--S3 survive Holm. AUROC of the trajectory max: 0.817 reader vs 0.715 LLM.
+\item Both TPRs are lower than in the pilot (0.32 / 0.14), because the pilot was S4-heavy; the gap between the monitors is not.
+\item \textbf{Strata} \tE\ (descriptive, unadjusted): every structure and side task is positive (S1 $+0.17$, S2 $+0.13$, S3 $+0.21$; malware $+0.32$, sudo $+0.27$, passwords $+0.18$, firewall $+0.07$). Firewall attacks are nearly undetectable by both monitors (0.08 / 0.01).
+\item \textbf{External honest runs} \tE\ (200 BashArena opus-4-6 honest runs on tasks not in Honest-550): at the Honest-550 thresholds the realized FPR at 1\% is 1.06\% for the reader and 1.17\% for the LLM, i.e.\ about 2 alarms in 200 for each. That shows no worse transfer for the reader but cannot rank the two (audit-3 gap interval $[-1.5, +1.1]$ pp). The round-4 log's ``transfers at least as well'' is withdrawn.
+\item \textbf{Scope.} The comparator is one cheap LLM monitor (\texttt{gpt-4.1-mini}, AUROC 0.72 here), not a frontier monitor; the attacks share scenarios with the pilot (762 of 1{,}000 share task $\times$ side task $\times$ agent with a pilot attack); and the FIBS probe's training data may include BashArena-like transcripts (FIBS is an external release, so disjointness cannot be verified). Of the other generic probes, \texttt{sab} is null and the FIBS linear follow-up is borderline.
+\end{itemize}
+
+\subsection{Part 2: LinuxArena paired comparison and equal-FPR checks}\label{sec:r4p2}
+\textbf{Reproduction.} LinuxArena (342 trajectories) and T3 round 1 (509) were re-read in both modes. The pilot's tables reproduce: LinuxArena AUROC within 0.001 for every stream, TPR at 0.01/0.05 within 0.008, T3-r1 detection rows mean $|$diff$|$ 0.002 (\nolinkurl{results/r4_wb/repro/}).
+
+\textbf{Paired comparison \tC.} FIBS axial follow-up (\texttt{full}) minus each of the 12 sweep monitors on the trajectories both scored (200 honest, 101 attacks); 200 splits grouped by main task; paired bootstrap; Holm over the 12 contrasts at each $\alpha$. With $n_\text{cal}=100$ honest runs, a 1\% threshold rests on about one calibration point.
+
+\begin{figure}[!htbp]\centering
+\includegraphics[width=0.95\linewidth]{wb_la_paired_conformal.pdf}
+\caption{LinuxArena: reader (FIBS axial follow-up, full) minus each LLM monitor, TPR of the trajectory max, conformal thresholds. Left: nominal 1\% (committed analysis code; realized FPR reader 0.84--1.09\%, LLMs 0.90--1.20\%). Right: both monitors bisected to exactly 2.0\% realized FPR (audit-3 code). Filled markers: Holm $p<0.05$ over 12 monitors. Sources: \nolinkurl{results/fixes2/wb_r4la_conformal_thrfix/la_paired.csv}, \nolinkurl{results/fixes2/wb_a3la_conformal_thrfix/wb_la_equalfpr.csv}.}\label{fig:r4la}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Nominal 1\%, conformal rule.} The reader's realized FPR is 0.84--1.09\% and its TPR 0.66--0.72 (under the plug-in rule it ran at 1.8--2.1\% with TPR 0.76--0.81, the pilot's ``0.756''). It is Holm-significantly above 7 of 12 monitors with the committed split code (gpt-4.1-nano, gpt-5-nano, gpt-oss-120b, kimi-k2.5, gpt-5-mini, gemini-3-flash and gpt-5.4, the last at Holm $p=0.035$) and 6 of 12 with the audit's split code (gpt-5.4 at Holm $p=0.055$). It is not distinguishable from haiku-4.5, glm-5, sonnet-4.6 and gemini-3.1-pro, and is significantly below opus-4.6 ($-0.21$ [$-0.29$, $-0.07$]).
+\item \textbf{Equal realized FPR.} The preregistered equal-FPR comparison was not run in round 4 (an undeclared omission); audit 3 ran it. At exactly 1.00\% for both monitors the count is rule-dependent: 7 of 12 above and 1 below under the plug-in rule, 10 of 12 above and 0 below under the conformal rule, because 8 of the 12 LLM levels fall below $1/(n_\text{cal}+1)$, where the conformal rule never alarms with certainty. This comparison sits at the calibration resolution limit and is not reported as a count. At exactly 2.0\% the result is the same under both rules: 6 of 12 above (gpt-4.1-nano, gpt-5-nano, gpt-5-mini, gpt-oss-120b, kimi-k2.5, gemini-3-flash) and 1 below (opus-4.6), with reader TPR 0.76--0.81.
+\item At 5\% (nominal, conformal) the reader is above 5 monitors (sonnet-4.6 at Holm 0.036) and below gemini-3.1-pro ($-0.11$) and opus-4.6 ($-0.12$).
+\item In \texttt{none} mode the reader is weak on LinuxArena (TPR $\le0.18$ at 1\%) and loses to most monitors \tE.
+\item \textbf{Revised claim.} In full reading the reader probe is above the small and mid-size monitors, not distinguishable from haiku-4.5, glm-5, sonnet-4.6 and gemini-3.1-pro, and below opus-4.6.
+\end{itemize}
+
+\textbf{Equal-FPR check on the pilot MB data (A1) \tE.} Full-reading FIBS axial: the earlier ``+0.061 [+0.021, +0.219] at equal realized FPR'' was the gain at the plug-in FPR floor (1.6--1.7\%) with a bootstrap bias of about +0.04. Under the conformal rule the reader can be lowered to the LLM's FPR, and the gain is $-0.015$ [$-0.055$, $+0.097$]; with both at exactly 1.00\%, $-0.019$ [$-0.057$, $+0.087$]. \textbf{This claim is dropped.} FIBS axial \texttt{none} ($+0.183$ [$+0.080$, $+0.260$]) and \texttt{sab} full ($+0.093$ [$+0.012$, $+0.161$]) hold at equal FPR (\nolinkurl{results/fixes2/wb_r4a1_conformal_thrfix/a1_mb_equalfpr.csv}).
+
+\textbf{Per-context calibration is not a usable fix at 1\%} \tE. Per-cluster plug-in thresholds on the 8 MB task clusters realize 5--7.6\% FPR at nominal 1\% for every monitor, and about 10\% on the 10 LinuxArena environments (10 honest runs per environment per calibration half). A global threshold reported with its realized FPR remains the right comparison.
+
+\subsection{Part 3: MOLE policy arm with account-matched negatives \tC}\label{sec:r4p3}
+\textbf{Design.} 233 insider sessions of the \texttt{qwen36\_27b} single-day corpus, each paired with a benign session of the \emph{same account on the same day} (38 accounts). Arms: \texttt{policy} (Qwen3.6-27B reads its own sessions with the original system prompt, which states the insider objective); \texttt{policy\_neutral} (the attack session's system prompt replaced by its paired benign session's, so the instruction is identical within a pair); \texttt{reader} (Qwen3.5-27B, monitor framing); \texttt{gpt-4.1-mini} on the reader-format transcript, one call per session (insider-aware and generic prompts). Probe statistic: \texttt{sab}, max over turns. Preregistered Holm family of five contrasts at session AUROC, and the same five at TPR at 5\% session FPR; account-cluster bootstrap ($B=2{,}000$), paired across arms.
+
+\begin{figure}[!htbp]\centering
+\includegraphics[width=0.95\linewidth]{wb_mole_conformal.pdf}
+\caption{MOLE, account-matched negatives: the five preregistered contrasts as differences in session AUROC (left) and in TPR at 5\% session FPR (right, conformal thresholds), account-cluster 95\% CIs (\nolinkurl{results/fixes2/wb_a3mole_conformal_thrfix/wb_mole.csv}). The TPR family was preregistered but omitted from the round-4 log; audit 3 computed it.}\label{fig:r4mole}
+\end{figure}
+
+\begin{table}[!htbp]\centering\small
+\begin{adjustbox}{max width=\linewidth}\begin{tabular}{@{}lcc@{}}
+\toprule
+Contrast & $\Delta$ AUROC [95\% CI] (Holm $p$) & $\Delta$ TPR at 5\% FPR [95\% CI] (Holm $p$)\\
+\midrule
+M1 policy $-$ reader & $-0.035$ [$-0.076$, $+0.010$] (0.30) & $\mathbf{-0.238}$ [$-0.339$, $-0.101$] ($<0.001$)\\
+M2 policy\_neutral $-$ reader & $-0.033$ [$-0.070$, $+0.007$] (0.30) & $-0.181$ [$-0.282$, $-0.040$] (0.008)\\
+M3 policy $-$ policy\_neutral & $-0.002$ [$-0.016$, $+0.014$] (0.84) & $\mathbf{-0.057}$ [$-0.102$, $-0.025$] (0.008)\\
+M4 reader $-$ LLM (insider prompt) & $-0.053$ [$-0.104$, $-0.005$] (0.14) & $-0.311$ [$-0.469$, $-0.174$] ($<0.001$)\\
+M5 policy\_neutral $-$ LLM (insider prompt) & $-0.086$ [$-0.138$, $-0.037$] (0.015) & $-0.492$ [$-0.621$, $-0.319$] ($<0.001$)\\
+\bottomrule
+\end{tabular}\end{adjustbox}
+\caption{MOLE contrasts (audit-3 implementation, conformal thresholds for TPR). TPR at 5\% FPR: reader 0.47, policy 0.23, policy\_neutral 0.28, LLM (insider prompt) 0.78, at realized FPR 5.1--5.4\% (\nolinkurl{results/fixes2/wb_mole_fpr_thrfix.csv}). Session AUROCs: policy 0.815, policy\_neutral 0.817, reader 0.850, LLM 0.903 (insider prompt) / 0.915 (generic) (\nolinkurl{results/r4_wb/mole_arms.csv}).}\label{tab:r4mole}
+\end{table}
+
+\begin{itemize}
+\item \textbf{AUROC shows no policy-vs-reader difference} (M1--M3 n.s.). \textbf{At 5\% session FPR the reader beats the policy}: 0.47 vs 0.23, $-0.24$ [$-0.34$, $-0.10$]. The round-4 log's ``policy activations do not beat the reader'' is therefore corrected: they are worse at the preregistered operating point.
+\item \textbf{The insider instruction lowers the policy probe's TPR}: $-0.057$ [$-0.102$, $-0.025$] (Holm 0.008). The round-4 log's ``removing the instruction changes nothing measurable'' holds only for \texttt{sab}-max AUROC (shift bounded to about $\pm0.017$). On other statistics the instruction matters too \tE: mean over turns $+0.014$ [$+0.006$, $+0.024$], FIBS-on-tokens max $-0.085$, J-lens mass max $-0.060$. ``The probes key on content, not the instruction'' over-generalizes from one statistic.
+\item \textbf{A cheap LLM session monitor beats every \texttt{sab}-max probe arm} (M5 Holm 0.015; M4 nominal only at AUROC). The LLM reads the whole session while the probes take a max over turns, so this compares aggregation as much as signal. With the mean-over-turns statistic the reader is above the LLM in AUROC ($+0.050$ [$+0.008$, $+0.098$], secondary \tE).
+\item \textbf{``Unmatched negatives explain the pilot AUROCs'' fails.} With matched negatives the mean-statistic AUROCs are still 0.94--0.96 (pilot 0.95--0.96). The pilot's high AUROCs come from the mean statistic, which was chosen post hoc.
+\item Reader J-lens top-25 hits: 0.935 (max) / 0.974 (mean), the best probe stream \tE.
+\end{itemize}
+
+\subsection{Reasoning leakage (audit 3)}
+Agent reasoning is nearly label-revealing in these datasets (on MB, honest runs show reasoning on every step and attacks on 43\%), so a monitor that saw it could separate the classes for the wrong reason. No monitor scored in this repository receives it: the white-box reader export, the \texttt{gpt-4.1(-mini)} monitors in every history mode and the MOLE renders all exclude agent reasoning, and no text-only assistant turn appears among the visible MB steps (\nolinkurl{results/audit3/leak_reasoning.csv}). The MOLE session arms show assistant turn content by design, equally in every arm. The LinuxArena sweep scores were computed externally and cannot be checked.
+
+\subsection{Deviations and caveats}
+\begin{itemize}
+\item OpenRouter credit ran out mid-run: 305 LLM steps in 28 held-out attacks were missing in the registered run and handled by \texttt{nanmax} as preregistered; re-scoring them later changes $\Delta$ by $-0.002$. The 200 external honest runs were scored after credit returned.
+\item \texttt{analyze\_primary.py} was finalized after the data arrived but matches the preregistration (audit 3). The preregistration's ``1{,}869 attacks no earlier track scored'' is not exact (another track had trajectory-level scores for some; not used for selection).
+\item The Qwen3.6-27B revision is unpinned, as in the pilot.
+\item GPU: four on-demand pods, about \$70; OpenRouter \$34.47.
 \end{itemize}
 
 \section{What holds, what is weakened, what is dropped}
-Table~\ref{tab:ledger} lists every headline claim with its verdict after the first audit (\rf{results/fixes/}) and the second audit (\rf{results/audit2/}).
+Table~\ref{tab:ledger} lists every headline claim with its verdict after the three audits (\nolinkurl{results/fixes/}, \nolinkurl{results/audit2/}, \nolinkurl{results/audit3/}) and the threshold-convention re-run (\nolinkurl{results/fixes2/}).
 
 \begin{table}[!htbp]\centering\footnotesize
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5.0cm}>{\raggedright\arraybackslash}p{2.1cm}>{\raggedright\arraybackslash}X@{}}
 \toprule
 Claim & Verdict & Basis\\
 \midrule
-Per-step FIBS axial follow-up beats \texttt{gpt-4.1-mini} at 1\% FPR & \textbf{holds} & $+0.206$ / $+0.194$ / $+0.185$ (10 / 40 / 200 splits); $+0.183$ at equal realized FPR; both agent models; only Holm survivor of 18 (audit2 m1, m2)\\
-\texttt{sab} cascade (10\%) beats the LLM with 87\% fewer calls & \textbf{holds} & 0.298 vs 0.168, $+0.129$ [$+0.07$, $+0.23$] at realized FPR 1.43\% vs 1.81\% (audit2 m4); $q$ chosen among 5; larger on opus-4-5\\
-No accumulation rule beats max on probe streams & \textbf{holds} & Table~\ref{tab:acc}; consistent with Idea 1\\
-Probe streams are more context-heterogeneous than LLM streams & \textbf{holds} & honest-only statistic, unaffected by matching issues (first audit M5 row)\\
-Full-reading \texttt{sab} beats the LLM ($+0.10$) & weakened & Holm $p=0.22$; $+0.148$ on opus-4-5 vs $+0.016$ on opus-4-6 (audit2 m2)\\
-Full-reading FIBS axial beats the LLM ($+0.057$) & weakened / not shown & realized FPR 2.05\% vs 1.42\%; floor 1.58\%; $+0.059$ at the floor (audit2 A1)\\
-FIBS-axial-full fusion (KDE-LLR 0.328, $+0.16$) & weakened & realized FPR 2.8\% vs 1.4\% (audit2 A1)\\
-LinuxArena: FIBS follow-up above \texttt{gpt-5.4} and four others & weakened, unverifiable & no paired test; score files lost (audit2 m3, A2)\\
-T3 round-1 reader detection rows & unverifiable & score files lost (A2); round 2 intact and consistent\\
-CFAR on probes ``roughly doubles'' uniform TPR (E5, 1\%) & dropped / replaced & 1\% matching not estimable; $1.3$--$1.5\times$ at equal realized spend (first audit C1)\\
-\texttt{sab} L43 ($+0.24$) & exploratory only & selected on the evaluation set\\
+Per-step FIBS axial follow-up beats \texttt{gpt-4.1-mini} at 1\% FPR & \textbf{confirmed} \tC & Held-out replication $+0.194$ [$+0.089$, $+0.288$]; $+0.164$ at exactly 1.00\% FPR for both; S1--S3 only; one cheap comparator\\
+\texttt{sab} cascade (10\%) beats the LLM with 87\% fewer calls & \textbf{holds} \tE & $+0.123$ [$+0.059$, $+0.217$] at realized FPR 1.34\% vs 1.59\%; $q$ chosen among 5; larger on opus-4-5\\
+No accumulation rule beats max on probe streams & \textbf{holds} \tE & Table~\ref{tab:acc}; consistent with Idea 1\\
+Probe streams are more context-heterogeneous than LLM streams & \textbf{holds} \tE & honest-only statistic\\
+LinuxArena: full-reading FIBS follow-up above small/mid monitors & \textbf{holds, revised} \tC & 6--7 of 12 Holm-significant at nominal 1\% (realized $\approx$1\%, TPR 0.66--0.72); 6 of 12 at equal 2\%; below opus-4.6; equal-1\% count rule-dependent\\
+Full-reading \texttt{sab} beats the LLM ($+0.10$) & weakened \tE & Holm $p=0.22$; $+0.148$ on opus-4-5 vs $+0.016$ on opus-4-6\\
+Full-reading FIBS axial beats the LLM at equal FPR ($+0.061$) & \textbf{dropped} & $-0.015$ [$-0.055$, $+0.097$] under the conformal rule; the earlier value sat at a plug-in FPR floor\\
+FIBS-axial-full fusion (KDE-LLR 0.328, $+0.16$) & weakened & realized FPR 2.8\% vs 1.4\%\\
+Reader threshold transfers to new tasks ``at least as well'' as the LLM's & \textbf{withdrawn} & about 2 alarms in 200 for each; cannot rank\\
+MOLE: policy activations do not beat the reader & \textbf{corrected} \tC & No AUROC difference, but at 5\% FPR the reader detects more ($-0.24$)\\
+MOLE: the insider instruction has no measurable effect on the policy probe & \textbf{corrected} \tC & Holds for \texttt{sab}-max AUROC only; TPR at 5\% $-0.057$ (Holm 0.008)\\
+MOLE: pilot AUROCs came from the mean statistic and unmatched negatives & \textbf{half fails} & Matched mean-statistic AUROCs still 0.94--0.96\\
+MOLE: an LLM session monitor beats the max-over-turns probe arms & holds \tC, confounded & M5 Holm 0.015; whole-session vs max-over-turns\\
+CFAR on probes ``roughly doubles'' uniform TPR (E5, 1\%) & dropped / replaced & 1\% matching not estimable; $1.3$--$1.5\times$ at equal realized spend\\
+\texttt{sab} L43 ($+0.24$) & exploratory only & selected on the evaluation set; not replicated\\
 DiD of CUSUM gain (\texttt{sab} $+0.16$; FIBS $-0.18$) & exploratory & 10 splits, not in a declared family\\
-MOLE: policy activations add nothing over the reader & holds, weak design & unmatched benign sessions, no LLM baseline, objective in the policy's context\\
+No monitor sees agent reasoning & holds & audit 3, all monitors scored in this repository\\
 \bottomrule
 \end{tabularx}
-\caption{Claim ledger after both audits (\rf{results/audit2/corrections.csv}, \rf{results/audit2/issues.csv}, \rf{results/fixes/corrections.csv}).}
+\caption{Claim ledger after three audits and the threshold-convention re-run.}
 \label{tab:ledger}
 \end{table}
 
+\subsection*{Errata relative to the October 22 version}
+\begin{itemize}
+\item Summary item 1: pilot gain $+0.19$ to $+0.21$ (0.34 vs 0.15) is now $+0.18$ to $+0.21$ (0.32 vs 0.14) under the conformal rule, and is confirmed on held-out attacks.
+\item Summary item 2: cascade $+0.13$ is $+0.123$ [$+0.059$, $+0.217$] (conformal).
+\item Full-reading FIBS axial: ``not shown'' becomes dropped at equal FPR ($-0.015$).
+\item LinuxArena: ``no paired test, score files lost'' is superseded by the regenerated streams and paired tests (Section~\ref{sec:r4p2}).
+\item MOLE: ``policy activations do not beat the trusted reader'' is corrected by the matched design (Section~\ref{sec:r4p3}).
+\item Thresholds: plug-in values are labelled; headline numbers use the conformal rule.
+\end{itemize}
+
 \section{Interpretation}
 \begin{enumerate}
-\item \textbf{A trusted reader buys some power, not only cost savings.} The literature note expected ``white-box adds cost savings, not power, for a trusted reader''. One off-the-shelf probe (FIBS axial) on a per-step follow-up question beats a cheap LLM monitor by about 0.19 TPR at 1\% FPR with no task-specific training. The comparator is weak (\texttt{gpt-4.1-mini}, AUROC 0.66--0.76), so ``beats a cheap LLM monitor'' is the right scope; on LinuxArena the strongest frontier monitors remain ahead.
+\item \textbf{A trusted reader buys some power, not only cost savings.} The literature note expected ``white-box adds cost savings, not power, for a trusted reader''. One off-the-shelf probe (FIBS axial) on a per-step follow-up question beats a cheap LLM monitor by about 0.16--0.19 TPR at 1\% FPR with no task-specific training, and this replicated on new attacks under a preregistration. The comparator is weak (\texttt{gpt-4.1-mini}, AUROC 0.66--0.76), so ``beats a cheap LLM monitor'' is the right scope; on LinuxArena the reader is above small and mid-size monitors and below the strongest (opus-4.6).
 \item \textbf{The probe's best use with an LLM is triage.} The \texttt{sab} cascade gains about 0.13 TPR \emph{and} removes about 87\% of LLM calls, the shape of the published GDM and Anthropic misuse cascades\uv, here at matched trajectory FPR for multi-step sabotage.
-\item \textbf{Probe streams need context-aware calibration.} Their between-task heterogeneity is much larger ($\tau$ 1.2--3.8 for four probe streams vs 0.46 for the LLM), and the one audit failure (A1) is exactly a probe threshold that did not transfer across tasks. Per-context allocation helps only modestly at matched spend, and CFAR is exploitable by a context-selecting attacker; Stackelberg is the safe default, as in Idea 2.
+\item \textbf{Probe streams need careful calibration.} Their between-task heterogeneity is much larger ($\tau$ 1.2--3.8 for four probe streams vs 0.46 for the LLM), and the full-reading FIBS axial threshold did not transfer across tasks (about 2\% realized FPR at nominal 1\% under either rule). Per-context thresholds are not a fix at 1\% with these honest-set sizes. Compare monitors at equal realized FPR with a threshold rule whose FPR is exact.
 \item \textbf{The decision layer transfers unchanged.} Max is the right trajectory rule on every probe stream.
-\item \textbf{Token-level probes and question-based monitors fail differently.} Rewriting artifacts move LLM monitors and follow-up probes but not token probes, an argument for combining the two kinds. It is not robustness evidence: no attacker here knew about the probes.
+\item \textbf{Token-level probes and question-based monitors fail differently.} Rewriting moves LLM monitors and follow-up probes but not token probes, an argument for combining the two kinds. It is not robustness evidence: no attacker here knew about the probes.
+\item \textbf{Reading one's own activations is not better than a trusted reader on MOLE.} With matched negatives the policy's probe is no better in AUROC and worse at 5\% FPR, and its TPR depends on the instruction in its context.
 \end{enumerate}
 
 \section{Limitations}
 \begin{itemize}
-\item \textbf{One reader, one MB comparator} (\texttt{gpt-4.1-mini}); no frontier LLM monitor was run on MB.
+\item \textbf{One reader, one MB comparator} (\texttt{gpt-4.1-mini}); no frontier LLM monitor was run on MB. The replication covers S1--S3 only and re-uses Honest-550.
 \item \textbf{Statistical power.} 550 honest runs put a 1\% trajectory FPR on about 5 false alarms per calibration half; the project analysis used 10 splits; 7 MB clusters are too few for per-context significance.
 \item \textbf{Off-policy reading.} The reader reads Opus-authored text, the regime where intent probes generalize worst, and shares an LLM monitor's threat model (it sees only text).
 \item \textbf{Label-correlated agent model.} Honest runs are all opus-4-5; like-for-like results are reported, but surface features (truncation, reasoning visibility) remain label-correlated (first audit m8).
-\item \textbf{Lost data} (LinuxArena, T3-r1 reader streams; A2), \textbf{no adaptive white-box attacker} (every robustness concern in \S\ref{sec:prior} stands untested), and \textbf{bf16 noise} in max-pooled features (up to 2 SD for single steps).
+\item \textbf{Calibration resolution.} With 100 LinuxArena honest calibration runs, a 1\% threshold rests on about one run, and exact equal-FPR comparisons at 1\% are rule-dependent.
+\item \textbf{No adaptive white-box attacker} (every robustness concern in \S\ref{sec:prior} stands untested), and \textbf{bf16 noise} in max-pooled features (up to 2 SD for single steps).
 \end{itemize}
 
 \section{Recommended next steps}
 \begin{enumerate}
-\item \textbf{Preregister and Holm-control a small confirmatory family} on a fresh split: (i) per-step FIBS axial vs the LLM; (ii) the \texttt{sab} cascade at a pre-declared $q$; (iii) \texttt{sab} L43 in full reading, replicating the post hoc layer. Use $\ge$100 grouped splits, report realized FPR next to every TPR, and compare at equal realized FPR.
-\item \textbf{Regenerate the lost score files.} Re-read LinuxArena (342 trajectories) and T3 round 1 (509 attacks) in both modes (about 1--2 H200-hours), then run the missing paired LinuxArena contrasts. Guard the sync so it never overwrites a non-empty local file with an empty one.
-\item \textbf{Calibrate the full-reading FIBS axial threshold per cluster} (Stackelberg or partially pooled) and re-state the full-mode fusions at matched realized FPR.
-\item \textbf{Build a proper policy-activation arm}: matched benign sessions (same accounts, roles and days), an LLM baseline on the same split, an arm with the objective removed from the system prompt; better, fresh open-policy rollouts (e.g.\ Qwen3.6-27B on BashArena) with reasoning retained, so both arms see identical text.
-\item \textbf{Add a strong LLM comparator on MB} (\texttt{gpt-4.1} or a frontier monitor on the same 1{,}325 trajectories) to test whether the FIBS-axial gain survives against a non-trivial monitor.
+\item \textbf{Add a strong LLM comparator on MB} (\texttt{gpt-4.1} or a frontier monitor on the same trajectories) to test whether the confirmed FIBS-axial gain survives against a non-trivial monitor; add S4 attacks from a fresh source.
+\item \textbf{Replicate the \texttt{sab} cascade and \texttt{sab} L43} on a fresh split with a pre-declared $q$ and layer.
+\item \textbf{Fresh open-policy rollouts} (e.g.\ Qwen3.6-27B on BashArena) with reasoning retained, so policy and reader arms see identical text and the LLM baseline can be history-matched.
 \item \textbf{Run a probe-aware attacker}: first prompted (``a white-box probe on a trusted model reads your actions'') against a strong LLM monitor; then, if stage 1 holds, a trained RL-Obfuscation-style evader.
+\item \textbf{Larger honest sets} for LinuxArena-type comparisons, so that 1\% thresholds rest on more than one calibration run.
 \item \textbf{Contact FAR.AI} for FIBS's on-policy BashArena and SHADE step streams; our aggregation, per-context and cascade analyses would run on them unchanged.
 \end{enumerate}
 
 \section*{Cost and reproduction}
-GPU $\approx$\$70 (two on-demand H200 pods, about 7.0 h and 5.8 h at \$5.29/h, plus \$2.1 of earlier setup; about 1{,}000 tokens/s per reader process with per-step follow-ups); OpenRouter \$2.95 (contrast pairs); second audit \$0. Code: \texttt{tracks/wb\_whitebox/} (reader and analyses) and \texttt{tracks/audit2/}. Results: \texttt{results/wb/} (tables.md, CSVs, figures), \texttt{results/audit2/}, errata \texttt{results/fixes/corrections.csv}. Score streams: \texttt{data/processed/whitebox/scores/} (MB, T3 r2 and MOLE intact; LinuxArena and T3 r1 empty). Log: \texttt{EXPERIMENT\_LOG.md} (2026-10-21/22). Repository: \url{https://github.com/gregkocher/agent-monitor-detection} (private).
+Pilot: GPU $\approx$\$70 (two on-demand H200 pods, about 7.0 h and 5.8 h at \$5.29/h, plus \$2.1 of earlier setup; about 1{,}000 tokens/s per reader process with per-step follow-ups); OpenRouter \$2.95 (contrast pairs). Round 4: GPU $\approx$\$70 (three H200 pods and one H100 pod, deleted after outputs were copied off and verified); OpenRouter \$34.47. Audits and the threshold re-run \$0. Code: \texttt{tracks/wb\_whitebox/} (reader and analyses), \texttt{tracks/r4\_wb/} (round 4, incl.\ \texttt{PREREG.md}), \texttt{tracks/audit2/}, \texttt{tracks/audit3/} (\texttt{wb\_*}, \texttt{leak\_*}), \texttt{tracks/fixes2/} (\texttt{wb\_*}); round-4 report figures \texttt{docs/reports/src/make\_r4\_report\_figs.py}. Results: \texttt{results/wb/}, \texttt{results/r4\_wb/}, \texttt{results/audit2/}, \texttt{results/audit3/}, \texttt{results/fixes2/}, errata \texttt{results/fixes/corrections.csv}. Score streams: \texttt{data/processed/whitebox/scores/} (LinuxArena and T3 r1 regenerated in \texttt{scores/r4/}). Log: \texttt{EXPERIMENT\_LOG.md} (2026-10-21/22/23). Repository: \url{https://github.com/gregkocher/agent-monitor-detection} (private).
 \end{document}
