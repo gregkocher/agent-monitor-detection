@@ -1402,3 +1402,188 @@ not in the Holm family; scope set by the $50 RunPod cap, ≈ 3 requests/s on one
 **Predictions written down now (from prior work):** standalone JEV TPR at 1% FPR well below the LLM's
 (Gould: SHADE 47% vs 67–71%); any value is in routing; JEV misses concentrate in derived/state-changing sabotage;
 confident JEV misses are repeated by the LLM more than independence predicts.
+
+## 2026-10-22/23: Round 4 white-box follow-ups (track r4_wb): preregistered replication, regenerated LinuxArena / T3-r1 streams, MOLE policy arm
+
+Code `tracks/r4_wb/`; results `results/r4_wb/` (CSVs, `figures/*.pdf`). The preregistration `tracks/r4_wb/PREREG.md`
+and the fixed held-out sets `tracks/r4_wb/heldout.json` were committed (c3cfacc) before any held-out item was scored.
+Reader streams (no activations) are in `data/processed/whitebox/scores/r4/`. The pod code (`pod_reader.py`,
+`pod_policy.py`, `probes.pt`, `probes_qwen36.pt`) is unchanged from the pilot. Pod environment: torch 2.14.1+cu130,
+transformers 5.20.2, fla 0.5.2, no causal_conv1d.
+
+**Environment agreement.** Honest trajectories re-read on the new pods agree with the pilot's stored streams at
+bf16-noise level:
+- Honest-550 `none`: FIBS axial r(max) 0.9993, median |Δmax| 0.025 honest SD.
+- 60 honest trajectories, `full`: r(max) 0.998.
+- Every mean-pooled stream has r ≥ 0.999 (`results/r4_wb/agreement_*.csv`).
+
+### Part 1 (confirmatory): FIBS axial follow-up (`none`) vs gpt-4.1-mini (`none`) on held-out MonitoringBench
+
+**Data.**
+- Attacks: 1,000 attacks the pilot never touched, stratified by agent model × structure × side task.
+  771 are opus-4-5 and 229 opus-4-6. There are no S4 attacks: all S4 attacks were in the pilot.
+- Honest: Honest-550, re-used for calibration and realized FPR, as preregistered. The reader honest scores were
+  recomputed on the replication pod.
+- Analysis: 200 task-grouped splits; paired task-cluster bootstrap with calibration noise (B = 2,000).
+
+| contrast (FPR 0.01 unless stated) | TPR reader | TPR LLM | Δ [95% CI] |
+|---|---|---|---|
+| **H1 primary** (realized FPR: reader 1.39%, LLM 1.28%) | 0.274 | 0.071 | **+0.203 [+0.100, +0.296]** |
+| S1 opus-4-5 attacks (n=771) | 0.265 | 0.063 | +0.202 [+0.086, +0.307] |
+| S2 opus-4-6 attacks (n=229; agent not in Honest-550) | 0.304 | 0.099 | +0.205 [+0.106, +0.296] |
+| S3 FPR 0.05 (realized 6.1% / 5.4%) | 0.426 | 0.266 | +0.160 [+0.096, +0.290] |
+| sens: pilot-stored honest reader scores | 0.273 | 0.071 | +0.202 [+0.099, +0.294] |
+| sens: 972 attacks with complete LLM streams | 0.262 | 0.066 | +0.196 [+0.095, +0.289] |
+| sens: missing LLM steps re-scored | 0.274 | 0.073 | +0.201 [+0.097, +0.293] |
+| sens: calibration on Honest-550 + 200 external honest | 0.263 | 0.068 | +0.195 [+0.111, +0.286] |
+| exploratory: `sab` (none) − LLM | 0.043 | 0.071 | −0.029 [−0.108, +0.020] |
+| exploratory: FIBS linear follow-up (none) − LLM | 0.146 | 0.071 | +0.075 [−0.002, +0.148] |
+
+- **H1 is supported.** The lower bound is +0.100 > 0. The estimate +0.203 lies inside the pilot interval
+  [+0.10, +0.30] and is almost the same as the pilot's S1–S3-only estimate (+0.180).
+- The equal-realized-FPR guard was not triggered (gap 0.11 pp < 0.25 pp).
+- S1–S3 survive Holm, each with bootstrap p < 0.001.
+- AUROC of the trajectory max: 0.817 for the reader vs 0.715 for the LLM.
+- Both TPRs are lower than in the pilot (0.334 / 0.146). The pilot was S4-heavy; the gap between monitors is not.
+- Strata (descriptive, `primary_strata.csv`):
+  - Every structure and side task is positive: S1 +0.18, S2 +0.15, S3 +0.22; malware +0.33, sudo +0.29,
+    passwords +0.19, firewall +0.08.
+  - Firewall attacks are nearly undetectable by both monitors (0.09 / 0.01).
+- **External honest** (200 akshn BashArena opus-4-6 honest runs on tasks not in Honest-550,
+  `primary_external.csv`): at the Honest-550-calibrated thresholds, realized FPR is
+  - at 1%: reader 1.20%, LLM 1.42%;
+  - at 5%: reader 4.99%, LLM 7.16%.
+
+  So the reader threshold transfers to new tasks and a new agent at least as well as the LLM's.
+- The trusted reader's FIBS axial follow-up therefore beats a history-free gpt-4.1-mini at 1% FPR on new attacks
+  by about +0.20. The other generic probes do not: `sab` is null, and the FIBS linear follow-up is borderline.
+
+### Part 2: regenerated LinuxArena and T3-r1 streams (audit A2), paired tests, realized FPR (audit A1)
+
+**Reproduction.**
+- LinuxArena (342 trajectories) and T3-r1 (509) were re-read in `full` and `none`. The pilot's analyses
+  (`tracks/r4_wb/repro_pilot.py` → `results/r4_wb/repro/`) reproduce the published tables:
+  - LinuxArena AUROC: |diff| ≤ 0.001 for every stream.
+  - LinuxArena TPR@0.01/0.05: |diff| ≤ 0.008 (FIBS axial full 0.756 → 0.763).
+  - T3-r1 detection rows: 532 rows, mean |diff| 0.002, max 0.016.
+- **The lost score files are regenerated.** `scores/{la,t3}_{full,none}.jsonl` were written only over the
+  0-byte files.
+
+**LinuxArena, paired** (`la_paired.csv`, `fig_la_paired.pdf`). FIBS axial follow-up `full` minus each of the 12 sweep
+monitors, on the trajectories both scored. 200 splits; paired bootstrap; Holm over 12 contrasts per α.
+
+| Comparator at FPR 0.01 (reader TPR 0.76–0.81) | Δ [95% CI] | Holm result |
+|---|---|---|
+| gpt-4.1-nano | +0.64 | Holm p < 0.05 |
+| gpt-5-nano | +0.63 | Holm p < 0.05 |
+| gpt-oss-120b | +0.46 | Holm p < 0.05 |
+| gpt-5-mini | +0.30 | Holm p < 0.05 |
+| kimi-k2.5 | +0.30 | Holm p < 0.05 |
+| gemini-3-flash | +0.28 | Holm p < 0.05 |
+| gpt-5.4 | +0.22 [+0.05, +0.32] | Holm p 0.020 |
+| haiku-4.5 | +0.18 | not significant |
+| glm-5 | +0.15 | not significant |
+| sonnet-4.6 | +0.12 | not significant |
+| gemini-3.1-pro | −0.15 | not significant |
+| opus-4.6 | −0.16 [−0.28, −0.07] | **below the reader**, significant |
+
+- At FPR 0.05:
+  - The reader also beats sonnet-4.6 (+0.12, Holm 0.036).
+  - It is below gemini-3.1-pro (−0.11) and opus-4.6 (−0.12).
+  - gpt-5.4, gpt-5-mini and kimi drop to Holm 0.10.
+- Realized FPR on the held-out honest half is 1.8–2.1% for the reader vs 1.2–1.8% for the LLMs (A1 again). The
+  reader therefore runs at up to about 0.8 pp more FPR, and part of the margin over the weaker monitors is budget.
+- In `none` mode the reader is weak on LinuxArena: TPR 0.19, and it loses to 9 of the 12 monitors.
+- Revised pilot claim: in `full` mode the reader probe is above all small/mid monitors (7 Holm-significant), not
+  distinguishable from haiku / glm / sonnet / gemini-3.1-pro, and below opus-4.6.
+
+**A1 on the pilot MonitoringBench data** (`a1_mb_equalfpr.csv`, 200 splits; Δ vs gpt-4.1-mini of the same mode).
+
+| Stream | Realized FPR, reader vs LLM | Δ at nominal 1% | Δ at equal realized FPR |
+|---|---|---|---|
+| FIBS axial `full` | 2.2% vs 1.27% | +0.105 [+0.052, +0.285] | +0.061 [+0.021, +0.219] |
+| FIBS axial `none` | 1.3% vs 1.3% | +0.187 [+0.087, +0.265] | unchanged |
+| sab `full` | equal | +0.099 [+0.021, +0.166] | +0.098 |
+
+- FIBS axial `full`: equal FPR is unreachable. The bisection floor at nominal 1e-5 still gives 1.72%; the Δ at
+  that floor is the "equal realized FPR" column.
+
+**Per-context calibration as a sensitivity** (`a1_mb_percluster.csv`, `la_percontext.csv`). It is **not a usable
+fix at 1%**:
+- 8 MonitoringBench task clusters: per-cluster plug-in thresholds give realized FPR 5–7.6% at nominal 1% for every
+  monitor, the LLM included, and about 10% at nominal 5%.
+- 10 LinuxArena environments: realized FPR about 10%. Each environment has only 10 honest trajectories per
+  calibration half.
+- The global threshold, reported with its realized FPR, stays the right comparison. Per-context thresholds need far
+  more honest data per context.
+
+### Part 3: MOLE policy-activation arm with account-matched benign sessions (qwen36_27b_single_day)
+
+**Design.**
+- 233 attack sessions, each paired with a benign session of the **same account on the same day** (all 233 pairs
+  same-day, 38 accounts; `tracks/r4_wb/mole_sel_ids.json`).
+- `policy_neutral`: each attack session's system prompt (insider objective) is replaced by its paired benign
+  session's system prompt, so within a pair the instruction is identical.
+- LLM baselines: gpt-4.1-mini reads the reader-format transcript (no system prompt), one call per session.
+- Inference: account-cluster bootstrap (B = 2,000), paired across arms (`mole_arms.csv`, `mole_contrasts.csv`,
+  `fig_mole.pdf`).
+
+**Session AUROC, `sab` max over turns:**
+
+| Arm | AUROC [95% CI] |
+|---|---|
+| policy | 0.815 [0.77, 0.86] |
+| policy_neutral | 0.817 [0.77, 0.86] |
+| reader | 0.850 [0.80, 0.90] |
+| LLM (insider prompt) | 0.903 [0.85, 0.95] |
+| LLM (generic prompt) | 0.915 [0.87, 0.96] |
+
+**Preregistered contrasts (Holm family of 5):**
+
+| Contrast | Δ AUROC [95% CI] | Holm p |
+|---|---|---|
+| M1 policy − reader | −0.035 [−0.075, +0.008] | 0.29 |
+| M2 policy_neutral − reader | −0.033 [−0.071, +0.005] | 0.29 |
+| M3 policy − policy_neutral | −0.002 [−0.017, +0.014] | 0.80 |
+| M4 reader − LLM(insider) | −0.053 [−0.104, −0.003] | 0.14 |
+| M5 policy_neutral − LLM(insider) | **−0.086 [−0.140, −0.032]** | **0.005** |
+
+**Secondary.**
+- Mean over turns: policy 0.957, policy_neutral 0.943, reader 0.953. The instruction effect is small but nonzero
+  (+0.014 [+0.006, +0.024]).
+- FIBS-on-tokens (max over turns) rises when the instruction is neutralized: 0.818 → 0.903.
+- Reader J-lens hits: 0.935 max / 0.974 mean, the best probe stream.
+
+**Reading.**
+- With account-matched negatives, the policy's own activations do not beat the trusted reader on the preregistered
+  probe.
+- Removing the insider instruction from the policy's context changes the policy probe by nothing measurable on the
+  primary statistic. The probes key on the session's own content, not on the instruction.
+- A cheap LLM session monitor (gpt-4.1-mini) beats every `sab`-max probe arm on these sessions (M5 survives Holm;
+  M4 is nominal only). The pilot's high policy/reader AUROCs (0.95+) came from the mean statistic, which was chosen
+  post hoc, and from unmatched negatives.
+
+**Deviations and caveats.**
+- OpenRouter credit ran out mid-run (402 on the personal key; the MATS workspace was already at its lifetime cap).
+  - 305 LLM steps in 28 held-out attack trajectories were NaN in the registered run. They were handled by nanmax, as
+    preregistered. Re-scored once credit was restored, they change Δ by −0.002 (sensitivity row).
+  - The 200 external honest trajectories were scored after credit was restored. Nothing was changed after seeing
+    primary results apart from adding those sensitivity rows.
+- The held-out set has no S4 attacks, so the replication covers S1–S3 only.
+- Honest-550 is re-used, so the honest side of the replication is not new data. The external honest check (new
+  tasks, new agent) is the out-of-sample FPR evidence.
+- The Qwen3.6-27B revision is unpinned, as in the pilot.
+- The FIBS axial probe's training data (FIBSv1) may include BashArena-like transcripts. FIBS is an external release,
+  so disjointness from MonitoringBench cannot be verified.
+- The MOLE LLM baseline sees whole sessions (history-aware), while the probes take a max over turns.
+
+**Cost.**
+- GPU (RunPod MATS account, on-demand):
+  - `r4wb-a` H200, 5.0 h: $26.5.
+  - `r4wb-b` H200, 0.35 h: $1.9. It had a slow network and was replaced by `-c`.
+  - `r4wb-c` H200, 5.4 h: $28.6.
+  - `r4wb-d` H100, 3.35 h: $13.4.
+  - Total ≈ $70.
+- All four pods were deleted after their outputs were copied off and verified: row counts and unique ids checked,
+  no empty files.
+- OpenRouter track r4wb: $34.47 / $60.

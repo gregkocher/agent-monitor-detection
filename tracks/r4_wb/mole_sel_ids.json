@@ -1,0 +1,1869 @@
+{
+ "seed": 20261022,
+ "pairs": [
+  {
+   "attack": "25666dd2fe53419c819e83d413fa389d",
+   "benign": "2bb02aa328f44c4491616a965e662482",
+   "account": "alice.kim",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "1625f61f1bd14e29bb74c63f1099fe97",
+   "benign": "927a2ef356a444f88316d86a7ae7a77b",
+   "account": "alice.kim",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "112c0ee4a22f45ee93d67823a82cd503",
+   "benign": "60bbff9e3a9c404b95a82fa18fcd19a3",
+   "account": "alice.kim",
+   "day": "2026-05-05",
+   "benign_day": "2026-05-05",
+   "same_day": true
+  },
+  {
+   "attack": "97f8f6b0fe9a4c4fb3c31b1f7a8dd13d",
+   "benign": "60b13bfec20d4e3ca7f0952fb2779d4b",
+   "account": "alice.kim",
+   "day": "2026-05-14",
+   "benign_day": "2026-05-14",
+   "same_day": true
+  },
+  {
+   "attack": "ee3dd86df25541e8a09ad3df790bfeea",
+   "benign": "acf0629270a9491697fa3be7d6af01e0",
+   "account": "ben.c11",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "51cd344c69484230aae9938497fff1be",
+   "benign": "78167e37f44e4fd0bbbcbf616ede7b82",
+   "account": "ben.c11",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "4c23107109214e6190a30293a0fc45b9",
+   "benign": "ec57389a96ea48e9af9054589e6d96ff",
+   "account": "ben.c11",
+   "day": "2026-04-29",
+   "benign_day": "2026-04-29",
+   "same_day": true
+  },
+  {
+   "attack": "946f15b5ab3d458ebef7c35f519316f7",
+   "benign": "81208db49d574eabb3bc5e867923361e",
+   "account": "ben.c11",
+   "day": "2026-05-07",
+   "benign_day": "2026-05-07",
+   "same_day": true
+  },
+  {
+   "attack": "908fd38a2a20415f83cc774466b56059",
+   "benign": "fc6c5c6f76814496a90272696637a745",
+   "account": "ben.v130",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "97de7dfec20346d0a8d360e00c6f342a",
+   "benign": "7adcfdde09a04b228b8e147e5484ad2f",
+   "account": "ben.v130",
+   "day": "2026-05-04",
+   "benign_day": "2026-05-04",
+   "same_day": true
+  },
+  {
+   "attack": "94d96aacd7024178839ea80f1aa78422",
+   "benign": "9560d124eb8e4181912a01fc65334687",
+   "account": "ben.v130",
+   "day": "2026-05-06",
+   "benign_day": "2026-05-06",
+   "same_day": true
+  },
+  {
+   "attack": "d2678b9a49ef424e89a7b1194039e81c",
+   "benign": "de415139a2b647e085491f55c96bae0f",
+   "account": "bob.li",
+   "day": "2026-04-07",
+   "benign_day": "2026-04-07",
+   "same_day": true
+  },
+  {
+   "attack": "b8de8fe545cd430a8dcfb9673a240ded",
+   "benign": "f7ff9ed1ecfe436286d815e91b714bda",
+   "account": "bob.li",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "9d47583a437640c4821dd1bdfdafab58",
+   "benign": "80a2d4611b454152b044079cb5700a23",
+   "account": "bob.li",
+   "day": "2026-04-29",
+   "benign_day": "2026-04-29",
+   "same_day": true
+  },
+  {
+   "attack": "661e10392d1f4089be3404d6021c4f6b",
+   "benign": "e5e667caf76a41f29d7436e8e556df56",
+   "account": "bob.li",
+   "day": "2026-05-07",
+   "benign_day": "2026-05-07",
+   "same_day": true
+  },
+  {
+   "attack": "dd3591fdb995403590ad61011f10094e",
+   "benign": "637cf3bcfb184c6cb696b37d03b8d88d",
+   "account": "carlos.a32",
+   "day": "2026-04-09",
+   "benign_day": "2026-04-09",
+   "same_day": true
+  },
+  {
+   "attack": "3961624aa7af4700ab51a99ee66ebb5b",
+   "benign": "54d9f577d50b4dc1b155d721edc57aab",
+   "account": "carlos.a32",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "cffef93329244914979dbd954bc8ed16",
+   "benign": "463977fed76c409c980b522720707eae",
+   "account": "carlos.a32",
+   "day": "2026-04-28",
+   "benign_day": "2026-04-28",
+   "same_day": true
+  },
+  {
+   "attack": "af44a2737c094f39a4713fa91f1d723d",
+   "benign": "2dab59d0a9724ab9a04145869c9e8ce7",
+   "account": "carlos.a32",
+   "day": "2026-05-08",
+   "benign_day": "2026-05-08",
+   "same_day": true
+  },
+  {
+   "attack": "2f1cca4cec2c4880a900fb88cbd75731",
+   "benign": "57d25dc8cd3c42618311ef3349d5ae02",
+   "account": "carlos.k23",
+   "day": "2026-04-06",
+   "benign_day": "2026-04-06",
+   "same_day": true
+  },
+  {
+   "attack": "0506163058284f52a1bd0207c535e12e",
+   "benign": "079f170c07e34d98b7162e5300dafa19",
+   "account": "carlos.k23",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "75e0c96d03b843e59997c854c0745405",
+   "benign": "ccb891719a7d4ec9b91b42560e63229d",
+   "account": "carlos.k23",
+   "day": "2026-04-28",
+   "benign_day": "2026-04-28",
+   "same_day": true
+  },
+  {
+   "attack": "ccec550e8d7d452ba5c6c96c905b4bd3",
+   "benign": "9136b29ec1624098a2db4a337d322456",
+   "account": "carlos.k23",
+   "day": "2026-05-12",
+   "benign_day": "2026-05-12",
+   "same_day": true
+  },
+  {
+   "attack": "1080c25a487948a18b4e55a950f10882",
+   "benign": "50bcc143cf604e599f754732be427e56",
+   "account": "dan.r",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "d6d80839070741188758906e9560edb5",
+   "benign": "3f6ebc4ed3544fb798c40ae43da3102a",
+   "account": "dan.r",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "8b62cd7f95214b199846225552698bb4",
+   "benign": "1bee1a7b7808440b81922e85a0d6f496",
+   "account": "dan.r",
+   "day": "2026-04-27",
+   "benign_day": "2026-04-27",
+   "same_day": true
+  },
+  {
+   "attack": "3e49477693f64ea1be588f33e0399334",
+   "benign": "a608d4e229aa4a3c88cd3f6b05c70210",
+   "account": "dan.r",
+   "day": "2026-05-07",
+   "benign_day": "2026-05-07",
+   "same_day": true
+  },
+  {
+   "attack": "9a32be8165cb4802ab9683c5757dd917",
+   "benign": "72992bc0066b494fba85d760c33bca37",
+   "account": "deepa.a7",
+   "day": "2026-04-08",
+   "benign_day": "2026-04-08",
+   "same_day": true
+  },
+  {
+   "attack": "af9250431c244c1e8f15671bc49f2bdd",
+   "benign": "a99dd12183c3495ca7d5d26929ce873c",
+   "account": "deepa.a7",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "dc3e9ceb37ce4677b64a001df1564c85",
+   "benign": "c6417e4c63b245f99233880dcd23768f",
+   "account": "deepa.a7",
+   "day": "2026-04-30",
+   "benign_day": "2026-04-30",
+   "same_day": true
+  },
+  {
+   "attack": "a0603b250bd5462d9fce1a111056672f",
+   "benign": "34226da26964412cb069191fe82c7822",
+   "account": "deepa.a7",
+   "day": "2026-05-12",
+   "benign_day": "2026-05-12",
+   "same_day": true
+  },
+  {
+   "attack": "07e86d16173e471884e9b94303bc6fb0",
+   "benign": "d0396457a5d04fc2b7886f08f2105863",
+   "account": "deepa.g6",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "194237d2661746d3b9568c588247e7d2",
+   "benign": "eff0fdcb26974ba4add2849edeb7d917",
+   "account": "deepa.g6",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "b00e473f867a482abd3c236981c6721c",
+   "benign": "31920cb8da784b68b95447951a0186d2",
+   "account": "deepa.g6",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "5eb698dffe814d92afffffa63f1b7bf2",
+   "benign": "18ea9aa3a407453588216ec51153a376",
+   "account": "deepa.g6",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "0720fde03a6a4abe9acaccc2c81963c4",
+   "benign": "dc183ac2d844418abf2c793d31fbfc72",
+   "account": "deepa.g6",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "41fc499c44074ea49886e61af982a81c",
+   "benign": "c298b51474a645d5bad2b1af71221f4f",
+   "account": "deepa.g6",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "f460741fcaf6432ab3729f81edf77300",
+   "benign": "11804cf4a884403e9f349d1eead51862",
+   "account": "deepa.g6",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "760717b0ff22437186c07d9d51607614",
+   "benign": "d8f5a708a8924c5ea73a869a8c39843a",
+   "account": "deepa.g6",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "7b67ca49f7b640088d35312d115b3d92",
+   "benign": "6184eae3972c4cfc998fc6c9a447b63f",
+   "account": "deepa.g6",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "2a01b9c903984aa7bcb7cefa402fab0e",
+   "benign": "b1b0420d354048a79b3b40593b220109",
+   "account": "deepa.g6",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "20244754384b4d549a63d0a41f64c867",
+   "benign": "43ad44728d814ba2be2be68636ba529a",
+   "account": "deepa.g6",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "a654e780eaaf4c8393b119448dfb2e26",
+   "benign": "ff6a9c98f3a6488ab1bc5b3bdf6a3cf5",
+   "account": "deepa.g6",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "c231608a6cec46ebabc20441081af522",
+   "benign": "ee523635681f4477b79afc54cd19c3f3",
+   "account": "deepa.g6",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "920d1cae2b2f4d279c200012d9ebac08",
+   "benign": "a00421999f1b4ba9a652ff77666bd140",
+   "account": "deepa.h25",
+   "day": "2026-04-10",
+   "benign_day": "2026-04-10",
+   "same_day": true
+  },
+  {
+   "attack": "67be1a66b72a43a0a47c52c1832b60f3",
+   "benign": "1e92b2d2ee804e928064ff2111d0be7e",
+   "account": "deepa.h25",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "05745d951b094dab8e8f1dbe9281198c",
+   "benign": "f628f3f01e0e4b7c9fe54bcb70d3c7d8",
+   "account": "deepa.h25",
+   "day": "2026-05-01",
+   "benign_day": "2026-05-01",
+   "same_day": true
+  },
+  {
+   "attack": "b6128222ff8e498ebbbf11038a97dc2a",
+   "benign": "c7ef798d7cac42d4959c9b2af4096957",
+   "account": "deepa.h25",
+   "day": "2026-05-06",
+   "benign_day": "2026-05-06",
+   "same_day": true
+  },
+  {
+   "attack": "3cd9f96745144b9a9cb9c6d2ba8f1a84",
+   "benign": "4ac9d66c71304d3fa91264066251649d",
+   "account": "deepa.t9",
+   "day": "2026-04-07",
+   "benign_day": "2026-04-07",
+   "same_day": true
+  },
+  {
+   "attack": "b52ab11fc14b400182362d8a1fad6cc3",
+   "benign": "4ff88902aef348a69bcd99471e149bbd",
+   "account": "deepa.t9",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "3a6e663a8e7a41c99dddd8884d1da37b",
+   "benign": "43fff7a76ef54b25b9eea965c0e8dced",
+   "account": "deepa.t9",
+   "day": "2026-05-04",
+   "benign_day": "2026-05-04",
+   "same_day": true
+  },
+  {
+   "attack": "4d3456915f854a559816bbb6098922d7",
+   "benign": "460fd79899ae4a4b906611742a70cff8",
+   "account": "deepa.t9",
+   "day": "2026-05-15",
+   "benign_day": "2026-05-15",
+   "same_day": true
+  },
+  {
+   "attack": "c2bde4e0f1d3421b91272f32e0b1498a",
+   "benign": "96b4cfe6c38c4772b9102dc2cda61477",
+   "account": "elena.t129",
+   "day": "2026-04-07",
+   "benign_day": "2026-04-07",
+   "same_day": true
+  },
+  {
+   "attack": "67681e02b65a47f6b29541cbbe2a8cc3",
+   "benign": "8c971dbc90fc47e1b4cb0b1518ce68e1",
+   "account": "elena.t129",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "68b5b721a6a74567b9d6ac440b65215f",
+   "benign": "12e7e29c62a74a669a4d81dd37513714",
+   "account": "elena.t129",
+   "day": "2026-04-30",
+   "benign_day": "2026-04-30",
+   "same_day": true
+  },
+  {
+   "attack": "c0e2319c2d684b4382074eda4158c2f1",
+   "benign": "454b85d04e5d498f899bae23e258eda0",
+   "account": "elena.t129",
+   "day": "2026-05-12",
+   "benign_day": "2026-05-12",
+   "same_day": true
+  },
+  {
+   "attack": "77a7da4c8d7b432cae1f251444728e0f",
+   "benign": "dedb84f4cd2b4dd286fe6c4b02c0ad70",
+   "account": "frank.s",
+   "day": "2026-04-07",
+   "benign_day": "2026-04-07",
+   "same_day": true
+  },
+  {
+   "attack": "628b505c54614ca8b65cc3f5bc28f8c7",
+   "benign": "04cb1630594e4c92a9e0924a0fd62fe4",
+   "account": "frank.s",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "a5f9c0f6791b465885a7366dfdbe8dd5",
+   "benign": "7ae2dd10ce2142648a351d95886cd966",
+   "account": "frank.s",
+   "day": "2026-04-29",
+   "benign_day": "2026-04-29",
+   "same_day": true
+  },
+  {
+   "attack": "0724b4fdc24142dc86ab699606b512b4",
+   "benign": "76660738eeae469d8dc92d9780681554",
+   "account": "frank.s",
+   "day": "2026-05-15",
+   "benign_day": "2026-05-15",
+   "same_day": true
+  },
+  {
+   "attack": "6430453d698048d3886464a5e9ae2e6b",
+   "benign": "a33ff8fb3295431bb7b1ea9ba9da3d17",
+   "account": "grace.t",
+   "day": "2026-04-07",
+   "benign_day": "2026-04-07",
+   "same_day": true
+  },
+  {
+   "attack": "a267160e0fff4fb59e07b9c7a1c0a153",
+   "benign": "6e539056281f4001abf09fbe72b191ed",
+   "account": "grace.t",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "fbba7bbdcfb840f880729d348bb80531",
+   "benign": "40383191bc574ab0a93b4990bd768d59",
+   "account": "grace.t",
+   "day": "2026-04-27",
+   "benign_day": "2026-04-27",
+   "same_day": true
+  },
+  {
+   "attack": "ab29bde0c2c7447eb01cc364f7ef0550",
+   "benign": "d11616b0ee8242d4896eed1e1a560b50",
+   "account": "grace.t",
+   "day": "2026-05-14",
+   "benign_day": "2026-05-14",
+   "same_day": true
+  },
+  {
+   "attack": "1ad5545cf52943478bf777f90e1ffdac",
+   "benign": "b19695a3e09a4be6b435062ae870c4e1",
+   "account": "ivan.o",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "a8ffec1b8b534a1496d4a0c3c5aa8849",
+   "benign": "12df165c9ea3408487057dd4006adafe",
+   "account": "ivan.o",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "006ab9eb04c14434aef5bfdc35d6faa5",
+   "benign": "b19706c8da66439ca5a3e3de37624db2",
+   "account": "ivan.o",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "6e47962ae0934dc5bd7e4b3120a3efe2",
+   "benign": "23e8c5a6357047b0815a100f8eac78e4",
+   "account": "ivan.o",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "b94c2d598794446e86857d5bfbea57c7",
+   "benign": "7ee70095e792451fbe795aa3af3da066",
+   "account": "ivan.o",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "e6cbb724166847bd8f52912aea31b1cb",
+   "benign": "6f41967bedc9440ba5e7e42bc137b1d9",
+   "account": "ivan.o",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "84dfe76ee4e6407b9fc6a53f8f57f0b0",
+   "benign": "5dce8d8e6166468da693156504bc9826",
+   "account": "ivan.o",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "8f467366151c483c87e83655380b91a5",
+   "benign": "be5ce6e3651c490e9e740b3a1b2b8829",
+   "account": "ivan.o",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "41a088c2802e4464b98ade378185c14e",
+   "benign": "ece034f83d9846e4b0b7d92c9be4afd5",
+   "account": "ivan.o",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "d3d3eda2504b4244aebb024e73e36c86",
+   "benign": "fabe7de72e3845e5890596e2f624dc52",
+   "account": "ivan.o",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "d5be39a74d65484aa1d0e12c8e687e94",
+   "benign": "e2eaff5a450e467daa1e452d0cafe467",
+   "account": "ivan.o",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "5f8f825270a34ffd9a38c3a01142d8f9",
+   "benign": "9c253361929d43938a1bc4802757eaef",
+   "account": "ivan.o",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "a2d432457e3240e38a4f5787a55bb45a",
+   "benign": "e7262353be8c40039a67b2f4613bfc13",
+   "account": "ivan.o",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "aefe798a6a624a38bd277f95a9a42dde",
+   "benign": "91d1b09827174647867027e84087f407",
+   "account": "ivan.o",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "71293a00759147ef85f47cf369b04d82",
+   "benign": "25f065a04c3d40c7be44a860871acf92",
+   "account": "julian.x",
+   "day": "2026-04-08",
+   "benign_day": "2026-04-08",
+   "same_day": true
+  },
+  {
+   "attack": "52237fdeed3b449788db5cabce4d893a",
+   "benign": "3f3e8381279c4a56bd1c20acc900618d",
+   "account": "julian.x",
+   "day": "2026-04-30",
+   "benign_day": "2026-04-30",
+   "same_day": true
+  },
+  {
+   "attack": "ce6b80bf11124322935e964fc789b23d",
+   "benign": "44902cf2505c4f7fa149a1d41dd6692a",
+   "account": "julian.x",
+   "day": "2026-05-06",
+   "benign_day": "2026-05-06",
+   "same_day": true
+  },
+  {
+   "attack": "88db22971a1247f5aa36a7fffa65395d",
+   "benign": "8486e489d4b54232bbd22b29ab7a4c83",
+   "account": "kara.p",
+   "day": "2026-04-07",
+   "benign_day": "2026-04-07",
+   "same_day": true
+  },
+  {
+   "attack": "32ba4af44f2a4301ae7c02d47b723c69",
+   "benign": "66d64513a42a40d0a3ed4c4e8e971a55",
+   "account": "kara.p",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "b158a0adee8446fc916b11726e9062cb",
+   "benign": "ffade3c17fb44354a29ba383d8a6730a",
+   "account": "kara.p",
+   "day": "2026-04-30",
+   "benign_day": "2026-04-30",
+   "same_day": true
+  },
+  {
+   "attack": "c22466535f1e4964959527c189042f75",
+   "benign": "65646767a4c94c16aa64486c4e8af09b",
+   "account": "kara.p",
+   "day": "2026-05-08",
+   "benign_day": "2026-05-08",
+   "same_day": true
+  },
+  {
+   "attack": "23e95c79dd124adab5c87839d50dc1c9",
+   "benign": "fd72b24425ab4a1d99221871f63f174a",
+   "account": "kofi.s54",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "83ee0c2762e34904a1a23ccc1e33fd0e",
+   "benign": "b0295a1dcf6d4fed817e3cc5428fb07d",
+   "account": "kofi.s54",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "8efcc7b578104642a549b105b6923c68",
+   "benign": "79dd0ad9c61648f783ac76fbc50f3199",
+   "account": "kofi.s54",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "a3ba6c848e6c4b8aafc9135213bd068c",
+   "benign": "7d2681509c904f4d8907b0a3562291f9",
+   "account": "kofi.s54",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "0a35b51c19e64f7d846e4764a2dcd077",
+   "benign": "1a59680e3ad042f69b6e1558e31b08d5",
+   "account": "kofi.s54",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "3a65a47c0a0845c790475045dbc104c9",
+   "benign": "c93199eeff94443f9c4a24cb2fa857cb",
+   "account": "kofi.s54",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "18faa92d5c234ccabda6a07a4882501f",
+   "benign": "1185ef5f95aa4ea2aa9cc6b70e0d3b4a",
+   "account": "kofi.s54",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "f451a29caea649789f36356fad014d0c",
+   "benign": "ea594bc9db4f42219f54f293153cf3c0",
+   "account": "kofi.s54",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "9c9a244911154108854e74821e686bfd",
+   "benign": "47c6c8f59ab24829b813ad0dd6edef16",
+   "account": "kofi.s54",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "7948a207e92e4f529faf342fe8c18237",
+   "benign": "f1f56c9abd774b7180dd4f88d828be6a",
+   "account": "kofi.s54",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "8cca40b2f6b14c7081ae7fc9e6b86ecd",
+   "benign": "c787102b970e4276b265b5535f87b53a",
+   "account": "kofi.s54",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "9111b922327d495dbb5094e1d196efc4",
+   "benign": "823c78c024474941b998d8ed78736d13",
+   "account": "kofi.s54",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "a145bb9f2947406e9bbd69baaa6bdccd",
+   "benign": "514cf54a02f1480da6cebeaa94dbf41e",
+   "account": "kofi.s54",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "f88ae22874d6471aa2a33dba01692e94",
+   "benign": "9579605b3e7f445281aef130c4745b7d",
+   "account": "kofi.s54",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "a376b66f3ebe4cefbfe327b3d181ec23",
+   "benign": "113bd0a2e1b14106a2dbb9a1ae75a1d9",
+   "account": "kofi.s54",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "5d740a1fc50f4025bc3856b443684a02",
+   "benign": "d8c72e1187774f8aa909b06b891b0571",
+   "account": "kofi.s54",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "f4fa8583ef574dfbb254b6dfc48aeec8",
+   "benign": "885757becf934246b069c69fef1009f0",
+   "account": "kofi.s54",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "ad082d3dcb8c471195430a675c59a23e",
+   "benign": "a464f7cda3b849c08d409b2374e9dbd7",
+   "account": "lena.h128",
+   "day": "2026-04-06",
+   "benign_day": "2026-04-06",
+   "same_day": true
+  },
+  {
+   "attack": "504f68defdef41378ca72ccf0b07efbf",
+   "benign": "2a3d1d442f91466085580a9c95d66b15",
+   "account": "lena.h128",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "9dab678c394147d4af69ff0bf01590f9",
+   "benign": "036acafca0cd478d9b446451f8e72000",
+   "account": "lena.h128",
+   "day": "2026-04-30",
+   "benign_day": "2026-04-30",
+   "same_day": true
+  },
+  {
+   "attack": "25659b02f07a4dc5a37655e96ad783d7",
+   "benign": "2572ec8eb165482aacdd337ffd670c77",
+   "account": "lena.h128",
+   "day": "2026-05-13",
+   "benign_day": "2026-05-13",
+   "same_day": true
+  },
+  {
+   "attack": "0b551d7d6b4d4f87a0b3b0b044c8a53d",
+   "benign": "a926acf760174473940697f3fe1bda73",
+   "account": "marco.a4",
+   "day": "2026-04-08",
+   "benign_day": "2026-04-08",
+   "same_day": true
+  },
+  {
+   "attack": "400524eebc9d4611a74202b6c2fb2994",
+   "benign": "5ad445f63b3a4cbebab398e276cc4756",
+   "account": "marco.a4",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "5989ba7789a94e57b49361ceb570ad64",
+   "benign": "1e2fc03665e346358aa03f95c5a22081",
+   "account": "marco.a4",
+   "day": "2026-05-04",
+   "benign_day": "2026-05-04",
+   "same_day": true
+  },
+  {
+   "attack": "14c665cde52a4f2994b6846d3276e520",
+   "benign": "8da32f43506b440d853c5b5917d29469",
+   "account": "marco.a4",
+   "day": "2026-05-08",
+   "benign_day": "2026-05-08",
+   "same_day": true
+  },
+  {
+   "attack": "5abc7e0c0abc4febae3c527de9823da0",
+   "benign": "57e091d6c1e9455788bdd6e824513379",
+   "account": "marco.c8",
+   "day": "2026-04-10",
+   "benign_day": "2026-04-10",
+   "same_day": true
+  },
+  {
+   "attack": "51750a9d60144422ac4b3dbf7ca42c72",
+   "benign": "476542b3fea4496c89539eac8cba4024",
+   "account": "marco.c8",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "ef694c10f6974415a72e53e957731258",
+   "benign": "67472e795b6843329d03e42498f66f3f",
+   "account": "marco.c8",
+   "day": "2026-05-05",
+   "benign_day": "2026-05-05",
+   "same_day": true
+  },
+  {
+   "attack": "513fca6c7cb54feaaba6feb179874930",
+   "benign": "9cccc14d4ac24710b5744839f6b14811",
+   "account": "marco.c8",
+   "day": "2026-05-12",
+   "benign_day": "2026-05-12",
+   "same_day": true
+  },
+  {
+   "attack": "17d8cf7d52e34de2a45140eac849e673",
+   "benign": "af0744341e814d3ebb942b4db78f73a2",
+   "account": "marco.g127",
+   "day": "2026-04-10",
+   "benign_day": "2026-04-10",
+   "same_day": true
+  },
+  {
+   "attack": "016e1983258646dbadc47d45d2314391",
+   "benign": "3a3112095db544f69b1a7355f64ce801",
+   "account": "marco.g127",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "98da8ce08a4e43a5a92d8fc31f46e5af",
+   "benign": "36a824b503e5452d9a5888249c5fb25c",
+   "account": "marco.g127",
+   "day": "2026-05-01",
+   "benign_day": "2026-05-01",
+   "same_day": true
+  },
+  {
+   "attack": "69f2c895d8e042bcabdebf59b1e18ef9",
+   "benign": "696b37934b4e496cb17db83affe626ec",
+   "account": "marco.g127",
+   "day": "2026-05-06",
+   "benign_day": "2026-05-06",
+   "same_day": true
+  },
+  {
+   "attack": "dff6b0d85aa147ffa58bf8184f9190bf",
+   "benign": "8feb1e8d70cb4c90bfd2a370e43ff111",
+   "account": "marco.g35",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "6fd7fd72167b4a02ab7beec2d6c497da",
+   "benign": "43fc00f1d19246dba19886c8cb5fd32a",
+   "account": "marco.g35",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "7225900c287a4c208a6f36361cdf6934",
+   "benign": "6cbcaf84c8ba49f4882b867edf2f0466",
+   "account": "marco.g35",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "7a66ecd3ccbc4ca18555991b1f06e2e8",
+   "benign": "aff58c87ea704a008822e2ff2e5b14bd",
+   "account": "marco.g35",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "ba7dd9541e324658868190cfc52f60c7",
+   "benign": "6d739f85b2f04d8c9022a0ef41ef49de",
+   "account": "marco.g35",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "e8357bc5d8b34d01a47149061b71756b",
+   "benign": "4d4004181ff34696867b573e6c56df4d",
+   "account": "marco.g35",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "58bafae0f5eb4ed3b6a37f7c8fcaeedd",
+   "benign": "cb3112bd6e844638b9c5ade374715c81",
+   "account": "marco.g35",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "21a1b329d8a04ff7968d7f2afeee289f",
+   "benign": "40255cc505b349bfa79ed6eb05b219f3",
+   "account": "marco.g35",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "f26fe5938b37447589b359263b62e5fb",
+   "benign": "7bcc858a4c5c46ab8fde3db8c553b06c",
+   "account": "marco.g35",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "a395938a402249d1b82c145be645394d",
+   "benign": "7d5da63d63fa45a2a4716c346f437bdd",
+   "account": "marco.g35",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "a9b740f913f74f1b945e88479b33c394",
+   "benign": "b830c968a73c44859e72ca2e446bdbf4",
+   "account": "marco.g35",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "e5760e1f479c40a2b076161eb472f70b",
+   "benign": "34182af907d14be892a68086d4b67eea",
+   "account": "marco.g35",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "959768ea9a7841b0b8097e5c9f19d3a8",
+   "benign": "91201d5ba7414e328eac687a5b9f0459",
+   "account": "marco.g35",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "a1dccf63490744f59208c2b07c1932cd",
+   "benign": "16ad7309b83444d9913653e54172ad73",
+   "account": "marco.g35",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "84e4a6d0f6094258916058a15723823d",
+   "benign": "6d62374de93641d1af612afd67c26347",
+   "account": "marco.n28",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "989ff2af07db40c09cfacc53735ddf12",
+   "benign": "bdb7a781ac4445d5a8fba37a66537920",
+   "account": "marco.n28",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "a669905076844759983409cb4a930c24",
+   "benign": "78a8e630b20e4803b4b9749859147f77",
+   "account": "marco.n28",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "f4e6537a27e447259a89eaef85bbe618",
+   "benign": "e4112390d2a14eef87eb498df21dd098",
+   "account": "marco.n28",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "8129a31beafe4aceb08a4bf9afbe5b41",
+   "benign": "06679f9b34aa4f37a727ac098cc3ef87",
+   "account": "marco.n28",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "972163f7bde74fdca1311074e1e64e21",
+   "benign": "6ff3a1ad4607431aa363cb151eaed4d6",
+   "account": "marco.n28",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "cf44ea362634475d8264ea4ac2a18670",
+   "benign": "856028633d5e4b74923ecf0559736961",
+   "account": "marco.n28",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "a60f7808f6d546539d2d5f224a040e9f",
+   "benign": "26da1738a7fd4b8cb52ab6d2fb4ff55f",
+   "account": "marco.n28",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "6fba714a32e94be388cf954dd947edc6",
+   "benign": "6705e9190e724b48a4c77b3015321ac2",
+   "account": "maya.v121",
+   "day": "2026-04-10",
+   "benign_day": "2026-04-10",
+   "same_day": true
+  },
+  {
+   "attack": "80dd976d04ac48d5b6bc561fdb200280",
+   "benign": "54c81c544d624280b1b54b0085c7d1ca",
+   "account": "maya.v121",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "f1ec9eb3ffc14f08af75f1461c229d67",
+   "benign": "7ef0683a63cb4a8b8995c92d302b5ed7",
+   "account": "maya.v121",
+   "day": "2026-04-29",
+   "benign_day": "2026-04-29",
+   "same_day": true
+  },
+  {
+   "attack": "d25c614ac4cc4f7dad54ea7e0ad4d297",
+   "benign": "c236c45ea25348509ff87cf7d759539e",
+   "account": "maya.v121",
+   "day": "2026-05-15",
+   "benign_day": "2026-05-15",
+   "same_day": true
+  },
+  {
+   "attack": "7f9f5adf791f4b1ea540b5c4a08bfdb1",
+   "benign": "0ae643e065764a5ab572a77aecf58868",
+   "account": "mei.r134",
+   "day": "2026-04-07",
+   "benign_day": "2026-04-07",
+   "same_day": true
+  },
+  {
+   "attack": "085dfb94d2c645efa7f8fd5969340f12",
+   "benign": "bda0d551dac44c5abfb89b15ca525022",
+   "account": "mei.r134",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "69f2b31057d54b0483fe9ad2c9baa190",
+   "benign": "70f39834607b4399b23b0509357c5317",
+   "account": "mei.r134",
+   "day": "2026-04-27",
+   "benign_day": "2026-04-27",
+   "same_day": true
+  },
+  {
+   "attack": "3b5e8b4dd63548ae9431aaf6470142e5",
+   "benign": "dcf5824fd4b54da690e17cca764fa8ff",
+   "account": "mei.r134",
+   "day": "2026-05-11",
+   "benign_day": "2026-05-11",
+   "same_day": true
+  },
+  {
+   "attack": "0029d841e85e41dba86758e886350262",
+   "benign": "b8678f01bb42411282a792969053783f",
+   "account": "priya.o122",
+   "day": "2026-04-08",
+   "benign_day": "2026-04-08",
+   "same_day": true
+  },
+  {
+   "attack": "803abe17c4d143b6bb08ac7d39824271",
+   "benign": "5ff1f740bde84cd1a3ead0c39014af5a",
+   "account": "priya.o122",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "0d4910eb67d94131a341d006fb9953ba",
+   "benign": "0fa65cdc83e8455e853aaf4d34b62443",
+   "account": "priya.o122",
+   "day": "2026-05-05",
+   "benign_day": "2026-05-05",
+   "same_day": true
+  },
+  {
+   "attack": "988c4061216d4125a78f4a734ba2200e",
+   "benign": "77414991b3234ccaa8a1ecd323289193",
+   "account": "priya.o122",
+   "day": "2026-05-07",
+   "benign_day": "2026-05-07",
+   "same_day": true
+  },
+  {
+   "attack": "f95cebbe0a494381b26ed07ed572ec0d",
+   "benign": "b8fb0329e837417e85c93a9777a44883",
+   "account": "raj.i123",
+   "day": "2026-04-09",
+   "benign_day": "2026-04-09",
+   "same_day": true
+  },
+  {
+   "attack": "294c5933c2854591b27b3e3f3d02b638",
+   "benign": "64cb44d4fa1e4a2c98acbdd28b84dce4",
+   "account": "raj.i123",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "88a8114f397b4735bcddfb270d2b9fec",
+   "benign": "b7477d014c1248f39c0b1a5d2f2f5d3b",
+   "account": "raj.i123",
+   "day": "2026-04-30",
+   "benign_day": "2026-04-30",
+   "same_day": true
+  },
+  {
+   "attack": "0cb051accd82460392f281dba00ec450",
+   "benign": "4859a0d8f4034f7282f14f0814648a88",
+   "account": "raj.i123",
+   "day": "2026-05-06",
+   "benign_day": "2026-05-06",
+   "same_day": true
+  },
+  {
+   "attack": "68c6dd6965f9472e8154b4bd6ebb1d55",
+   "benign": "1d36ea6f90314c4d9f7b193b8229bbd4",
+   "account": "sam.k47",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "781eb430cb8f414f9d41625925bfd584",
+   "benign": "b6a3543920984b8098ba230276a651ee",
+   "account": "sam.k47",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "3782d59a55b84629ac0cba2272a029ff",
+   "benign": "ac0579c0bdf849c8a4f3fffa87a04362",
+   "account": "sam.k47",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "685e4113c0f04dceb330406ee6d2e61c",
+   "benign": "144879826f984251b517a4a588f5f41a",
+   "account": "sam.k47",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "0fecd5eb8f9e4985a78f1fd985ee4278",
+   "benign": "fc810e0bd8094c76a4b2d319188bacfc",
+   "account": "sam.k47",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "47728b3664e84648aa6c4080bac98338",
+   "benign": "39e6a0d9924b407880a178d719e5f10e",
+   "account": "sam.k47",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "2a1bafec84af42fa857fa0a2e023774a",
+   "benign": "7cbdea388416493cbd980299a67ad2c4",
+   "account": "sam.k47",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "3b77418c670a4b678d3450d5c8f9a1cf",
+   "benign": "27ed1eea11934a1685654c29d04eb114",
+   "account": "sam.k47",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "8759e6b53e7d4c5b8ffc373d676a5f58",
+   "benign": "61a2acea8cbc4ef7a388662d2f0b48b0",
+   "account": "sam.k47",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "57017370fbfc468ab5fcaf5a0efaa3af",
+   "benign": "3caf434f42bb485792c0c0a26e669d73",
+   "account": "sam.k47",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "79388e22c9f94d2a8fe9ad1318be5bd1",
+   "benign": "7a82f91d88c645e9a601d864b9f41f9f",
+   "account": "sam.k47",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "3f7a28f5129d480babe615b82c1166b9",
+   "benign": "a26437ca258940a4853d876c95a1dc5d",
+   "account": "sam.k47",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "6b8c6e06334f42818e2051e69c95532d",
+   "benign": "defb078ac6384ddcbff49e006b70eaf5",
+   "account": "sam.k47",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "93b1ffac76024ca0b15dda419239e415",
+   "benign": "4115f7b8c00e4de08430d2d937e916ee",
+   "account": "sam.k47",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "93f564fe4d04458cb172cfec5a0395a3",
+   "benign": "4b00905e94ba412188aab0ed996ed918",
+   "account": "sam.k47",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "231cae62b99d4658a02bafeca0b473c0",
+   "benign": "aa705e2f2ea54420865bf5a3bd99708c",
+   "account": "sam.k47",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "570b4a6face84cf6bc4cd451d0493d18",
+   "benign": "44931ef5113144cea5b76f3783919b95",
+   "account": "sam.k47",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "56c4482546c240e5a2de945c8c066028",
+   "benign": "c8ed572ead0342d9812c121886f04281",
+   "account": "sara.c56",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "7dbd5c60616d47e8a8e3c2f4937a0866",
+   "benign": "b85d8ce250b645da97e7faddcd519c83",
+   "account": "sara.c56",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "2b6a9038ecc048d5a3945317533663df",
+   "benign": "39cf1722dab949538322d90a1ae3be20",
+   "account": "sara.c56",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "6a4830b8f68a4711975d302eef8d98d2",
+   "benign": "04582de6f0fc40e5bc8fe8ae1be4e41e",
+   "account": "sara.c56",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "127a195b2a3b4b2f8658c0576bf613fa",
+   "benign": "10bc401644f24ca89b0ec1368c3a98da",
+   "account": "sara.c56",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "c7923f138253493db6d2c985187d3081",
+   "benign": "cbe950cf80b54fc2a5059c46f6b86cdb",
+   "account": "sara.c56",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "e60c358512004d9e8c6ada59c05ccb15",
+   "benign": "f368c2875aa647ffa9ecad8958f16207",
+   "account": "sara.c56",
+   "day": "2026-04-16",
+   "benign_day": "2026-04-16",
+   "same_day": true
+  },
+  {
+   "attack": "8c3453c508c54787a6ebfbe46e101b9c",
+   "benign": "279c7e5b74b5433c8afd6f752f26b99c",
+   "account": "sara.c56",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "bb52e7b58c504313b363ffb13710922a",
+   "benign": "2b9f00e5cb974b31a1427fd41ada5e27",
+   "account": "sara.c56",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "ac3d1306a50d409492dee03849711344",
+   "benign": "9ec3ee8b55444f168912a7a67a9de970",
+   "account": "sara.c56",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "b7da095bf7eb49dea0b0c5c6dc99e066",
+   "benign": "d97a9c39ecea49b58f7a4c924c339094",
+   "account": "sara.c56",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "13c3cd0305fd4829aa3d553ac956abd1",
+   "benign": "cfb17cb9e56240eaa7638707d2b9ae12",
+   "account": "sara.c56",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "ad048db51b1746e18b50d9f1b17676d8",
+   "benign": "40b964539e2f4b70a9509f228e7816bd",
+   "account": "sara.c56",
+   "day": "2026-04-23",
+   "benign_day": "2026-04-23",
+   "same_day": true
+  },
+  {
+   "attack": "3a5a0347d233452a82605699a786e66b",
+   "benign": "9e24c07538074f93880970b155a9861a",
+   "account": "sara.c56",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "32f1e9179f794ca4a232591dc366d9c5",
+   "benign": "6786df88d2614a3a8f5cf0c514f6ecbe",
+   "account": "sara.s126",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "ced88a52a92f4fe990a46c0726dd1d20",
+   "benign": "9a626791749c4af7b0acad5b974bd456",
+   "account": "sara.s126",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "54517811109e44519d0fcd33b39f1f94",
+   "benign": "fc2d4f32ebff44b491ad19104c867571",
+   "account": "sara.s126",
+   "day": "2026-05-04",
+   "benign_day": "2026-05-04",
+   "same_day": true
+  },
+  {
+   "attack": "02b551d3e7bc490984696c371d1f4c31",
+   "benign": "31cb561f07b848ca865a8d7d91093a77",
+   "account": "sara.s126",
+   "day": "2026-05-12",
+   "benign_day": "2026-05-12",
+   "same_day": true
+  },
+  {
+   "attack": "1e682b9788514af6be0089acc9676ed1",
+   "benign": "968ae4c7f4a747ac9c89ac19b330a75d",
+   "account": "tom.g0",
+   "day": "2026-04-09",
+   "benign_day": "2026-04-09",
+   "same_day": true
+  },
+  {
+   "attack": "3edc434885cd497d8034bf12d47a63fe",
+   "benign": "555673bfba484e3b97084f08bc071893",
+   "account": "tom.g0",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "cccfa88447e84b4298eb750959d007bc",
+   "benign": "944a6628804a4e9b8a62bed554428be7",
+   "account": "tom.g0",
+   "day": "2026-04-29",
+   "benign_day": "2026-04-29",
+   "same_day": true
+  },
+  {
+   "attack": "eec41077ade34bbd909da89e57c3702b",
+   "benign": "371c1f3933f84b0cbc4bbd0adad9f95a",
+   "account": "tom.g0",
+   "day": "2026-05-08",
+   "benign_day": "2026-05-08",
+   "same_day": true
+  },
+  {
+   "attack": "f6bfae9833764527b34ce8c9470079c9",
+   "benign": "65e7d06d849c484ab9ae22f35642d6ae",
+   "account": "wei.k10",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "5dae833b6a8940a5842b3cbc625e279f",
+   "benign": "39cc50664010423a88b44c3e4ce1cbdb",
+   "account": "wei.k10",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "02b6c24ab0fc43a8a72dbae12efd096c",
+   "benign": "20a1857a6e9f4341a2e6e0622ed9556d",
+   "account": "wei.k10",
+   "day": "2026-05-05",
+   "benign_day": "2026-05-05",
+   "same_day": true
+  },
+  {
+   "attack": "dbdce480faf64faeac5f5e69c00e1603",
+   "benign": "a2124265ca8540a2ab6aa7a4fb2f91af",
+   "account": "wei.k10",
+   "day": "2026-05-07",
+   "benign_day": "2026-05-07",
+   "same_day": true
+  },
+  {
+   "attack": "48ed4cef5a94454f92748abf39e619f8",
+   "benign": "25aec5e78a284f6f9d0b7a1c9631733c",
+   "account": "wei.k133",
+   "day": "2026-04-10",
+   "benign_day": "2026-04-10",
+   "same_day": true
+  },
+  {
+   "attack": "20268b3c944b47078b572735c151ad34",
+   "benign": "daeafe4b8fd64b0c80262a17bb8c64bf",
+   "account": "wei.k133",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "e60417e245164fb38d329cb77d6f3d6c",
+   "benign": "29d10964fe5b4ee087e7b91cc35c0976",
+   "account": "wei.k133",
+   "day": "2026-04-28",
+   "benign_day": "2026-04-28",
+   "same_day": true
+  },
+  {
+   "attack": "715050b65ffa4b33ad00c0fd0bd1dc82",
+   "benign": "61281e0e119b40169621da9213730550",
+   "account": "wei.k133",
+   "day": "2026-05-15",
+   "benign_day": "2026-05-15",
+   "same_day": true
+  },
+  {
+   "attack": "2849ba62ce1a40ae90227ec4c7aec6e5",
+   "benign": "78440d5d41684ab3b1a84b41670ee071",
+   "account": "wei.n2",
+   "day": "2026-04-09",
+   "benign_day": "2026-04-09",
+   "same_day": true
+  },
+  {
+   "attack": "fa95dd093b1f470797c45c100918cb91",
+   "benign": "fa5eb314cf8647559b6bca0e6ef47f8e",
+   "account": "wei.n2",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "d702c1f24c844bf7b997d659e1a5b408",
+   "benign": "33de84a6c4194e34987bad8c62c470e4",
+   "account": "wei.n2",
+   "day": "2026-04-30",
+   "benign_day": "2026-04-30",
+   "same_day": true
+  },
+  {
+   "attack": "b3e214e17ce341969948dd198573b722",
+   "benign": "88a19f79bd094d0db0e1fd7260020f38",
+   "account": "wei.n2",
+   "day": "2026-05-11",
+   "benign_day": "2026-05-11",
+   "same_day": true
+  },
+  {
+   "attack": "bfbb1abdd16f43a6982ebfd8de5f9af7",
+   "benign": "4068eaa64c4e49babcbe48d18afa4b44",
+   "account": "wei.r22",
+   "day": "2026-04-06",
+   "benign_day": "2026-04-06",
+   "same_day": true
+  },
+  {
+   "attack": "d9d9c792861942a3822c64468f8c6d4f",
+   "benign": "ef1852c253bc426fbf325161a4cd717f",
+   "account": "wei.r22",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  },
+  {
+   "attack": "28561e18b286408fb23fc7b776c1bbd7",
+   "benign": "9f66f9013b0d4637a8915a943cc24f41",
+   "account": "wei.r22",
+   "day": "2026-04-27",
+   "benign_day": "2026-04-27",
+   "same_day": true
+  },
+  {
+   "attack": "dafa9ec02cc3443daa53ea2ab319dca9",
+   "benign": "487a5a6df43d40a5ae6e7d50731d7a81",
+   "account": "wei.r22",
+   "day": "2026-05-14",
+   "benign_day": "2026-05-14",
+   "same_day": true
+  },
+  {
+   "attack": "5c4c867195ec40a398a65e9aa09c39c0",
+   "benign": "c97af68578c540b49a788f802e6182e7",
+   "account": "yuki.n21",
+   "day": "2026-04-10",
+   "benign_day": "2026-04-10",
+   "same_day": true
+  },
+  {
+   "attack": "dd5cc29261ab4865901f1552d137c819",
+   "benign": "ad648fa09d57465f89426f1856e6cf26",
+   "account": "yuki.n21",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "5218f44be8b0443b908fb412735b68aa",
+   "benign": "17980764a4aa4f6cad4735a1ecb7bb9d",
+   "account": "yuki.n21",
+   "day": "2026-05-01",
+   "benign_day": "2026-05-01",
+   "same_day": true
+  },
+  {
+   "attack": "5d094e7a627f4d1c9007c8c6f3cff144",
+   "benign": "5b4f45bef1fd4be98ab52006167bbadb",
+   "account": "yuki.n21",
+   "day": "2026-05-06",
+   "benign_day": "2026-05-06",
+   "same_day": true
+  },
+  {
+   "attack": "49842e9849e44e178e59b3e8dc66c5fd",
+   "benign": "3e08721a8b4441179c2daad8b9211900",
+   "account": "yuki.v49",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "b940c0ac0ab04ab78faaca4984cf9802",
+   "benign": "9b53a9c8e9e2457ba1e197a4d3e73360",
+   "account": "yuki.v49",
+   "day": "2026-04-13",
+   "benign_day": "2026-04-13",
+   "same_day": true
+  },
+  {
+   "attack": "95ad0a30435f4386a6a843d18b7b0c0b",
+   "benign": "313f341425964bd4b57035cd90c882e8",
+   "account": "yuki.v49",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "dbe6b22c7ca1480b856acb0bf465542c",
+   "benign": "7ecd2a25c3ed423c959f7ba442a55231",
+   "account": "yuki.v49",
+   "day": "2026-04-14",
+   "benign_day": "2026-04-14",
+   "same_day": true
+  },
+  {
+   "attack": "594166c7285e483f9273f9c0934fcffe",
+   "benign": "4c790a30c4314bc68636ae4f1a70429a",
+   "account": "yuki.v49",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "c871351009594a4f99d11bfe66177a3b",
+   "benign": "09fe9de6e4bd405da07189e0322b7737",
+   "account": "yuki.v49",
+   "day": "2026-04-15",
+   "benign_day": "2026-04-15",
+   "same_day": true
+  },
+  {
+   "attack": "19ca8f213f504022a946ab954dc1f447",
+   "benign": "ff089e24d5a04056aa01676893ab96bd",
+   "account": "yuki.v49",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "9daa8d3333054a0f8e65a2731b7c6d73",
+   "benign": "ae6e74cffb3141f38c15b900aec08fcb",
+   "account": "yuki.v49",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "b5de9a699d5b428e939f9176df1cb04f",
+   "benign": "41fe8ba0ef4a48e28416b84664ab2fb0",
+   "account": "yuki.v49",
+   "day": "2026-04-17",
+   "benign_day": "2026-04-17",
+   "same_day": true
+  },
+  {
+   "attack": "054e251d834a44d3ac2878e35c91f2da",
+   "benign": "5e6d98edac044e0189a9523de0d76db0",
+   "account": "yuki.v49",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "a7250bc2c759431cae776fdc08d93f38",
+   "benign": "8815b2cd17874503b83ea80b8fbd983a",
+   "account": "yuki.v49",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "e5ae8098a8994220aa189a4a45c63c2a",
+   "benign": "3ac010ad0fb44a2994614c1107b15097",
+   "account": "yuki.v49",
+   "day": "2026-04-20",
+   "benign_day": "2026-04-20",
+   "same_day": true
+  },
+  {
+   "attack": "aaef5728ff0146d584342b2117856d44",
+   "benign": "60141bf5a6244fdc8c9156473b125ba4",
+   "account": "yuki.v49",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "e9ad14edc874425faf015c138528e6cc",
+   "benign": "b4db9ca2bc6c452ca77818709bfec50d",
+   "account": "yuki.v49",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "fba83643c6a64db78ce4a7e535b7da54",
+   "benign": "614e2c185d9a449cbbc2ac1bf18791f2",
+   "account": "yuki.v49",
+   "day": "2026-04-21",
+   "benign_day": "2026-04-21",
+   "same_day": true
+  },
+  {
+   "attack": "0dbf8bf5993f423c99632a9833fdd987",
+   "benign": "f5db6a99240d45ff82fd4355b47080a6",
+   "account": "yuki.v49",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "4d8181fa663542aaaa296a7d069b0c8a",
+   "benign": "44ce3d245adf444b8d014587c0e748b0",
+   "account": "yuki.v49",
+   "day": "2026-04-22",
+   "benign_day": "2026-04-22",
+   "same_day": true
+  },
+  {
+   "attack": "fc9a19adce0a4b27995c3f57c7a50079",
+   "benign": "6259576b2552472bbf2251cc5cf0a46c",
+   "account": "yuki.v49",
+   "day": "2026-04-24",
+   "benign_day": "2026-04-24",
+   "same_day": true
+  }
+ ]
+}
