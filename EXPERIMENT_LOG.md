@@ -2471,8 +2471,8 @@ Verdicts are identical under both conventions and under main-task resampling. Pr
 - Truncation explains about half of Luna's opus-4-6 routing loss vs Gemini at e = 20% and most of JEV's. The rest is
   content.
 
-**Equal-FPR note.** Under the conformal rule, realized FPR is 0.8–1.4% in every cascade cell, and the two arms of each
-contrast are within 0.15 points. The exceptions are standalone JEV on MB (2.1–2.3%; 8 of the top 9 honest maxima come
+**Equal-FPR note.** Under the conformal rule, realized FPR is 0.8–1.6% in every cascade cell, and the two arms of each
+contrast are within 0.3 points. The exceptions are standalone JEV on MB (2.1–2.3%; 8 of the top 9 honest maxima come
 from one task) and H5b-MB nano (1.37%). The JEV exception favors JEV.
 
 ### Addendum: generative Luna as MB's strong second stage and baseline
@@ -2488,8 +2488,8 @@ Family of 11, Holm. Conformal rule; plug-in and main-task resampling give the sa
   - nano 0.028.
 - **H1-MB-strong supported:** JEV → Luna cascade e = 20%, 0.432 vs Luna only 0.381.
   - Δ = +0.051 [−0.004, +0.106], p_NI = 0.001, Holm 0.022.
-  - Every deployable gate at e ≤ 20% is at or above Luna only; small-e triage filters Luna's honest false alarms. At
-    e = 10%: JEV 0.447, probe 0.437, Decider 0.415, Luna Decisions 0.392, nano 0.297, length 0.208, random 0.129.
+  - The JEV and probe gates are at or above Luna only at every e ≤ 20% (small-e triage filters Luna's honest false
+    alarms); nano, length and random gates are below it. At e = 10%: JEV 0.447, probe 0.437, Decider 0.415, Luna Decisions 0.392, nano 0.297, length 0.208, random 0.129.
 - **S1–S4 (generative Luna − X, standalone):**
   - S1 JEV: +0.161 [−0.001, +0.268], Holm 0.27; JEV is at 2.3% FPR.
   - **S2 Luna Decisions: +0.338 [+0.242, +0.461], Holm 0.022.**
