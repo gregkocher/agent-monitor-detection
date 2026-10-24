@@ -70,6 +70,8 @@ def main():
         lu = _cache_stats(DATA / "r5_luna" / "cache" / f"luna_{src}.sqlite", "%r5-B_w3|both-orders")
         first[src] = {"watch": w, "watch_exp": w, "jev": j, "luna": lu}
     dh = _cache_stats(DATA / "r5_luna" / "cache" / "decider_dev.sqlite")
+    if not np.isfinite(dh[1]):      # the dev-check cache has no latency field: use the spend-ledger rows of that check
+        dh = (dh[0], _ledger_latency(lambda r: r.get("model") == "perplexity/pplx-decider-v1.2"), dh[2])
     gen_c = _cache_stats(DATA / "r5_luna" / "cache" / "gen_mb.sqlite")[0]
     gen_l = _ledger_latency(lambda r: str(r.get("tag", "")).startswith("r5luna:gen"))
     mini_l = _ledger_latency(lambda r: r.get("track") == "t1" and r.get("model") == "openai/gpt-4.1-mini")

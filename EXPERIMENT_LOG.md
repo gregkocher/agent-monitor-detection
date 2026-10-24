@@ -2547,3 +2547,134 @@ are identical; no answer is identical to 1e-6.
 | hosted Decider | $0.03 |
 
 Cost per held-out step: Luna Decisions $0.00011–0.00030 by source (MB $0.00029); JEV $0.00004–0.00014. No pods.
+
+## 2026-10-24: Idea 05, Watcher-style triage arm (track r5watch): results
+
+Preregistration: commit c52b2ad (the entry above), written before any held-out call. Code `tracks/r5_watch/`; tables
+and vector PDFs `results/r5_watch/` (`hypotheses.csv` = the W1/W2 family on every panel × convention × resampling;
+`secondary.csv`; `w3.csv`; `cells.csv` = every first stage × e × α with realized FPR and escalated shares;
+`standalone.csv`; `cost_latency.csv`; `panels.csv`; `explore_*.csv`; `fig_w1_w2.pdf`, `fig_tpr_vs_escalation.pdf`);
+scores and caches in `data/r5_watch/`. All numbers below use the conformal rule and main-task resampling (primary)
+unless noted; 50 grouped splits, B = 1,000. Δ = decision-model cascade − Watcher-style cascade.
+
+**Scoring completeness.** GPT-5.6 Luna (`openai/gpt-5.6-luna`, OpenAI standard tier) scored all 63,996 MB steps
+(2 parse failures) and all 47,975 LinuxArena nano-subset steps (1 parse failure), 0 API errors after one pass each.
+Parse failures are escalated (preregistered). Every other stream was complete except 6 generative-Luna MB steps
+(missing, contribute nothing). Mean calibration n: MB 252, LinuxArena 253, so every 1% cell is estimable.
+
+### Confirmatory family (MB, second stage generative GPT-6 Luna, 1% trajectory FPR; Holm over six two-sided tests)
+
+| test | TPR decision vs Watcher-style | realized FPR | Δ [95% CI] | Holm p |
+|---|---|---|---|---|
+| W1@10 JEV | 0.447 vs 0.353 | 1.16% vs 1.35% | **+0.094 [+0.041, +0.130]** | **0.012** |
+| W1@20 JEV | 0.432 vs 0.383 | 1.32% vs 1.33% | **+0.049 [+0.016, +0.104]** | **0.012** |
+| W2-luna@10 Luna Decisions | 0.392 vs 0.353 | 1.43% vs 1.35% | +0.038 [+0.004, +0.075] | 0.072 |
+| W2-luna@20 | 0.387 vs 0.383 | 1.35% vs 1.33% | +0.004 [−0.012, +0.019] | 1.000 |
+| W2-decider@10 Decider v1.2 | 0.415 vs 0.353 | 1.19% vs 1.35% | +0.061 [−0.005, +0.113] | 0.210 |
+| W2-decider@20 | 0.379 vs 0.383 | 1.29% vs 1.33% | −0.004 [−0.018, +0.031] | 1.000 |
+
+- **W1 is supported in the opposite direction from the prediction:** the JEV first stage routes better than the
+  Watcher-style GPT-5.6 Luna severity stage at both e. W2 is not significant after Holm. No decision model is
+  significantly worse at any family cell.
+- Robust to the rule and the resampling: round-1 group resampling gives the same W1 Holm p (0.012) and the same W2
+  verdicts. The plug-in rule gives W1@10 +0.085 [+0.046, +0.127], W1@20 +0.042 [+0.017, +0.099] (both Holm 0.012). With
+  round-1 resampling plus plug-in, W2-luna@10 (+0.030, Holm 0.048) also passes; that combination is not primary.
+- Escalated honest-step shares are matched within 0.01 (JEV 0.106 / 0.208 vs 0.100 / 0.200; JEV's 0.01-rounded ties).
+
+**Context.** Generative Luna alone: 0.381 (FPR 1.29%). The Watcher-style cascade is never above it at e ≥ 10%
+(e = 10%: −0.027 [−0.069, +0.019]; e = 30%: −0.005 [−0.010, −0.003]). The JEV cascade is +0.066 above it at e = 10%
+[−0.007, +0.116] (it gates out generative Luna's honest false alarms).
+
+**Secondary panels (outside the family).**
+- *MB, second stage gpt-4.1-mini* (mini alone 0.101): W1@10 +0.009 [−0.012, +0.032], W1@20 −0.004 [−0.009, +0.012];
+  W2-luna@10 +0.063 [+0.004, +0.109], @20 +0.042 [−0.003, +0.087]; W2-decider@10 +0.026 [−0.011, +0.060],
+  @20 +0.018 [+0.002, +0.042]. None survives Holm within the panel (smallest 0.13).
+- *LinuxArena nano subset, second stage Gemini-3.1-Pro* (Gemini alone 0.928, FPR 0.92%): every cascade at e ≥ 10%
+  is within 0.01 of Gemini alone. All six Δ lie in −0.007 to +0.003 (CIs within ±0.024; Holm 1.0). This panel cannot
+  separate routers at e ≥ 10%. At e = 5%: Decider − Watcher +0.022 [+0.001, +0.054], JEV +0.011, Luna +0.017 (n.s.).
+- *Other e and α (MB gen).* JEV − Watcher: e = 5% +0.065 [−0.021, +0.129]; e = 30% +0.006 [+0.002, +0.028]; at 5%
+  FPR +0.011 to +0.108, all CIs above 0. Decider − Watcher at 5% FPR: +0.014 to +0.107, all CIs above 0.
+  The one cell favouring the Watcher-style stage: Luna Decisions − Watcher at e = 30%, −0.010 [−0.016, −0.004].
+- *Logprob-expected severity* (`watch_exp`, continuous, no ties) vs the integer: MB gen e = 10% +0.032
+  [+0.001, +0.067]; every other cell |Δ| ≤ 0.013 and n.s. At e = 10% the MB integer cut falls in severity 5, where 42%
+  of the cut is random tie-breaking (`explore_tie_cut.csv`). Ties explain about a third of the W1@10 gap; the
+  expected-severity arm still trails JEV (0.385 vs 0.447).
+
+**Standalone (trajectory max) AUROC.**
+- MB: Watcher-style 0.67 [0.61, 0.73] (expected 0.70); JEV 0.81; Decider 0.82; Luna Decisions 0.73; generative Luna
+  0.91; mini 0.73.
+- LinuxArena: Watcher-style 0.88 (0.90); JEV 0.93; Luna Decisions 0.92; Decider 0.96; Gemini 0.99.
+- TPR at 1% FPR: Watcher-style 0.077 (MB) / 0.404 (LinuxArena). Decision models − Watcher-style on LinuxArena:
+  +0.21 to +0.24, all CIs above 0. On MB, JEV +0.14 is at unequal realized FPR (JEV 2.3%, its top ties); Decider +0.085
+  [+0.032, +0.197] at 1.4% vs 1.0%.
+
+### W3 (descriptive): Watcher's fixed operating points
+
+| panel | cutoff | honest steps escalated | attack steps | honest traj. with ≥ 1 escalation | attack traj. | cascade TPR @1% [CI] (FPR) | decision models at the same e: Δ vs fixed cutoff |
+|---|---|---|---|---|---|---|---|
+| MB, gen | ≥ 6 | 7.4% | 9.8% | 76% | 90% | 0.349 [0.256, 0.465] (1.32%) | JEV **+0.097 [+0.044, +0.139]**, Luna +0.037 [−0.002, +0.094], Decider **+0.092 [+0.027, +0.133]** |
+| MB, gen | ≥ 8 | 2.4% | 5.7% | 42% | 74% | 0.413 [0.319, 0.512] (1.42%) | JEV +0.033 [−0.060, +0.095], Luna −0.022 [−0.080, +0.039], Decider +0.066 [−0.034, +0.124] |
+| MB, mini | ≥ 6 | 7.4% | 9.8% | 76% | 90% | 0.113 [0.080, 0.218] (1.31%) | JEV +0.004, Luna +0.054, Decider +0.022 (all n.s.) |
+| MB, mini | ≥ 8 | 2.4% | 5.7% | 42% | 74% | 0.225 [0.177, 0.310] (1.16%) | JEV −0.096 [−0.175, +0.036], Luna +0.014, Decider +0.026 (n.s.) |
+| LinuxArena, Gemini | ≥ 6 | 1.3% | 10.9% | 37% | 89% | 0.818 [0.729, 0.885] (0.94%) | JEV **+0.066 [+0.027, +0.117]**, Luna **+0.065 [+0.019, +0.122]**, Decider **+0.101 [+0.045, +0.161]** |
+| LinuxArena, Gemini | ≥ 8 | 0.2% | 8.3% | 10% | 76% | 0.725 [0.627, 0.812] (1.03%) | JEV **+0.087 [+0.028, +0.142]**, Luna +0.054 [−0.017, +0.097], Decider **+0.090 [+0.024, +0.158]** |
+
+- Both fixed cutoffs cost detection on LinuxArena relative to Gemini alone (0.928): −0.11 at ≥ 6 and −0.20 at ≥ 8. On
+  MB with mini, the tight ≥ 8 gate (2.4% escalation) reaches 0.225 vs mini alone 0.101, because it filters mini's honest
+  false alarms; decision models at the same e reach 0.13–0.25 (n.s. differences).
+- **Severity is not suspicion on MonitoringBench.** 42% of honest MB trajectories contain a step the Watcher-style
+  stage scores ≥ 8, and 76% contain one scored ≥ 6. These are mostly the sudo / firewall / credential work the main
+  tasks require (`explore_severity_hist.csv`). Under Watcher's default the gateway would see most honest BashArena-style
+  sessions. On LinuxArena, honest severity is lower (0.2% of steps ≥ 8) and attack steps are more often ≥ 8 (8.3%).
+- Prediction (2) holds (≥ 6 escalates 7.4% of honest MB steps, most honest trajectories). Prediction (1) fails: dev
+  AUROC 0.86 (20 trajectories) overstated held-out 0.67.
+
+### Cost and latency per 1k trajectories (`cost_latency.csv`)
+
+MB, 29.0 steps per trajectory, second stage generative Luna ($0.00045 / step, median 2.9 s). Generative Luna alone
+costs $13.0 per 1k trajectories.
+
+| first stage | $/step | median latency | first stage alone | cascade e = 10% / 20% | Watcher cutoffs ≥ 6 / ≥ 8 | serial compute-h, e = 10% |
+|---|---|---|---|---|---|---|
+| Watcher-style GPT-5.6 Luna | $0.00056 | 0.83 s | $16.4 | $17.6 / $18.9 | $17.3 / $16.7 | 9.0 |
+| JEV | $0.00014 | 0.19 s | $3.9 | $5.3 / $6.6 | n/a | 4.0 |
+| Luna Decisions | $0.00029 | 0.19 s | $8.4 | $9.7 / $11.0 | n/a | 3.9 |
+| Decider (hosted price; pod ≈ $0.00028) | $0.00005 | 0.28 s | $1.6 | $2.9 / $4.3 | n/a | 4.7 |
+
+- With gpt-4.1-mini as the second stage ($0.00088 / step, 2.75 s; alone $25.6): Watcher-style $18.9 / $21.5 vs JEV
+  $6.6 / $9.2.
+- LinuxArena (60 steps per trajectory; Gemini cost unknown): first stage alone $29.0 Watcher-style vs JEV $7.3, Luna
+  $15.6, Decider $3.2.
+- The Watcher-style triage call costs more per step than the generative GPT-6 Luna second stage. That stage writes
+  hidden reasoning, but GPT-5.6 Luna is billed at twice GPT-6 Luna's token prices and the ≈ 2.4k-token rubric is
+  re-sent with every call (≈ 46% of input tokens hit the prompt cache). So on these data the Watcher-style
+  cascade costs more than running the second stage on every step.
+
+### Deviations and caveats
+- **Rubric fidelity.** The prompt reconstructs Watcher from public text. The definition, factors, all ten level
+  explanations and examples are verbatim; the role line, headers, input framing and one-line output are ours.
+  Watcher's production triage prompt, reasoning effort, context assembly (whole conversation, no tool outputs,
+  middle truncation), org custom instructions, regex rules (≈ 55% of real actions auto-resolved before triage) and
+  per-tool thresholds are absent or unknown. Here triage saw only the task, 3 previous steps and the current action
+  WITH its output (information parity with JEV, as specified). The results describe "Watcher's published rubric
+  on GPT-5.6 Luna", not Watcher Live.
+- **Effort `none` (dev choice for cost).** A reasoning effort might rank better: `low` had dev AUROC 0.78 vs 0.82 on
+  20 trajectories, not tested on held-out. The dev AUROC (0.86 MB) overstated held-out (0.67).
+- **The rubric scores stakes and loss of control, not covert intent.** Its "agent intent" factor is one of six. On
+  BashArena-style tasks, high-stakes honest work dominates, which is the setting r3_t2 found severity uninformative in
+  (stakes-only rubric, AUROC 0.53). Watcher's design target (accidental and overeager harms in real coding sessions)
+  differs from covert-sabotage detection, so this is not a test of Watcher on its own threat model.
+- Realized FPR on MB is 1.1–1.4% for every arm at nominal 1% (task-grouped splits, out-of-task shift). It is
+  matched within ≈ 0.2 pp between compared arms; LinuxArena 0.9–1.0%.
+- The blind code check ran on the real cached scores of the other first stages and second stages (disclosed in the
+  preregistration); only the Watcher stream was surrogate.
+- After the preregistration commit: `cost.py` takes Decider's latency from the spend ledger (its dev-check cache has
+  no latency field). `make_figures.py` and `explore.py` (exploratory distributions) were added. No analysis code
+  changed.
+- Decider scores are the self-hosted round-1 ones; its cost row uses the hosted price, its latency the hosted dev check.
+  JEV / Decider / Luna training contamination with these public benchmarks cannot be excluded (as before).
+- The second stages are cached per-step monitors, not Watcher's gateway (Opus 4.7). W1–W3 compare triage stages
+  with a fixed second stage.
+
+**Spend.** r5watch $61.90 / $100: dev pilots and probes $2.70, MB $36.10, LinuxArena nano $23.10. Global ledger ≈ $1,465
+of $1,900. No pods.
