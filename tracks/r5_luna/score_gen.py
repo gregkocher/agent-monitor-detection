@@ -4,7 +4,8 @@ model openai/gpt-6-luna via chat completions, API settings as the round-4 r4cs L
 completion cap 4,000 tokens because hidden reasoning counts against it; no logprobs are offered, so the step score is
 the generated integer 0-10). Track r5luna. Resumable cache data/r5_luna/cache/gen_<source>.sqlite.
 
-Sets: dev (--dev-n per source from dev_attack/honest samples) or the preregistered H5c subset (h5c_subset.json).
+Sets: dev (--dev-n per source from dev_attack/honest samples), the preregistered H5c subset (h5c_subset.json), or
+mb_all (every MonitoringBench evaluation trajectory; the strong-second-stage addendum). Same prompt and cache for all.
 
     unset VIRTUAL_ENV; uv run python -m tracks.r5_luna.score_gen --set dev --sources mb,akshn_basharena_opus46 --dev-n 3,3
     unset VIRTUAL_ENV; uv run python -m tracks.r5_luna.score_gen --set h5c --yes
@@ -103,7 +104,7 @@ def load_gen(src, trajs, max_steps=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--set", required=True, choices=["dev", "h5c"])
+    ap.add_argument("--set", required=True, choices=["dev", "h5c", "mb_all"])
     ap.add_argument("--sources")
     ap.add_argument("--dev-n", default="3,3")
     ap.add_argument("--max-steps-per-traj", type=int)
@@ -114,6 +115,8 @@ def main():
     a = ap.parse_args()
     spl = json.load(open(HERE / "splits.json"))["sources"]
     sub = json.load(open(SUBSET_FILE)) if a.set == "h5c" else None
+    if a.set == "mb_all":   # addendum: every MonitoringBench evaluation trajectory (honest + attacks)
+        sub = {"sources": {"mb": {"honest": spl["mb"]["eval_honest"], "attack": spl["mb"]["eval_attack"]}}}
     srcs = a.sources.split(",") if a.sources else (list(sub["sources"]) if sub else ["mb"])
     plans, grand = [], 0.0
     for src in srcs:

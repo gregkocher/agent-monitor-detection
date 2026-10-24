@@ -15,15 +15,15 @@ for pass in 1 2 3 4 5 6 7 8 9 10; do
   L=data/r5_luna/logs/pass_${chain}.log
   : > $L
   if [ "$chain" = "decisions" ]; then
-    uv run python -m $S --model luna --set eval --subset nano --sources mb,$AK --yes >> $L 2>&1
-    uv run python -m $S --model luna --set eval --subset all --sources akshn_basharena_opus46 --yes >> $L 2>&1
-    uv run python -m $S --model luna --set eval --mode full --subset all --sources akshn_basharena_opus46 --yes >> $L 2>&1
-    uv run python -m $S --model luna --set eval --mode full --subset nano --sources akshn_linuxarena --yes >> $L 2>&1
-    uv run python -m $S --model jev --set eval --mode full --subset all --only-truncated --sources akshn_basharena_opus46 --yes >> $L 2>&1
-    uv run python -m $S --model jev --set eval --mode full --subset nano --only-truncated --sources akshn_linuxarena --yes >> $L 2>&1
-    uv run python -m $S --model luna --set eval --subset all --sources $AK --yes >> $L 2>&1
+    uv run python -m $S --model luna --set eval --subset nano --sources mb,$AK --yes --concurrency ${CONC:-48} --rps ${RPS:-40} >> $L 2>&1
+    uv run python -m $S --model luna --set eval --subset all --sources akshn_basharena_opus46 --yes --concurrency ${CONC:-48} --rps ${RPS:-40} >> $L 2>&1
+    uv run python -m $S --model luna --set eval --mode full --subset all --sources akshn_basharena_opus46 --yes --concurrency ${CONC:-48} --rps ${RPS:-40} >> $L 2>&1
+    uv run python -m $S --model luna --set eval --mode full --subset nano --sources akshn_linuxarena --yes --concurrency ${CONC:-48} --rps ${RPS:-40} >> $L 2>&1
+    uv run python -m $S --model jev --set eval --mode full --subset all --only-truncated --sources akshn_basharena_opus46 --yes --concurrency ${CONC:-48} --rps ${RPS:-40} >> $L 2>&1
+    uv run python -m $S --model jev --set eval --mode full --subset nano --only-truncated --sources akshn_linuxarena --yes --concurrency ${CONC:-48} --rps ${RPS:-40} >> $L 2>&1
+    uv run python -m $S --model luna --set eval --subset all --sources $AK --yes --concurrency ${CONC:-48} --rps ${RPS:-40} >> $L 2>&1
   else
-    uv run python -m tracks.r5_luna.score_gen --set h5c --yes >> $L 2>&1
+    uv run python -m tracks.r5_luna.score_gen --set h5c --yes --concurrency ${CONC:-48} >> $L 2>&1
   fi
   grep -E "todo=|done|Budget|Error|error" $L | cut -c1-200 | tail -30
   t=$(todo $L)
