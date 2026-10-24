@@ -229,11 +229,14 @@ def main():
     ap.add_argument("--boot", type=int, default=1000)
     ap.add_argument("--quick", action="store_true", help="8 splits / 60 replicates (code check only)")
     ap.add_argument("--no-task", action="store_true", help="skip the task-level resampling pass")
+    ap.add_argument("--interim", action="store_true", help="write to data/r5_luna/interim (scoring incomplete)")
     ap.add_argument("--blind", action="store_true",
                     help="code check without reading Luna outcomes: luna / luna_full / gen are replaced by noisy JEV")
     a = ap.parse_args()
     S, B = (8, 60) if a.quick else (a.splits, a.boot)
     out = (BOOT.parent / ("blind_codecheck" if a.blind else "quick")) if (a.quick or a.blind) else OUT
+    if a.interim:
+        out = BOOT.parent / "interim"
     out.mkdir(parents=True, exist_ok=True)
     BOOT.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
