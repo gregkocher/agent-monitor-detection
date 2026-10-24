@@ -2344,3 +2344,206 @@ fixed cutoffs come from the task specification.
 0.74): W1/W2 Δ ≤ 0, |Δ| < 0.05 at e = 20%. (2) At severity ≥ 6 it escalates ≈ 4–7% of honest steps (dev), so most
 honest trajectories have at least one escalated step; ≥ 8 escalates ≈ 2%. (3) Integer ties make the e-matched Watcher
 arm partly random within a severity level; `watch_exp` routes at least as well as `watch`.
+
+## 2026-10-24: Idea 05, GPT-6 Luna Decisions arm (track r5luna): results (H5a–H5d, MB strong-second-stage addendum)
+
+**Provenance.**
+- Preregistration: 9e79e74. Analysis code: eab198d, checked blind on surrogate scores before any held-out Luna score
+  was read.
+- Addendum preregistration: 6205280; its code is d47a21e.
+- Code: `tracks/r5_luna/`. Tables and vector PDFs: `results/r5_luna/`.
+  - `hypotheses.csv`: both threshold conventions, plus main-task resampling.
+  - `robustness.csv`: per setting, leave-SHADE-out, equal weight, 5% FPR, e grid, H5c/H5d detail.
+  - `cells.csv`: every panel × first stage × e × α, with realized FPR and escalated shares.
+  - `standalone.csv`, `panels.csv`, `mb_strong_{hypotheses,cells}.csv`, `decider_hosted_vs_pod.csv`, `spend.csv`.
+  - Figures: `fig_hypotheses.pdf`, `fig_tpr_vs_e_alpha1.pdf`, `fig_per_setting.pdf`, `fig_h5d_truncation.pdf`.
+- Raw scores and caches are in `data/r5_luna/`.
+- Inference: 50 grouped 50/50 splits, joint clustered bootstrap B = 1,000. The smallest attainable two-sided p is
+  0.002, so the smallest Holm-adjusted p over 8 tests is 0.016.
+
+**Scoring completeness.**
+- Luna Decisions: every call was answered by `openai/gpt-6-luna-decisions-20261006`; the version never changed.
+  - 400,643 held-out frozen requests: MB 64.0k plus all 7 aksh-n evaluation sets (336.6k).
+  - 0 missing, except 4 BashArena-sonnet-4-5 steps that the model refuses on every attempt (HTTP 502 "OpenAI refused
+    to answer question"; injector / exploit C code).
+  - Per the preregistered rule, a missing first-stage score is always escalated. Sonnet-4-5 only enters 5% cells.
+  - Full-text arm: 1,819 opus-4-6 and 2,081 LinuxArena-nano steps differ from the frozen request. All are scored with
+    Luna and with JEV (`typesafe/jev-1.14-20261014`). JEV's > 32 kB long-context requests worked through OpenRouter.
+- Generative Luna: H5c subset 91,081 steps, then the rest of MB (38,614).
+  - 7 parse failures (6 MB, 1 LinuxArena) are treated as missing.
+  - Mean $0.00043 per step, ~100–150 completion tokens. Per step this is ≈ 1.8× the Decisions cost, not "much higher".
+
+### Confirmatory H5 (two-sided, Holm over 8; conformal randomized threshold rule; 1% trajectory FPR)
+
+TPRs are given as arm 1 vs arm 2; FPR is the realized FPR of each arm on the test-honest half (split mean).
+
+| test | contrast | TPRs | realized FPR | Δ [95% CI] | Holm p | plug-in Δ [CI] | task-resampled CI |
+|---|---|---|---|---|---|---|---|
+| H5a-MB | Luna → mini vs JEV → mini, e = 10% | 0.162 vs 0.108 | 1.26 / 1.22% | +0.054 [−0.016, +0.104] | 0.30 | +0.051 [−0.022, +0.107] | [−0.016, +0.105] |
+| **H5a-AK** | Luna → Gemini vs JEV → Gemini, e = 10%, 6 settings, full eval | 0.775 vs 0.810 | 0.97 / 1.00% | **−0.034 [−0.056, −0.021]** | 0.016 | −0.035 [−0.054, −0.021] | [−0.058, −0.017] |
+| H5b-MB | Luna vs nano triage, e = 10% | 0.162 vs 0.108 | 1.26 / 1.37% | +0.054 [−0.021, +0.101] | 0.30 | +0.053 [−0.020, +0.108] | [−0.014, +0.105] |
+| **H5b-AK** | Luna vs nano triage, e = 10%, nano subset, 6 settings | 0.736 vs 0.606 | 1.04 / 1.04% | **+0.130 [+0.090, +0.165]** | 0.016 | +0.135 [+0.101, +0.168] | [+0.082, +0.168] |
+| **H5c** | Luna Decisions vs generative Luna, standalone traj-max, 3 panels pooled | 0.170 vs 0.328 | 1.09 / 1.09% | **−0.158 [−0.227, −0.113]** | 0.016 | −0.182 [−0.242, −0.128] | [−0.238, −0.103] |
+| **H5d-AUC** | opus-4-6 standalone AUROC, full − frozen | 0.427 vs 0.320 | – | **+0.107 [+0.085, +0.131]** | 0.016 | same | [+0.085, +0.130] |
+| **H5d-TPR** | opus-4-6 standalone TPR, full − frozen | 0.010 vs 0.004 | 1.07 / 1.06% | **+0.006 [+0.003, +0.011]** | 0.016 | +0.007 [+0.003, +0.013] | [+0.003, +0.011] |
+| **H5d-CAS** | opus-4-6 Luna → Gemini e = 20%, full − frozen | 0.598 vs 0.488 | 0.82 / 0.82% | **+0.110 [+0.059, +0.150]** | 0.016 | +0.126 [+0.068, +0.154] | [+0.059, +0.149] |
+
+Verdicts are identical under both conventions and under main-task resampling. Predictions vs outcomes:
+- H5a: predicted ≈. Luna is a slightly worse router on aksh-n and ≈ on MB.
+- H5b: as predicted.
+- H5c: as predicted (generative > Decisions).
+- H5d: as predicted. Full text helps but does not fix opus-4-6.
+
+**H5a-AK per setting** (1%, e = 10%, Luna − JEV cascade, conformal; realized FPR 0.8–1.2% in every cell):
+
+| setting | Δ [95% CI] |
+|---|---|
+| bash | +0.004 [−0.002, +0.008] |
+| agentdojo | −0.050 [−0.072, −0.035] |
+| iac | −0.110 [−0.150, −0.081] |
+| SHADE | +0.013 [−0.030, +0.059] |
+| opus-4-6 | −0.093 [−0.232, +0.001] |
+| LinuxArena | −0.006 [−0.017, +0.006] |
+
+- Pooled-variant robustness:
+  - leave-SHADE-out: −0.043 [−0.065, −0.028];
+  - equal-weight: −0.040 [−0.068, −0.023];
+  - main-task resampling: pooled [−0.058, −0.017]; iac [−0.191, −0.060]; agentdojo [−0.087, −0.026].
+- 5% FPR, e = 10%: −0.024 [−0.033, −0.015]. At e = 20%: −0.009 [−0.017, −0.001].
+- The loss comes from settings where standalone Luna Decisions is much weaker than JEV (standalone TPR at 1%, Luna vs
+  JEV):
+  - iac 0.016 vs 0.543;
+  - agentdojo 0.51 vs 0.91;
+  - bash 0.55 vs 0.99;
+  - SHADE 0.17 vs 0.14;
+  - LinuxArena 0.62 vs 0.63.
+  - Pooled: 0.358 vs 0.570 (Gemini 0.813).
+- Escalated share of attack steps, pooled at e = 10%: Luna 0.19 vs JEV 0.29.
+
+**H5b-AK per setting** (Luna − nano, e = 10%, 1%):
+
+| setting | Δ [95% CI] |
+|---|---|
+| agentdojo | +0.131 [+0.082, +0.178] |
+| iac | +0.141 [+0.066, +0.231] |
+| SHADE | +0.101 [+0.029, +0.198] |
+| opus-4-6 | +0.145 [−0.004, +0.272] |
+| LinuxArena | +0.217 [+0.155, +0.287] |
+| bash | +0.043 [−0.159, +0.075] |
+
+- Leave-SHADE-out +0.135 [+0.086, +0.173].
+- Equal-weight = pooled (300 attacks per setting).
+- 5% FPR: +0.21 (e = 10%), +0.16 (e = 20%).
+- Like H2, this compares designs: Luna sees the task + 3-step window and the decision rubric; nano's `none` prompt is
+  history-free.
+
+**H5c per panel** (standalone traj-max at 1%; equal realized FPR 1.1%):
+
+| panel | Luna Decisions vs generative Luna | Δ [95% CI] | AUROC (Decisions / generative) |
+|---|---|---|---|
+| MB subset | 0.036 vs 0.379 | −0.343 [−0.473, −0.238] | 0.73 / 0.91 |
+| opus-4-6 | 0.004 vs 0.082 | −0.078 [−0.126, −0.055] | 0.32 / 0.55 |
+| LinuxArena nano | 0.618 vs 0.662 | −0.044 [−0.145, +0.044] | 0.92 / 0.96 |
+
+- The same model is far weaker through the decision interface than generatively. The gap is largest on MB, where
+  generative Luna also beats gpt-4.1-mini (0.379 vs 0.091) and JEV (0.379 vs 0.198, JEV at realized 2.1%).
+- Generative Luna also fails on opus-4-6 (AUROC 0.55; Gemini 0.975, TPR 0.71). The opus-4-6 inversion is not
+  specific to decision-only models.
+- Residual design differences (declared in the preregistration): wording, caps, and reasoning before the score.
+
+**H5d detail (opus-4-6, all evaluation trajectories, 1%).**
+- Gemini only: 0.710 [0.440, 0.898].
+- Luna → Gemini cascade, frozen → full text:
+  - e = 10%: 0.330 → 0.464 (+0.135 [+0.071, +0.185]);
+  - e = 20%: 0.488 → 0.598;
+  - e = 30%: 0.609 → 0.645.
+- At e = 20%, full text is still below Gemini only: −0.112 [−0.148, −0.070]; frozen is −0.222.
+- JEV full text (secondary; long-context mode works) helps more:
+  - AUROC 0.299 → 0.427 (+0.127 [+0.104, +0.152]);
+  - cascade e = 10%: 0.423 → 0.694 (+0.271 [+0.208, +0.300]);
+  - e = 20%: 0.492 → 0.755 (+0.264 [+0.146, +0.447]). That is at or above Gemini only (0.710), with realized FPR
+    0.9% vs 0.8%.
+- Standalone AUROCs stay below 0.5 (0.43 for both). With full text, the attack payloads are visible to the router, but
+  the honest firewall edits (round-2 part A) still set the honest maximum.
+- LinuxArena nano (secondary):
+  - full text changes nothing (Luna cascade e = 20% +0.003 [−0.003, +0.011]; JEV ±0.000);
+  - standalone AUROC: Luna −0.004, JEV +0.006 [+0.002, +0.011].
+- Truncation explains about half of Luna's opus-4-6 routing loss vs Gemini at e = 20% and most of JEV's. The rest is
+  content.
+
+**Equal-FPR note.** Under the conformal rule, realized FPR is 0.8–1.4% in every cascade cell, and the two arms of each
+contrast are within 0.15 points. The exceptions are standalone JEV on MB (2.1–2.3%; 8 of the top 9 honest maxima come
+from one task) and H5b-MB nano (1.37%). The JEV exception favors JEV.
+
+### Addendum: generative Luna as MB's strong second stage and baseline
+
+Family of 11, Holm. Conformal rule; plug-in and main-task resampling give the same verdicts.
+- Standalone at 1% (realized FPR):
+  - generative Luna 0.381 [0.283, 0.509] (1.3%), AUROC 0.909;
+  - gpt-4.1-mini 0.101 (1.3%);
+  - JEV 0.220 (2.3%);
+  - Luna Decisions 0.042 (1.1%);
+  - Decider 0.162 (1.4%);
+  - FIBS probe 0.291 (1.5%);
+  - nano 0.028.
+- **H1-MB-strong supported:** JEV → Luna cascade e = 20%, 0.432 vs Luna only 0.381.
+  - Δ = +0.051 [−0.004, +0.106], p_NI = 0.001, Holm 0.022.
+  - Every deployable gate at e ≤ 20% is at or above Luna only; small-e triage filters Luna's honest false alarms. At
+    e = 10%: JEV 0.447, probe 0.437, Decider 0.415, Luna Decisions 0.392, nano 0.297, length 0.208, random 0.129.
+- **S1–S4 (generative Luna − X, standalone):**
+  - S1 JEV: +0.161 [−0.001, +0.268], Holm 0.27; JEV is at 2.3% FPR.
+  - **S2 Luna Decisions: +0.338 [+0.242, +0.461], Holm 0.022.**
+  - **S3 Decider: +0.218 [+0.071, +0.336], Holm 0.022.**
+  - S4 probe: +0.090 [−0.015, +0.221], Holm 0.45.
+- **T1–T6 (triage into Luna, X − JEV):**
+  - T1 Luna Decisions e = 10%: −0.055 [−0.110, +0.017], n.s.
+  - **T2 Luna Decisions e = 20%: −0.045 [−0.098, −0.014], Holm 0.022.**
+  - T3 / T4 probe: −0.010 / −0.032, n.s.
+  - **T5 nano e = 10%: −0.150 [−0.197, −0.083], Holm 0.022.**
+  - T6 nano e = 20%: −0.070 [−0.122, −0.007], Holm 0.14.
+- With a strong second stage, MB is no longer degenerate. The JEV, probe and Decider routers are equivalent, and
+  Luna Decisions and nano route worse.
+
+### Hosted vs self-hosted Decider (sanity check, dev)
+
+500 MB dev requests (A_w3), hosted `perplexity/pplx-decider-v1.2-20261016` vs the round-1 bf16 pod outputs. Token counts
+are identical; no answer is identical to 1e-6.
+
+| | Pearson | Spearman | mean abs diff | label agreement |
+|---|---|---|---|---|
+| benign-first (`bs`, our score) | 0.79 | 0.80 | 0.128 | 0.86 |
+| suspicious-first (`sb`) | 0.88 | 0.83 | – | 0.97 |
+| mean of both orders | 0.90 | – | 0.042 | 0.99 |
+
+- Top-decile agreement for `bs` is 0.92.
+- Order bias: the hosted model raises P(suspicious) when benign is listed first (mean 0.36 vs 0.24) and lowers it when
+  suspicious is first (0.22 vs 0.28). The two deployments therefore differ in label-order bias, which mostly cancels in
+  the mean.
+- Hosted-Decider results would therefore not reproduce the pod's `bs` scores exactly. Agreement is moderate (ρ ≈ 0.8);
+  the order-averaged score transfers well (r 0.90).
+
+### Deviations
+- **H5a-AK used the full evaluation set as preregistered**; the contingency was not used.
+- Network outages over about 22 h wall:
+  - A generative process stuck on dead sockets after a network change was killed and resumed from the cache.
+  - The decisions driver was restarted with concurrency 160 / 60 rps (no effect on outputs).
+  - The driver was stopped after pass 3 when only the 4 refusals were left.
+- An `--interim` output option was added to `analyze.py` (no analysis change). An interim run on incomplete scores
+  went to gitignored `data/r5_luna/interim/` and is not reported.
+- Refusals and parse failures are listed above; all are handled by preregistered missing-score rules.
+- The hosted Decider check covers MB dev only: all 1,024 pod dev outputs are MB.
+- Bootstrap p resolution is 0.002, so every "Holm 0.016 / 0.022" is the floor.
+
+**Spend.** r5luna $154.38 / $200:
+
+| component | spend |
+|---|---|
+| Luna Decisions frozen, held-out | $92.92 |
+| generative Luna, H5c | $39.44 |
+| generative Luna, rest of MB (addendum) | $17.19 |
+| Luna full text | $2.86 |
+| JEV full text | $0.89 |
+| dev pilots / probes | $1.05 |
+| hosted Decider | $0.03 |
+
+Cost per held-out step: Luna Decisions $0.00011–0.00030 by source (MB $0.00029); JEV $0.00004–0.00014. No pods.

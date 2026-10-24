@@ -1,0 +1,12 @@
+component,calls,cost_usd,input_tokens
+H5a/b: openai/gpt-6-luna-decisions frozen (held-out),400643,92.92,929198275
+H5c: generative Luna (held-out),91081,39.44,273582546
+H5d: openai/gpt-6-luna-decisions full-text (held-out),7087,2.86,28606287
+H5d: typesafe/jev-1.14 full-text (held-out),3900,0.89,21240011
+"addendum: generative Luna, rest of MB (held-out)",38614,17.19,117684828
+dev: API probe / repeatability,122,0.03,306662
+dev: generative Luna,170,0.08,537415
+dev: openai/gpt-6-luna-decisions frozen,3936,0.88,8778482
+dev: openai/gpt-6-luna-decisions full-text,76,0.04,406377
+dev: typesafe/jev-1.14 full-text,76,0.02,419637
+hosted Decider check (dev),500,0.03,1343994

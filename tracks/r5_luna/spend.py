@@ -18,6 +18,8 @@ def component(tag, model):
         return f"dev: {model} {'full-text' if ':full:' in tag else 'frozen'}"
     if tag.startswith("r5luna:gen:dev"):
         return "dev: generative Luna"
+    if tag.startswith("r5luna:gen:mb_all"):
+        return "addendum: generative Luna, rest of MB (held-out)"
     if tag.startswith("r5luna:gen:h5c"):
         return "H5c: generative Luna (held-out)"
     if "decider_dev" in tag:
