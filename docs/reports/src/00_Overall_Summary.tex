@@ -1,216 +1,226 @@
 \documentclass[11pt]{article}
 \input{preamble}
+\usepackage{xspace}
+\newcommand{\tC}{\textsf{\scriptsize\textcolor{ForestGreen}{[C]}}\xspace}
+\newcommand{\tE}{\textsf{\scriptsize\textcolor{ink2}{[E]}}\xspace}
+\newcommand{\ci}[2]{\,[#1,\,#2]}
 \title{\textbf{Detection-Theoretic Decision Rules for AI-Agent Monitors}\\[4pt]
-\large Overall summary of three rounds of experiments, a white-box pilot, and two validity audits}
-\date{October 22, 2026 (supersedes the October 21 version)}
+\large Overall summary: four ideas over four rounds, a white-box track, decision-only first-stage monitors, three validity audits and a threshold-convention fix}
+\date{October 24, 2026 (supersedes the October 22 version)}
 \begin{document}
 \maketitle
 \vspace{-1.2em}
 
-\keybox{\textbf{In one paragraph.} AI-control monitoring has improved its \emph{monitors} (LLM judges, prompts, probes) much more than its \emph{decision layer}: the rule that turns per-step scores into audit decisions. Almost every system takes the maximum over steps and compares it with one global honest-run quantile. Starting from detection theory (Neyman--Pearson, CFAR, CUSUM, sequential tests), we asked three questions:
+\keybox{\textbf{In one paragraph.} AI-control monitoring has improved its \emph{monitors} (LLM judges, prompts, probes) much more than its \emph{decision layer}, the rule that turns per-step scores into audit decisions. Almost every system takes the maximum over steps and compares it with one global honest-run quantile. Starting from detection theory (Neyman--Pearson, CFAR, CUSUM, sequential tests, cascades), we asked five questions:
 \begin{enumerate}[leftmargin=1.2em]
 \item Do accumulating rules beat max at a matched false-alarm budget?
 \item Should thresholds be set per context?
 \item Can an attacker who knows the detector game it?
+\item Can a trusted open model's activations (white-box probes) feed the same decision layer?
+\item Can a cheap decision-only model (JEV and similar) triage which steps an LLM monitor reads?
 \end{enumerate}
-We also ran a white-box pilot that feeds probe scores from an open model into the same decision layer. Over three rounds of experiments, followed by two independent audits that re-derived the headline numbers and corrected several claims, the surviving picture is:
+After four rounds, preregistered confirmatory tests, three independent audits and a re-run of every headline under an exact-FPR (conformal) threshold rule, the picture is:
 \begin{itemize}[leftmargin=1.2em]
-\item \textbf{max} (or top-3 sum) remains the robust default;
-\item accumulation helps only in narrow settings;
-\item \textbf{CFAR is the wrong per-context rule against an attacker who chooses where to act}, while damage-equalizing (Stackelberg) allocation is better at a 5\% budget;
-\item \textbf{LLM rewriting of attacks dominates detector-aware red-teaming}, so an uninformed-rewrite control is essential;
-\item a \textbf{probe read on a follow-up question by an open trusted reader beats a cheap LLM monitor at 1\% FPR}, and probe triage nearly doubles detection while calling the LLM on 13\% of steps.
+\item \textbf{max remains the robust default}. Accumulation does not generalize across monitor families.
+\item \textbf{CFAR is the wrong per-context rule} against an attacker who chooses where to act. Damage-equalizing (Stackelberg) allocation beats global at 5\%. Its preregistered 1\% gain depends on SHADE, and its CI includes 0 under main-task resampling.
+\item \textbf{Detector-aware attacks show no measurable strategy effect}, and execution replay shows that an LLM validity judge does not predict whether an attack works.
+\item \textbf{A white-box probe beats a cheap LLM monitor}: the FIBS follow-up probe read by a trusted Qwen3.5-27B replicated on 1{,}000 held-out attacks ($+0.194$ TPR at 1\% FPR).
+\item \textbf{Decision-model triage works}:
+  \begin{itemize}[leftmargin=1em]
+  \item it routes better than nano-LLM and Watcher-style generative triage;
+  \item a JEV$\to$strong-monitor cascade keeps the strong monitor's detection at half the cost;
+  \item the same model is much weaker through the decision interface than generatively.
+  \end{itemize}
 \end{itemize}}
 
 \tableofcontents
 
 \section{What was done}
 \begin{enumerate}
-\item \textbf{Literature review.} We read 92 arXiv papers in full and 101 lab and community sources (Redwood, Apollo, UK AISI, Anthropic, OpenAI, GDM, METR, security vendors), and wrote a separate review of white-box monitoring. We ranked 10 ideas and ran the top three plus a white-box pilot.
-\item \textbf{Infrastructure.} The private repository \texttt{gregkocher/agent-monitor-detection} contains:
+\item \textbf{Literature review.} We read 92 arXiv papers in full and 101 lab and community sources, and wrote separate notes on white-box monitoring and on decision-only models. We ranked 10 ideas, ran the top three, then added a white-box track and Idea 05.
+\item \textbf{Infrastructure} (private repository \texttt{gregkocher/agent-monitor-detection}):
   \begin{itemize}
-  \item loaders for MonitoringBench, Honest-550, the LinuxArena 12-monitor sweep, aksh-n per-step labels, ScaleAI MRT, persistent-state VibeCoding and MOLE;
-  \item a per-step OpenRouter scoring harness (logprob-expected scores, resumable cache);
+  \item loaders for MonitoringBench, Honest-550, the LinuxArena 12-monitor sweep, aksh-n per-step settings, ScaleAI MRT, persistent-state VibeCoding and MOLE;
+  \item a per-step OpenRouter scoring harness, including the Decisions API;
   \item a detector library calibrated at matched false-alarm budgets;
   \item a spend ledger;
-  \item a trusted-reader white-box pipeline on RunPod GPUs.
+  \item a trusted-reader white-box pipeline and a self-hosted decision model on RunPod GPUs;
+  \item BashArena execution replay with the official side-task scorers.
   \end{itemize}
-\item \textbf{Three rounds of experiments} per idea; Section~\ref{sec:ideas} lists them.
-\item \textbf{Two independent validity audits.} Each re-derived the headline numbers with its own minimal code and checked calibration leakage, grouping, confounds, onset labels, attack validity, spend matching, selection effects and report/table consistency. A fixer re-analyzed every affected result with corrected methods:
+\item \textbf{Four rounds per idea.} Round 4 was preregistered for Ideas 1--3 and the white-box track. Idea 05 had three preregistered arms and one addendum (Section~\ref{sec:ideas}).
+\item \textbf{Three independent validity audits.} Each re-derived the headline numbers with its own minimal code. They checked calibration leakage, grouping, confounds, onset labels, attack validity, spend matching, selection effects, preregistration timing, truncation and reasoning leakage. Corrections are tracked claim by claim in \texttt{results/fixes/}, \texttt{results/audit2/} and \texttt{results/audit3/corrections.csv}.
+\item \textbf{Threshold-convention fix.} The third audit found that the plug-in randomized threshold used everywhere runs one calibration point hot for continuous scores (Section~\ref{sec:pitfalls}). Every headline was re-run under a conformal randomized rule with exact expected FPR (\texttt{results/fixes2/headline\_threshold\_rerun.csv}, 57 rows). Seven conclusions changed; the reports and the figure below use the corrected numbers.
+\end{enumerate}
+
+\section{Most important and most novel findings}\label{sec:findings}
+\begin{enumerate}
+\item \textbf{A white-box probe on a trusted reader beats a cheap LLM monitor, confirmed} \tC. The FIBS axial probe, read on a per-step follow-up question by a trusted Qwen3.5-27B, raises TPR at 1\% trajectory FPR over \texttt{gpt-4.1-mini} by $+0.194\ci{+0.089}{+0.288}$ on 1{,}000 held-out MonitoringBench attacks (0.26 vs 0.06). With both monitors bisected to exactly 1.00\% FPR the gain is $+0.164$. The pilot found the same ($+0.204$), and probe triage plus the LLM gains $+0.123$ while calling the LLM on 13\% of steps \tE. The comparator is a cheap monitor, and the replication covers attack structures S1--S3 only.
+\item \textbf{Decision-model triage} (Idea 05).
   \begin{itemize}
-  \item a single-resampling paired bootstrap clustered by task or account, including calibration noise;
-  \item true spend matching;
-  \item like-for-like attacker arms;
-  \item strict validity;
-  \item prompts matched except for the variable under test.
+  \item \emph{It beats cheap generative triage at equal escalation.} JEV beats a \texttt{gpt-4.1-nano} first stage by $+0.170\ci{+0.131}{+0.201}$ on aksh-n \tC. This compares first-stage designs: JEV saw a three-step window, nano did not. On MonitoringBench into generative GPT-6 Luna, JEV beats a Watcher-style GPT-5.6 Luna severity stage by $+0.093\ci{+0.041}{+0.130}$ ($e=10\%$) and $+0.049\ci{+0.016}{+0.104}$ ($e=20\%$) \tC. That stage used Watcher's published rubric, not Watcher Live. The Watcher-style triage call also costs more than running generative Luna on every step.
+  \item \emph{A cascade into a strong monitor keeps its detection on MonitoringBench.} JEV$\to$generative Luna at $e=20\%$ is non-inferior to Luna on every step (0.432 vs 0.381, $+0.051\ci{-0.004}{+0.106}$) \tC, at about half the cost (\$6.6 vs \$13.0 per 1{,}000 trajectories). Superiority is not shown.
+  \item \emph{With the dataset's Gemini monitor, the pooled non-inferiority is a cancellation.} The pooled estimate is $+0.005$, made of SHADE $+0.18$ and BashArena-opus-4-6 $-0.22$. It is not non-inferior without SHADE or at 5\% FPR.
+  \item \emph{The interface penalty.} The same model, GPT-6 Luna, is far weaker through the decision interface than generatively: standalone TPR 0.17 vs 0.33 pooled over three panels ($-0.158\ci{-0.227}{-0.113}$) and 0.04 vs 0.38 on MonitoringBench \tC. Luna Decisions also routes worse than JEV ($-0.034$) \tC.
   \end{itemize}
-  Corrections are tracked claim by claim in \texttt{results/fixes/corrections.csv} and \texttt{results/audit2/corrections.csv}.
+\item \textbf{Stackelberg vs CFAR, and the SHADE dependence} (Idea 2). CFAR, which equalizes FPR per context, is the worst allocation against an attacker who picks the context: $-0.280$ at 1\% with exact spend matching \tE. Stackelberg (damage-equalizing) beats global at 5\% ($+0.076\ci{+0.026}{+0.124}$) \tE. The preregistered 1\% test was met, $+0.107\ci{+0.024}{+0.152}$ \tC, but the informed attacker picks SHADE (5 main tasks) in every split. With main-task resampling the CI is $[-0.003, +0.251]$.
+\item \textbf{Max is hard to beat} (Idea 1 and the white-box track). Textbook sequential tests lose to max-type rules on almost every set. The preregistered cross-session test pooled over nine monitor families gives top-3 sum $-$ max $-0.066\ci{-0.147}{+0.015}$ \tC. No rule beats max on any of 8 MOLE corpora \tC, no rule chooser beats always-max out of sample, and max is also best on every probe stream. Positive cases exist (GPT-4o $+0.134\ci{+0.024}{+0.217}$) but are monitor- and read-out-specific.
+\item \textbf{Evaluation pitfalls that changed conclusions} (Section~\ref{sec:pitfalls}): the plug-in threshold running hot at low FPR; label leakage through reasoning and length; truncation asymmetry between monitors; pooled non-inferiority hiding per-setting failures; trajectory vs task resampling; and LLM-judged attack validity vs execution.
 \end{enumerate}
 
 \section{Results at a glance}
 \begin{figure}[H]\centering
 \includegraphics[width=\linewidth]{overview.pdf}
-\caption{Audit-verified effects with corrected 95\% CIs. Colored = CI excludes zero; gray = not significant. Sources: \texttt{results/fixes/corrections.csv}, \texttt{results/audit2/corrections.csv}, \texttt{results/t2/tables.md}, \texttt{results/r3\_t3/paired\_contrasts.md}, \texttt{results/wb/tables.md}.}
+\caption{Headline effects with corrected 95\% CIs under the conformal threshold rule. Colored = CI excludes zero; gray = not significant. Panels (a)--(d) and the first three rows of (e) are read from \texttt{results/fixes2/headline\_threshold\_rerun.csv}; the remaining rows of (e) from \texttt{results/r5\_luna/} and \texttt{results/r5\_watch/} (\texttt{make\_overview\_fig.py}). Panel (c), third row: detection only, with rewrite validity ignored (it was mislabeled ``valid rewrites'' in the October 22 version).}
 \end{figure}
 
-\section{The four research directions}\label{sec:ideas}
+\section{The five research directions}\label{sec:ideas}
 
 \subsection{Idea 1: accumulation vs max at a matched budget}
-\textbf{Ran.}
-\begin{itemize}
-\item \textbf{Round 1:} 46 real score-stream sets (aksh-n, LinuxArena sweep, MRT, persistent state), plus a controlled experiment: MonitoringBench re-scored per step by \texttt{gpt-4.1-mini} with full history vs none.
-\item \textbf{Round 2:} cross-session re-scoring of persistent state with three new monitor families; MOLE (30-day accounts); a data-driven rule chooser.
-\item \textbf{Round 3:} all 8 MOLE corpora under one common monitor, with activity and account-centering controls; long unreset streams; four ``re-flagging'' monitor designs.
-\end{itemize}
+\textbf{Ran.} Round 1: 40 existing stream sets and a controlled history experiment on MonitoringBench. Round 2: cross-session persistent state with four monitors, MOLE, a rule chooser. Round 3: all 8 MOLE corpora under one monitor, unreset streams, re-flagging monitor designs. Round 4 (preregistered): persistent state re-scored by nine monitor families with identical inputs, MOLE with a stronger day monitor (GPT-6 Luna), unreset streams with CIs.
 
 \textbf{Holds.}
 \begin{itemize}
-\item Max, 2nd-max and top-3 sum are strong defaults. Textbook sequential tests (CUSUM $k{=}0.5$, Shiryaev--Roberts, e-processes) lose to them on almost every set, partly because most honest steps score exactly 0.
-\item Cross-session accumulation with a history-free per-PR GPT-4o monitor: $+0.146$ [0.025, 0.226].
-\item On long unreset streams a forgetting rule (CUSUM) beats max: 0.71 vs 0.58 at ARL$_0$ = 100 PRs.
-\item On MOLE, no accumulation rule beats max on any of the 8 corpora (pooled 3rd-max $-0.066$ [$-0.156$, 0.023]).
+\item Max, 2nd-max and top-3 sum are strong defaults; textbook sequential tests lose almost everywhere \tE.
+\item Cross-session accumulation does not generalize: pooled over nine monitors, $-0.066\ci{-0.147}{+0.015}$ \tC. After Holm only GPT-6 Luna's loss ($-0.42$) is significant.
+\item MOLE: no accumulation rule beats max on any of 8 corpora ($-0.064\ci{-0.151}{+0.024}$) \tC. A stronger day monitor does not create a gain ($+0.047\ci{-0.026}{+0.125}$) \tC.
+\item No rule chooser beats always-max out of sample ($+0.001\ci{-0.006}{+0.009}$) \tE.
 \end{itemize}
-
 \textbf{Weakened.}
 \begin{itemize}
-\item The \texttt{gpt-4.1-mini} cross-session gain: $+0.145$ [$-0.001$, 0.228].
-\item The repeat-spike mechanism: descriptive only once dependence between cells is accounted for.
+\item GPT-4o history-free cross-session gain $+0.134\ci{+0.024}{+0.217}$ \tE: real, but one monitor.
+\item \texttt{gpt-4.1-mini}'s $+0.145\ci{+0.007}{+0.230}$ appears only with its logprob-expected read-out. The integer read-out of the same calls gives $-0.03$ (audit 3).
+\item The unreset-stream CUSUM result (0.72 vs 0.59) holds as computed, but with CIs it is $+0.132\ci{-0.086}{+0.296}$ \tC. No forgetting rule beats max pooled over nine monitors.
 \end{itemize}
-
-\textbf{Dropped.}
-\begin{itemize}
-\item The rule chooser's gain ($+0.001$ with nested calibration).
-\item ``Accumulators gain more with history''. It was a prompt-instruction confound, and vanishes with prompts matched except for history.
-\item The Gemini and Qwen cross-session gains.
-\item The round-2 MOLE gain. It was never significant, and was largely an account-activity effect.
-\end{itemize}
+\textbf{Dropped.} ``Accumulators gain more with history'' (a prompt-instruction confound); the round-2 MOLE gain; the repeat-spike mechanism (not predictive across monitors, \tC); ``Luna's insider signal is account-level'' (it comes from attack days).
 
 \subsection{Idea 2: per-context thresholds}
-\textbf{Ran.}
-\begin{itemize}
-\item \textbf{Round 1:} heterogeneity measurement; budget-matched allocation (global, CFAR, Mondrian, partial pooling, max-detection, Stackelberg); context-selecting and poisoning attackers.
-\item \textbf{Round 2:} transfer across attack policies and datasets; multi-context poisoning; severity-weighted damage; probing attackers; white-box and strong-monitor panels (E5).
-\item \textbf{Round 3:} Watcher-like severity tiers.
-\end{itemize}
+\textbf{Ran.} Round 1: heterogeneity measurement, budget-matched allocation (global, CFAR, Mondrian, partial pooling, max-detection, Stackelberg), context-selecting and poisoning attackers. Round 2: transfer, multi-context poisoning, severity, probing attackers, white-box panels. Round 3: Watcher-like severity tiers. Round 4 (pre-specified): allocation at $B=1\%$ with many honest runs per context and exact spend matching.
 
 \textbf{Holds.}
 \begin{itemize}
-\item Honest-score heterogeneity is large across deployments and small within one. Probe scores are far more context-dependent than LLM scores ($\tau$ up to 3.79 vs $\le0.46$).
-\item CFAR is the worst rule against an attacker who chooses its context, and a few alarm-feedback probes break it.
-\item Stackelberg beats global at 5\% (0.97 vs 0.89).
-\item Partial pooling handles small per-context samples.
-\item Watcher-like severity tiers lose 0.06--0.12 to a plain suspicion threshold at 5\% and cannot run at 1\%.
+\item Heterogeneity is real across deployments, small within one, and large for probes ($\tau$ up to 3.79 vs $\le0.46$ for LLM monitors) \tE.
+\item CFAR is the worst rule against context selection: $-0.280$ at 1\% with exact spend, worst at every budget. A few alarm-feedback probes exploit it \tE.
+\item Stackelberg beats global at 5\% ($+0.076\ci{+0.026}{+0.124}$) \tE.
+\item Per-context rules have a spend floor of about $\sum_c w_c/(n_c+1)$, so they need roughly $1/B$ calibration runs per context \tE.
+\item A frozen trusted reference resists poisoning but over-spends under genuine drift; Watcher-like fixed severity tiers lose 0.06--0.12 to a plain suspicion threshold \tE.
 \end{itemize}
+\textbf{Weakened.} The preregistered Stackelberg gain at 1\% ($+0.107\ci{+0.024}{+0.152}$) \tC is driven by SHADE, and with main-task resampling the CI is $[-0.003, +0.251]$. The matching uses held-out honest data as the operating point: fair across rules, but not deployable. Fit on other side tasks, Stackelberg loses to global.
 
-\textbf{Weakened or dropped.}
-\begin{itemize}
-\item The 1\% Stackelberg gain is not established, and the ControlArena 1\% gain is dropped.
-\item ``CFAR doubles probe TPR'' was a spend artifact: at equal spend the gain is 1.3--1.5$\times$.
-\item Stackelberg fails when fit on different side tasks.
-\item The leave-one-context-out poisoning defense breaks when poison is spread across contexts. A frozen trusted reference holds, but over-spends under genuine drift.
-\end{itemize}
+\textbf{Dropped.} ``CFAR doubles probe TPR at 1\%'' (not estimable; 1.3--1.5$\times$ at equal spend); the ControlArena 1\% gain.
 
 \subsection{Idea 3: detector-aware attackers}
-\textbf{Ran.}
-\begin{itemize}
-\item \textbf{Round 1:} a \texttt{gpt-4.1} rewriter told the monitor prompt and detector, with \texttt{gpt-4.1-mini} as monitor.
-\item \textbf{Round 2:} a strong \texttt{gpt-4.1} monitor; an anti-condensation pacing attacker; an uninformed-rewrite control.
-\item \textbf{Round 3:} a different-family rewriter (Gemini 2.5 Pro); a check that fabricated outputs don't leak cues; realized FPR; replay feasibility.
-\end{itemize}
+\textbf{Ran.} Round 1: a \texttt{gpt-4.1} rewriter told the monitor prompt and detector. Round 2: a strong monitor, pacing attackers, an uninformed-rewrite control. Round 3: a different-family rewriter, a fabricated-output leak test, realized FPR, replay feasibility. Round 4 (preregistered): originals and rewrites replayed in BashArena with the official side-task scorers.
 
 \textbf{Holds.}
 \begin{itemize}
-\item Any LLM rewrite makes attacks easier to catch, whether the rewriter is the monitor's own model family or a different one: $-0.37$ [$-0.55$, $-0.19$] for the Gemini rewriter. About 60\% of that drop is broken attacks; detection only is $-0.14$ [$-0.30$, $-0.03$].
-\item Detector-aware pacing shows no significant strategy effect when compared one-shot against one-shot ($+0.087$ [$-0.032$, 0.183]).
-\item Max, CUSUM $k{=}1.5$ and top-3 sum hold nominal FPR. The multi-chart OR over-alarms (0.017--0.020 at a nominal 0.01).
-\item The covert-adversary $\sqrt{\text{ARL}}$ law is rejected in this setting: detection hinges on single conspicuous steps.
+\item No detectable effect of detector knowledge: pacing $-$ plain rewrite $+0.095\ci{-0.020}{+0.183}$ (round 2, strict validity) \tE and $-0.107\ci{-0.357}{+0.120}$ under execution validity \tC.
+\item Max, CUSUM $k=1.5$ and top-3 sum hold nominal FPR; the multi-chart OR runs 1.7--1.9$\times$ nominal \tE.
+\item Pacing costs validity, not detection: $-0.321\ci{-0.625}{-0.034}$, of which $-0.24$ is broken attacks \tE.
 \end{itemize}
+\textbf{Weakened.} ``Any LLM rewrite makes attacks easier to catch.'' With judge or static validity the drops were large and significant (gemini rewrite $-0.385\ci{-0.556}{-0.195}$; detection only $-0.157\ci{-0.299}{-0.026}$). Under execution validity the preregistered contrast is $-0.214\ci{-0.480}{+0.032}$ ($n=28$) \tC, and $-0.395\ci{-0.667}{-0.083}$ without firewall attacks \tE. No execution-validity cell survives Holm. The direction is consistent; significance is not established.
 
-\textbf{Retracted.}
+\textbf{Also found.} 24 of 33 ``successful'' originals reproduce in BashArena 1.1, and 8 of the 9 failures are firewall attacks (environment drift). Judge-invalid rewrites succeed 4 of 5 and 6 of 7 times.
+
+\textbf{Retracted.} Round 1's ``aware attacks backfire'' (no control) and round 2's ``$+0.21$ pacing gain'' (adaptive vs one-shot arms).
+
+\subsection{White-box track}
+\textbf{Ran.} A trusted Qwen3.5-27B reader on H200 pods, reading per step or with full history: a synthetic sabotage probe, Apollo's deception probe, FAR.AI FIBS probes on step tokens and on a follow-up question, and a J-lens watch-list, all through the same decision layer. Round 4 (preregistered): replication on 1{,}000 new MonitoringBench attacks; regenerated LinuxArena streams with paired tests; a MOLE policy-activation arm with account-matched benign sessions.
+
+\textbf{Holds.}
 \begin{itemize}
-\item Round 1's ``aware attacks backfire'' (there was no control).
-\item Round 2's ``$+0.21$ pacing gain'' (an adaptive arm was compared with a one-shot control).
+\item The FIBS axial follow-up probe beats \texttt{gpt-4.1-mini}: $+0.194\ci{+0.089}{+0.288}$, and $+0.164$ at exactly 1.00\% FPR for both \tC.
+\item Sabotage-probe triage plus LLM: $+0.123\ci{+0.059}{+0.217}$ at matched realized FPR with about 87\% fewer LLM calls \tE.
+\item LinuxArena: the full-reading FIBS probe is Holm-significantly above 6--7 of 12 sweep monitors at nominal 1\% and below \texttt{claude-opus-4-6} \tC. Counts at exactly equal 1\% FPR are rule-dependent (one calibration point).
+\item MOLE with matched negatives: no AUROC difference between policy and reader, but at 5\% session FPR the reader detects more (policy $-$ reader $-0.24$), and the insider instruction lowers the policy probe's TPR ($-0.06$) \tC.
 \end{itemize}
+\textbf{Weakened or dropped.} The full-history sabotage probe ($+0.095$; Holm $p$ 0.22, opus-4-5 only). The full-history FIBS axial gain at equal FPR is dropped ($-0.015\ci{-0.055}{+0.097}$; the earlier $+0.061$ sat at a plug-in FPR floor). J-lens watch-lists are weak monitors (AUROC $\le0.72$).
 
-\subsection{White-box pilot}
-\textbf{Ran.}
+\subsection{Idea 05: decision-only models as first-stage monitors}
+\textbf{Ran.} JEV 1.14 (TypeSafe; label probabilities only, about \$0.04 per million input tokens) scored every step of MonitoringBench (511 honest, 1{,}637 attacks) and seven aksh-n settings: 421k held-out steps. The cascade escalates the top-$e$ share of steps to a cached per-step monitor; trajectory max; fixed trajectory FPR. Three preregistered arms:
 \begin{itemize}
-\item A Qwen3.5-27B trusted reader on two H200 pods, reading each transcript per step or with full history.
-\item Signals:
+\item round 1 (H1--H3) with nano, white-box probe, length, random and oracle gates;
+\item GPT-6 Luna Decisions vs JEV, vs nano, vs generative GPT-6 Luna, and full vs truncated actions (H5a--H5d), plus an addendum with generative Luna as MonitoringBench's strong second stage;
+\item a Watcher-style GPT-5.6 Luna severity stage (W1--W3).
+\end{itemize}
+Also: an exploratory length, format and truncation check, and self-hosted Perplexity Decider v1.2.
+
+\textbf{Holds} (1\% trajectory FPR).
+\begin{itemize}
+\item JEV triage beats nano triage on aksh-n by $+0.170\ci{+0.131}{+0.201}$, and Luna Decisions beats it by $+0.130$ \tC. Both compare first-stage designs (window and rubric vs a history-free prompt).
+\item JEV beats Watcher-style triage into generative Luna on MonitoringBench by $+0.093$ / $+0.049$ ($e=10/20\%$) \tC. Luna Decisions and Decider vs Watcher-style are not significant after Holm.
+\item JEV$\to$generative Luna is non-inferior to Luna on every step ($+0.051\ci{-0.004}{+0.106}$) \tC.
+\item The interface penalty: Luna Decisions vs generative Luna, $-0.158$ pooled and 0.04 vs 0.38 on MonitoringBench \tC. Luna Decisions routes worse than JEV on aksh-n ($-0.034\ci{-0.056}{-0.021}$) \tC.
+\item Full untruncated actions raise BashArena-opus-4-6 cascade TPR ($+0.110$ for Luna \tC). For JEV, 0.49$\to$0.76 matches Gemini alone (0.71) \tE.
+\item Confident JEV misses are shared with the LLM (1.1--5.9$\times$ the base miss rate), so confidence gating cannot rescue them \tE. The open Decider model routes as well as JEV \tE.
+\end{itemize}
+\textbf{Qualified.}
+\begin{itemize}
+\item H1-AK (JEV$\to$Gemini non-inferior to Gemini, $+0.005\ci{-0.014}{+0.028}$) is a cancellation of SHADE $+0.18$ and opus-4-6 $-0.22$. It is not non-inferior without SHADE ($-0.023$) or at 5\% FPR ($-0.025$).
+\item H1-MB and H3-MB use a degenerate weak second stage (mini TPR 0.10). H2-MB is not supported.
+\item Standalone JEV comparisons are at unequal FPR: JEV cannot get below about 2.2\% realized FPR on MonitoringBench, and on aksh-n Gemini saw full text.
+\end{itemize}
+\textbf{Not done.} Attacks that target the decision model; whether such a first stage is robust to an adaptive attacker remains open.
+
+\section{Evaluation pitfalls}\label{sec:pitfalls}
+These are methodological findings in their own right. Each changed at least one conclusion in this project.
+\begin{enumerate}
+\item \textbf{The plug-in threshold runs hot at low FPR.}
   \begin{itemize}
-  \item a synthetic sabotage probe;
-  \item Apollo's deception probe;
-  \item FAR.AI FIBS probes, read on the step tokens and on a follow-up question;
-  \item a J-lens watch-list.
+  \item The common randomized-quantile rule realizes $(\lfloor\alpha n\rfloor+1)/(n+1)$ for continuous scores: 1.98\% at $n=100$ and $\alpha=1\%$, 1.49\% at $n=200$. Randomizing at ties only fixes integer-score monitors.
+  \item Continuous probes were therefore compared with tied LLM scores at unequal realized FPR. Under a conformal rule with exact expected FPR, the full-history FIBS gain vanished ($+0.061\to-0.015$), and LinuxArena win counts moved.
+  \item Report realized FPR and compare monitors at equal realized FPR.
   \end{itemize}
-\item All signals passed through the decision layer (decision rules, per-context thresholds, LLM fusion, detector-aware rewrites).
-\item Data: MonitoringBench, LinuxArena, and MOLE policy-vs-reader.
-\end{itemize}
-
-\textbf{Holds.}
-\begin{itemize}
-\item The FIBS follow-up probe, read per step, beats \texttt{gpt-4.1-mini} at 1\% FPR: $+0.21$ [0.09, 0.32]. It is the only contrast that survives Holm correction across 18.
-\item Sabotage-probe triage plus LLM (13\% of steps) reaches 0.30 vs 0.17 at matched realized FPR.
-\item Pre-onset attack steps score like honest steps, so the probe is not leaking the attack in advance.
-\end{itemize}
-
-\textbf{Weakened.}
-\begin{itemize}
-\item The full-history sabotage probe gain ($+0.10$): Holm $p$ 0.22, and present only on one attack agent model.
-\item The full-history follow-up probe and the fusions built on it: its threshold does not transfer across tasks (2.05\% realized FPR at a nominal 1\%).
-\item The LinuxArena ranking and the round-1 rewrite comparison: their score files were lost in the final pod sync, so they are now unverifiable.
-\end{itemize}
-
-\textbf{Not supported.}
-\begin{itemize}
-\item J-lens watch-list readouts (AUROC $\le$ 0.72).
-\item Reading with the agent's own model beating the trusted reader on the sabotage probe.
-\end{itemize}
+\item \textbf{Reasoning and length leak the label in public benchmarks.}
+  \begin{itemize}
+  \item Agent reasoning length alone separates MonitoringBench honest from attack runs with AUROC 0.03 (honest runs have reasoning on every step, attacks on 43\%), and aksh-n LinuxArena with 0.81. No monitor we scored saw reasoning; externally computed scores cannot be checked.
+  \item Length alone reaches AUROC 0.84--0.95 on the BashArena sets and 0.90 on agentdojo, and step count 0.70 on MonitoringBench.
+  \end{itemize}
+\item \textbf{Truncation asymmetry.} Our pipeline keeps the head and tail of actions over 4{,}000 characters, while the datasets' own monitors scored full text. On BashArena-opus-4-6 attacks lose a median 52\% of action text, and the external monitor's top step is a truncated one in 75\% of them. Comparisons across monitors are only like-for-like when both saw the same text.
+\item \textbf{Pooled non-inferiority hides per-setting failures.} H1-AK passes pooled only because a SHADE gain cancels an opus-4-6 loss. Report per-setting, leave-one-out and equal-weight versions next to any pooled test.
+\item \textbf{Trajectory vs task resampling.} Settings with few main tasks (SHADE 5, iac 5, agentdojo 16) look precise when resampled by trajectory. The Idea 2 1\% primary goes from $[+0.024, +0.152]$ to $[-0.003, +0.251]$ with main-task resampling. Resample the unit that was sampled.
+\item \textbf{LLM-judged attack validity is not execution.} In BashArena replay the judge's validity label does not predict success (judge-invalid rewrites succeeded 4 of 5 and 6 of 7 times), and non-reproductions were mostly environment drift. Judge or static validity produced significant ``rewrites make attacks easier to catch'' effects that execution validity does not establish.
+\item \textbf{Read-out choice.} The same \texttt{gpt-4.1-mini} calls give a $+0.14$ accumulation gain with a logprob-expected score and $-0.03$ with the generated integer.
+\end{enumerate}
 
 \section{Recommendations for practitioners}
 \begin{enumerate}
-\item \textbf{Default trajectory rule:} max with a length-aware null where lengths differ; top-3 sum or CUSUM with $k\approx1.5$ as alternatives. Calibrate any OR combination \emph{jointly}, and verify realized FPR on held-out honest runs.
-\item \textbf{Accumulate across sessions only after checking} that repeated high scores are informative for your monitor and data. Prefer history-free per-session judgments, and use forgetting rules on long streams.
-\item \textbf{Per-context thresholds:}
-  \begin{itemize}
-  \item measure heterogeneity first;
-  \item never use CFAR when attackers can choose contexts;
-  \item use Stackelberg (damage-equalizing) allocation fit on attack data that resembles the threat, with shrinkage;
-  \item use partial pooling for small samples;
-  \item use a trusted frozen reference against poisoning.
-  \end{itemize}
-\item \textbf{Severity tiers} (Watcher-style) should be validated against an honest hit-rate before being wired in. Rank by suspicion, with one budget-matched threshold per deployment.
-\item \textbf{Red-teaming with LLM rewrites} must include an uninformed-rewrite control and strict validity checks; otherwise the rewrite artifact masquerades as a strategy effect.
-\item \textbf{White-box:} a probe read on a follow-up question is a cheap, strong complement to LLM monitors, and an efficient triage stage. Probe thresholds are strongly context-dependent, so calibrate per context.
+\item \textbf{Default trajectory rule:} max, with a length-aware null where lengths differ; top-3 sum or CUSUM with $k\approx1.5$ as alternatives. Calibrate any OR combination jointly. Use a threshold rule with exact FPR and verify realized FPR on held-out honest runs.
+\item \textbf{Accumulate across sessions only after checking} for your monitor, read-out and data; it does not generalize across monitor families.
+\item \textbf{Per-context thresholds:} measure heterogeneity first; never use CFAR when attackers can choose contexts; use Stackelberg allocation fit on threat-like attack data with shrinkage; budget about $1/B$ honest runs per context; use a frozen trusted reference against poisoning.
+\item \textbf{Severity is not suspicion.} Watcher-style severity tracks stakes, and on BashArena-style tasks most honest sessions contain high-severity steps. Validate tiers against an honest hit rate before wiring them in.
+\item \textbf{Cheap triage:} a windowed decision-only model or a white-box probe in front of a strong LLM monitor keeps detection at a fraction of the cost. Gate on suspicion, not confidence; give the first stage full text or add a length gate; do not use the decision model alone as the monitor.
+\item \textbf{Red-teaming with LLM rewrites} needs an uninformed-rewrite control and execution-grounded validity.
+\item \textbf{White-box:} a probe read on a follow-up question is a cheap complement to LLM monitors and an efficient triage stage. Calibrate probe thresholds per context.
 \end{enumerate}
 
 \section{What is new (to our knowledge, per the literature review)}
 \begin{itemize}
-\item A matched-budget comparison of sequential and anytime-valid statistics vs max on real AI-control score streams. It answers MonitoringBench's stated open question, largely in favor of max.
-\item Evidence, with corrected CIs, that cross-session accumulation of history-free judgments can beat max for some monitors. The source paper tested only a failing k-strikes rule.
-\item A per-context threshold study for control monitors: CFAR's failure under attack selection, the Stackelberg alternative, poisoning-robust baselines, and Watcher-like severity tiers.
-\item Evidence that LLM rewrite artifacts dominate detector-aware red-teaming, and that detector-aware pacing shows no measurable strategy effect once controlled.
-\item A trusted-reader white-box pipeline evaluated through the same decision layer, showing a follow-up-question probe beating a cheap LLM monitor at 1\% FPR, and efficient probe triage.
+\item A matched-budget comparison of sequential and anytime-valid statistics vs max on real AI-control score streams, including a preregistered test across nine monitor families. It answers MonitoringBench's stated open question, largely in favor of max.
+\item A per-context threshold study for control monitors: CFAR's failure under attack selection, the Stackelberg alternative, the spend floor, poisoning-robust baselines and Watcher-like tiers.
+\item Evidence that LLM rewrite artifacts dominate detector-aware red-teaming, and an execution-replay test of attack validity.
+\item A trusted-reader white-box pipeline through the same decision layer, with a preregistered replication of a probe beating a cheap LLM monitor.
+\item The first executed cascades with a decision-only first stage on agent-sabotage trajectories at fixed trajectory-level FPR, a same-model interface comparison, a Watcher-style triage comparison, and an open decision model in the same pipeline.
 \end{itemize}
 
 \section{Validity process and errata}
-The first audit found 2 critical, 9 major and 13 minor issues; the second found 4 major and 10 minor. All point estimates reproduced with independent code. The main corrections relative to the October 21 summary:
+Audit 1 found 2 critical, 9 major and 13 minor issues, and audit 2 found 4 major and 10 minor. Audit 3 (round 4 and Idea 05 round 1) lists 72 rows, led by the SHADE dependence of two primaries, firewall drift in replay, omitted preregistered analyses, read-out artifacts, FPR-mismatched wins, the threshold convention and truncation. Every headline number reproduced with independent code. Main changes relative to the October 22 summary:
 
 \begin{table}[H]\centering\small
 \begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{@{}llll@{}}
 \toprule
-Original claim (Oct 21) & Corrected & Verdict & Source\\
+Claim (Oct 22) & Now & Verdict & Source\\
 \midrule
-Cross-session gain $+0.15$ [0.12, 0.17] & GPT-4o $+0.146$ [0.025, 0.226]; gpt-4.1-mini [$-0.001$, 0.228] & holds / weakened & fixes C2\\
-Rule chooser $+0.023$ & $+0.001$ [$-0.014$, 0.013] (nested) & dropped & fixes M6\\
-Accumulators gain more with history & prompt confound; DiD $\approx 0$ with matched prompts & dropped & fixes M4\\
-CFAR doubles probe TPR at 1\% & 1\% not estimable; 1.3--1.5$\times$ at equal spend & dropped / weakened & fixes C1\\
-Aware attacks backfire (round 1) & rewrite artifact (control arm) & dropped & fixes M3\\
-Pacing vs control $+0.21$ & one-shot vs one-shot $+0.087$ [$-0.032$, 0.183] & weakened (n.s.) & fixes M1\\
-Gemini rewrite cost $-0.37$ & detection only $-0.14$ [$-0.30$, $-0.03$] & weakened & audit2 A4\\
-MOLE accumulation gain $+0.13$ & never significant; no rule beats max on 8 corpora & dropped & r3\_t1, audit2\\
-History-aware follow-up probe lead & threshold over-alarms (2.05\% at 1\%) & weakened & audit2 A1\\
+Cross-session GPT-4o $+0.146\ci{0.025}{0.226}$ & $+0.134\ci{+0.024}{+0.217}$ (conformal); 9-monitor pooled $-0.066$ & holds, does not generalize & fixes2, r4\_cs\\
+gpt-4.1-mini cross-session $[-0.001, 0.228]$ & $[+0.007, +0.230]$, but only with logprob read-out (integer $-0.03$) & weakened & audit3, fixes2\\
+Unreset CUSUM beats max (0.71 vs 0.58) & $+0.132\ci{-0.086}{+0.296}$ & not significant & r4\_cs\\
+Stackelberg $>$ global at 5\% & $+0.076$; 1\% primary met but SHADE-driven ($[-0.003, +0.251]$ by task) & holds / fragile & r4\_ctx, audit3\\
+Any rewrite makes attacks easier to catch & execution validity $-0.214\ci{-0.480}{+0.032}$ & weakened & r4\_replay\\
+Overview row ``valid rewrites'' $-0.143$ & detection only, validity ignored: $-0.157\ci{-0.299}{-0.026}$ & relabeled & fixes2\\
+FIBS follow-up probe beats mini (pilot) & replicated on held-out attacks, $+0.194$ & confirmed & r4\_wb\\
+Full-history FIBS probe lead & $-0.015$ at equal FPR (plug-in floor) & dropped & fixes2\\
+LinuxArena reader scores lost & regenerated; 6--7 of 12 above, below opus-4-6 & replaced & r4\_wb\\
+MOLE: policy does not beat reader & reader detects more at 5\% FPR ($-0.24$) & corrected & audit3\\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
@@ -218,49 +228,55 @@ History-aware follow-up probe lead & threshold over-alarms (2.05\% at 1\%) & wea
 
 \section{Budget, compute and artifacts}
 \begin{table}[H]\centering\small
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{@{}lrl@{}}
 \toprule
 Item & Spend & Notes\\
 \midrule
-Round 1 (OpenRouter) & \$195.56 & Ideas 1--3 initial experiments\\
-Round 2 (OpenRouter) & \$455.61 & Idea 1 \$147.89, Idea 3 \$304.77, white-box \$2.95\\
-Round 3 (OpenRouter) & \$294.20 & Idea 1 \$161.36, Idea 2 \$21.82, Idea 3 \$111.02\\
-Audit fixes (OpenRouter) & \$25.31 & matched-prompt re-scoring\\
+Idea 1 (OpenRouter) & \$562.34 & rounds 1--4: \$109.56, \$147.89, \$161.36, \$143.53\\
+Idea 2 & \$38.93 & rounds 1 and 3 (\$17.11, \$21.82); rounds 2 and 4 used cached scores\\
+Idea 3 & \$497.41 & rounds 1--4: \$68.36, \$304.77, \$111.02, \$13.26; replays ran locally\\
+White-box track & \$37.42 & pilot \$2.95, round 4 \$34.47\\
+Idea 05 & \$303.70 & dev \$5.34, round 1 \$82.08, Luna arm \$154.38, Watcher arm \$61.90\\
+Audit 1 re-scoring & \$25.31 & audits 2 and 3 and the threshold re-run: \$0\\
+Setup & \$0.53 & \\
 \midrule
-\textbf{OpenRouter total} & \textbf{\$970.69} & MATS account; no personal-key spend\\
-RunPod GPU & $\approx$\$72 & H200 pods for the white-box reader; all deleted\\
+\textbf{OpenRouter total} & \textbf{\$1{,}465.64} & per-call ledger outside the repository; it does not record which account paid\\
+RunPod GPU & $\approx$\$207 & white-box pilot $\approx$\$70, round 4 $\approx$\$70, Decider $\approx$\$67\\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
+All pods were on-demand on the MATS RunPod account (pilot: two H200; round 4: three H200 and one H100; Decider: one H100) and were deleted after outputs were copied off and verified.
 \begin{itemize}
-\item \textbf{Repository:} \url{https://github.com/gregkocher/agent-monitor-detection} (private). Code in \texttt{amd/} and \texttt{tracks/}, results in \texttt{results/}, write-ups in \texttt{docs/}.
-\item \textbf{Run history:} \texttt{EXPERIMENT\_LOG.md} has the full dated history.
-\item \textbf{Detailed reports:} \texttt{docs/reports/01\_Idea1\_Matched\_Budget.pdf}, \texttt{02\_Idea2\_Per\_Context\_Thresholds.pdf}, \texttt{03\_Idea3\_Aware\_Attacker.pdf}, \texttt{04\_WhiteBox\_Pilot.pdf}.
-\item \textbf{Literature:} \texttt{docs/research/} has the literature summary, idea ranking and reading cards.
+\item \textbf{Repository:} \url{https://github.com/gregkocher/agent-monitor-detection} (private). Code in \texttt{amd/} and \texttt{tracks/}, results in \texttt{results/}, write-ups in \texttt{docs/}; full dated history in \texttt{EXPERIMENT\_LOG.md}.
+\item \textbf{Detailed reports} in \texttt{docs/reports/}:
+  \begin{itemize}
+  \item \texttt{01\_Idea1\_Matched\_Budget.pdf}
+  \item \texttt{02\_Idea2\_Per\_Context\_Thresholds.pdf}
+  \item \texttt{03\_Idea3\_Aware\_Attacker.pdf}
+  \item \texttt{04\_WhiteBox\_Pilot.pdf}
+  \item \texttt{05\_Idea5\_Decision\_Model\_Monitors.pdf}
+  \end{itemize}
+\item \textbf{Literature:} \texttt{docs/research/} has the literature summary, idea ranking, reading cards and research notes.
 \end{itemize}
 
 \section{Limitations and next steps}
 \textbf{Limitations.}
 \begin{itemize}
-\item \textbf{Weak monitors and small samples.} The re-scored monitors are mostly cheap (\texttt{gpt-4.1-mini}/\texttt{gpt-4.1}). Many attack sets are small (35--150 base attacks), and honest sets are 200--550 runs. Low-FPR estimates are noisy.
-\item \textbf{Attacks were not executed.} Rewritten attacks were validated by LLM judge plus target-literal checks only.
-\item \textbf{Lost white-box files.} Some white-box score files were lost, and the LinuxArena reader results cannot be re-derived.
+\item \textbf{Offline replay of public benchmarks.} Almost everything runs on fixed, already-generated trajectories; only Idea 3 round 4 executed attacks. The benchmarks may be in the training data of the models used as monitors.
+\item \textbf{Weak comparators and small samples.} Several confirmed effects are against cheap monitors (\texttt{gpt-4.1-mini}). Honest sets of 200--550 runs put 1\% FPR on a handful of calibration exceedances, and several settings have few main tasks.
+\item \textbf{External scores.} The aksh-n Gemini and LinuxArena sweep scores are the dataset authors' outputs, computed on full text with inputs we cannot verify.
+\item \textbf{Closed, recent model versions} (JEV 1.14, GPT-6 Luna Decisions in beta, GPT-5.6 Luna) may not transfer to later versions.
+\item \textbf{No adaptive attacker against probes or decision-model first stages.} Attacks targeting the decision model were not run; this remains open.
 \end{itemize}
 
-\textbf{Recommended next steps}, in priority order:
+\textbf{Next steps}, in priority order:
 \begin{enumerate}
-\item \textbf{Execution replay of attacks} (\$0 API, laptop Docker). The infrastructure works. It needs:
-  \begin{itemize}
-  \item structured tool calls re-extracted from the source logs;
-  \item a rewriter that outputs structured calls.
-  \end{itemize}
-\item \textbf{White-box follow-ups:}
-  \begin{itemize}
-  \item a preregistered, Holm-controlled replication of the follow-up probe;
-  \item regenerating the lost score files;
-  \item a policy-activation arm with account-matched benign sessions.
-  \end{itemize}
-\item \textbf{Cross-session accumulation} with more monitors and longer real multi-session data, using the corrected bootstrap throughout.
-\item \textbf{Stackelberg allocation at 1\%}, with more honest runs per context so 1\% is reachable.
+\item \textbf{Strong comparators everywhere:} a frontier LLM monitor on the white-box MonitoringBench comparison, and strong second stages on all Idea 05 panels.
+\item \textbf{Full-text first stages:} re-run H1-AK with full-text JEV and a length gate, and separate the interface effect from prompt differences in H5c.
+\item \textbf{Adaptive attackers} against probes and decision-model first stages, with an uninformed-rewrite control and execution validity.
+\item \textbf{Stackelberg at 1\% with more main tasks}, so that the result does not rest on one 5-task setting.
+\item \textbf{Fresh on-policy rollouts} with reasoning retained, so policy and reader arms see identical text.
 \end{enumerate}
 \end{document}
